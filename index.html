@@ -313,6 +313,32 @@
     .info-card h4 { font-size: 17px; color: var(--primary-dark); margin-bottom: 8px; }
     .info-card p { font-size: 16px; color: var(--text-light); }
 
+    /* ---------- RESOURCES ---------- */
+    .resource-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.2s;
+    }
+    .resource-link:hover { color: var(--primary-dark); }
+    .resource-banner {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-top: 32px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border-left: 5px solid var(--accent);
+    }
+    .resource-banner p {
+      font-size: 17px;
+      color: var(--text);
+      line-height: 1.8;
+    }
+
     /* ---------- FOOTER ---------- */
     footer {
       background: var(--primary-dark);
@@ -522,6 +548,32 @@
       </div>
     </li>
   </ul>
+</section>
+
+<!-- RESOURCES -->
+<section id="resources" class="bg-alt">
+  <span class="section-icon">📚</span>
+  <h2 class="section-title">延伸學習資源</h2>
+  <p class="section-sub">從生活應用到技術實作，AI 學習路徑完整串連</p>
+
+  <div class="what-grid">
+    <div class="what-card">
+      <span class="what-icon">🌐</span>
+      <h3>網頁即時通訊工作坊</h3>
+      <p>Kevin Tsai｜SSE / WebSocket / WebRTC 實作，從瀏覽器到伺服器的即時技術完整攻略</p>
+      <a href="https://kevintsai1202.github.io/realtime-web-workshop/" target="_blank" class="resource-link">查看資源 →</a>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">📊</span>
+      <h3>富邦 API MCP Server</h3>
+      <p>Mofesto｜結合富邦證券 API 與 MCP 協議，用自然語言下單、控制台股 AI Agent 的開源專案</p>
+      <a href="https://github.com/Mofesto/fubon-api-mcp-server" target="_blank" class="resource-link">查看專案 →</a>
+    </div>
+  </div>
+
+  <div class="resource-banner">
+    <p>🤖 AI 不只是聊天機器人，還能結合語音、即時通訊、證券交易——<br>學完這堂課，你就知道 AI Agent 可以做到什麼。</p>
+  </div>
 </section>
 
 <!-- WHO -->
