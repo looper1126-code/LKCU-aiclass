@@ -1,457 +1,183 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI智慧生活應用｜林口社區大學 115年度秋季班</title>
-  <meta name="description" content="林口社區大學115年度秋季班 AI智慧生活應用課程，專為樂齡族設計，13週學會 ChatGPT、 LINE AI、Google Gemini 等實用工具。">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #0F4C75;
-      --primary-light: #1B6B93;
-      --primary-dark: #082B44;
-      --accent: #FF6B35;
-      --accent-light: #FF9A6C;
-      --accent-gradient: linear-gradient(135deg, #FF6B35 0%, #FF9A6C 100%);
-      --bg-warm: #FFF9F5;
-      --bg-card: #FFFFFF;
-      --text: #1A1A2E;
-      --text-medium: #4A4A68;
-      --text-light: #7A7A8C;
-      --success: #00C897;
-      --purple: #8B5CF6;
-      --pink: #EC4899;
-      --radius: 20px;
-      --radius-lg: 32px;
-      --shadow: 0 8px 32px rgba(0,0,0,0.08);
-      --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--text);
-      background: var(--bg-warm);
-      line-height: 1.8;
-      font-size: 18px;
-      overflow-x: hidden;
-    }
-    .bg-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-    .particle { position: absolute; border-radius: 50%; opacity: 0.4; animation: float 20s infinite ease-in-out; }
-    @keyframes float { 0%,100%{transform:translateY(0) rotate(0deg)} 25%{transform:translateY(-30px) rotate(90deg)} 50%{transform:translateY(0) rotate(180deg)} 75%{transform:translateY(30px) rotate(270deg)} }
-    .particle:nth-child(1) { width:300px; height:300px; background:radial-gradient(circle,rgba(255,107,53,0.1) 0%,transparent 70%); top:10%; right:-100px; animation-delay:0s; }
-    .particle:nth-child(2) { width:400px; height:400px; background:radial-gradient(circle,rgba(15,76,117,0.08) 0%,transparent 70%); bottom:20%; left:-150px; animation-delay:-5s; }
-    .particle:nth-child(3) { width:200px; height:200px; background:radial-gradient(circle,rgba(139,92,246,0.1) 0%,transparent 70%); top:50%; right:10%; animation-delay:-10s; }
-    
-    /* Nav */
-    .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 16px 32px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-    .nav.scrolled { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 12px 32px; }
-    .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .nav-logo { font-size: 1.3rem; font-weight: 700; color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-    .nav.scrolled .nav-logo { color: var(--primary-dark); }
-    .nav-logo-icon { width: 40px; height: 40px; background: var(--accent-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-    .nav-links { display: flex; gap: 8px; }
-    .nav-link { padding: 10px 18px; border-radius: 50px; text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: all 0.3s; color: white; opacity: 0.9; }
-    .nav-link:hover { background: rgba(255,255,255,0.2); opacity: 1; }
-    .nav.scrolled .nav-link { color: var(--text); opacity: 0.7; }
-    .nav.scrolled .nav-link:hover { background: var(--bg-warm); opacity: 1; }
-    .nav-cta { background: var(--accent-gradient); color: white !important; opacity: 1 !important; box-shadow: 0 4px 16px rgba(255,107,53,0.3); }
-    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,107,53,0.4); }
-    .mobile-toggle { display: none; flex-direction: column; gap: 6px; cursor: pointer; padding: 8px; }
-    .mobile-toggle span { width: 28px; height: 3px; background: white; border-radius: 2px; transition: all 0.3s; }
-    .nav.scrolled .mobile-toggle span { background: var(--primary-dark); }
-    
-    /* Hero */
-    .hero { min-height: 100vh; background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%); position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 120px 24px 80px; }
-    .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); opacity: 0.5; }
-    .hero-content { max-width: 900px; text-align: center; position: relative; z-index: 2; }
-    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px 24px; border-radius: 50px; color: white; font-size: 1rem; font-weight: 500; margin-bottom: 32px; border: 1px solid rgba(255,255,255,0.2); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
-    .hero-title { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900; color: white; line-height: 1.2; margin-bottom: 24px; text-shadow: 0 4px 24px rgba(0,0,0,0.2); }
-    .hero-title span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .hero-subtitle { font-size: clamp(1.2rem, 2.5vw, 1.6rem); color: rgba(255,255,255,0.9); margin-bottom: 48px; font-weight: 300; }
-    .hero-stats { display: flex; justify-content: center; gap: 48px; margin-bottom: 48px; flex-wrap: wrap; }
-    .hero-stat { text-align: center; }
-    .hero-stat-value { font-size: 3rem; font-weight: 900; color: white; line-height: 1; }
-    .hero-stat-value span { color: var(--accent); }
-    .hero-stat-label { color: rgba(255,255,255,0.7); font-size: 1rem; margin-top: 8px; }
-    .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 18px 36px; border-radius: 60px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; border: none; }
-    .btn-primary { background: var(--accent-gradient); color: white; box-shadow: 0 8px 32px rgba(255,107,53,0.4); }
-    .btn-primary:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 40px rgba(255,107,53,0.5); }
-    .btn-secondary { background: rgba(255,255,255,0.1); color: white; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
-    .btn-secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-4px); }
-    .hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; color: rgba(255,255,255,0.6); font-size: 0.9rem; animation: bounce 2s infinite; cursor: pointer; text-decoration: none; }
-    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(10px)} }
-    
-    /* Info Bar */
-    .info-bar { background: white; padding: 32px; border-radius: var(--radius-lg); box-shadow: var(--shadow); margin: -60px auto 60px; max-width: 1000px; position: relative; z-index: 10; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
-    .info-item { display: flex; align-items: center; gap: 16px; padding: 16px 24px; background: var(--bg-warm); border-radius: var(--radius); transition: all 0.3s; }
-    .info-item:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
-    .info-icon { font-size: 2rem; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; background: var(--accent-gradient); border-radius: 16px; flex-shrink: 0; }
-    .info-text { font-size: 0.95rem; }
-    .info-text strong { display: block; font-size: 1.1rem; color: var(--text); margin-bottom: 2px; }
-    .info-text span { color: var(--text-light); }
-    
-    /* Sections */
-    section { position: relative; z-index: 1; }
-    .section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
-    .section-header { text-align: center; margin-bottom: 64px; }
-    .section-badge { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(139,92,246,0.1) 100%); padding: 10px 20px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; color: var(--accent); margin-bottom: 16px; }
-    .section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: var(--text); margin-bottom: 16px; }
-    .section-desc { font-size: 1.15rem; color: var(--text-light); max-width: 600px; margin: 0 auto; }
-    
-    /* Audience */
-    .audience-section { background: linear-gradient(180deg, var(--bg-warm) 0%, white 100%); }
-    .audience-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-    .audience-card { background: white; border-radius: var(--radius-lg); padding: 40px 32px; text-align: center; box-shadow: var(--shadow); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; }
-    .audience-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); border-color: var(--accent); }
-    .audience-icon { font-size: 4rem; margin-bottom: 24px; }
-    .audience-title { font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
-    .audience-desc { color: var(--text-medium); line-height: 1.7; }
-    .audience-check { display: inline-flex; align-items: center; gap: 12px; margin-top: 24px; padding: 16px 24px; background: linear-gradient(135deg, rgba(0,200,151,0.1) 0%, rgba(0,200,151,0.05) 100%); border-radius: 16px; color: var(--success); font-weight: 600; }
-    
-    /* Weeks */
-    .weeks-section { background: white; }
-    .weeks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 32px; }
-    .week-card { background: var(--bg-warm); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-    .week-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: var(--shadow-hover); }
-    .week-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent-gradient); transform: scaleX(0); transition: transform 0.4s; }
-    .week-card:hover::before { transform: scaleX(1); }
-    .week-header { padding: 28px 28px 20px; display: flex; align-items: flex-start; gap: 20px; }
-    .week-number { width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 900; color: white; flex-shrink: 0; box-shadow: 0 8px 24px rgba(15,76,117,0.3); }
-    .week-header.special { background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%); box-shadow: 0 8px 24px rgba(139,92,246,0.3); }
-    .week-header.final { background: linear-gradient(135deg, var(--success) 0%, #00E5AA 100%); box-shadow: 0 8px 24px rgba(0,200,151,0.3); }
-    .week-title { font-size: 1.2rem; font-weight: 700; color: var(--text); line-height: 1.4; }
-    .week-emoji { font-size: 2.5rem; margin-bottom: 12px; }
-    .week-image { margin: 0 20px 20px; border-radius: var(--radius); overflow: hidden; position: relative; }
-    .week-image img { width: 100%; height: 180px; object-fit: cover; transition: transform 0.4s; }
-    .week-card:hover .week-image img { transform: scale(1.05); }
-    .week-image-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 16px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: white; font-size: 0.9rem; }
-    .week-steps { padding: 0 28px 28px; display: flex; flex-direction: column; gap: 12px; }
-    .week-step { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: white; border-radius: var(--radius); border-left: 4px solid var(--accent); transition: all 0.3s; }
-    .week-step:hover { transform: translateX(8px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-    .step-label { font-size: 0.85rem; font-weight: 700; color: var(--accent); min-width: 80px; }
-    .step-content { font-size: 0.95rem; color: var(--text-medium); }
-    
-    /* Instructor */
-    .instructor-section { background: linear-gradient(180deg, white 0%, var(--bg-warm) 100%); }
-    .instructor-card { background: white; border-radius: var(--radius-lg); padding: 64px; box-shadow: var(--shadow); display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: center; max-width: 900px; margin: 0 auto; }
-    .instructor-avatar { width: 180px; height: 180px; background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 5rem; box-shadow: 0 16px 48px rgba(15,76,117,0.2); }
-    .instructor-info { flex: 1; }
-    .instructor-name { font-size: 2rem; font-weight: 900; color: var(--text); margin-bottom: 8px; }
-    .instructor-title { font-size: 1.1rem; color: var(--accent); font-weight: 600; margin-bottom: 20px; }
-    .instructor-bio { color: var(--text-medium); line-height: 1.8; margin-bottom: 24px; }
-    .instructor-links { display: flex; gap: 16px; flex-wrap: wrap; }
-    .instructor-link { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bg-warm); border-radius: 50px; color: var(--primary); text-decoration: none; font-weight: 600; transition: all 0.3s; }
-    .instructor-link:hover { background: var(--primary); color: white; transform: translateY(-2px); }
-    
-    /* Register */
-    .register-section { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%); padding: 100px 24px; position: relative; overflow: hidden; }
-    .register-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
-    .register-content { max-width: 800px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
-    .register-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: white; margin-bottom: 24px; }
-    .register-desc { font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 48px; }
-    .register-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border-radius: var(--radius-lg); padding: 48px; border: 1px solid rgba(255,255,255,0.2); }
-    .register-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; text-align: left; margin-bottom: 40px; }
-    .register-item { display: flex; align-items: center; gap: 16px; padding: 20px; background: rgba(255,255,255,0.1); border-radius: var(--radius); color: white; }
-    .register-item-icon { font-size: 1.8rem; }
-    .register-item-text { font-size: 1.05rem; }
-    .register-item-text strong { display: block; margin-bottom: 4px; }
-    .register-item-text span { opacity: 0.8; }
-    
-    /* Footer */
-    .footer { background: var(--primary-dark); color: rgba(255,255,255,0.6); text-align: center; padding: 48px 24px; font-size: 1rem; }
-    .footer-logo { font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 16px; }
-    .footer-links { display: flex; justify-content: center; gap: 32px; margin-bottom: 24px; }
-    .footer-link { color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.3s; }
-    .footer-link:hover { color: var(--accent); }
-    
-    /* Floating CTA */
-    .floating-cta { position: fixed; bottom: 32px; right: 32px; z-index: 999; display: flex; align-items: center; gap: 12px; padding: 16px 28px; background: var(--accent-gradient); color: white; border-radius: 60px; text-decoration: none; font-weight: 700; font-size: 1rem; box-shadow: 0 8px 32px rgba(255,107,53,0.4); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; transform: translateY(100px); }
-    .floating-cta.visible { opacity: 1; transform: translateY(0); }
-    .floating-cta:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 12px 40px rgba(255,107,53,0.5); }
-    
-    /* AOS */
-    [data-aos] { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important; }
-    
-    /* Responsive */
-    @media (max-width: 900px) {
-      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; flex-direction: column; padding: 24px; gap: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); border-radius: 0 0 var(--radius) var(--radius); }
-      .nav-links.active { display: flex; }
-      .nav-links .nav-link { color: var(--text) !important; opacity: 1 !important; }
-      .mobile-toggle { display: flex; }
-      .hero { padding: 100px 24px 60px; }
-      .hero-stats { gap: 32px; }
-      .info-bar { margin: -40px 16px 40px; padding: 24px; grid-template-columns: 1fr 1fr; }
-      .instructor-card { grid-template-columns: 1fr; text-align: center; padding: 40px; }
-      .instructor-avatar { margin: 0 auto; }
-      .instructor-links { justify-content: center; }
-    }
-    @media (max-width: 600px) {
-      .info-bar { grid-template-columns: 1fr; }
-      .weeks-grid { grid-template-columns: 1fr; }
-      .register-items { grid-template-columns: 1fr; }
-      .register-box { padding: 32px 24px; }
-      .hero-stat-value { font-size: 2.2rem; }
-      .floating-cta { bottom: 20px; right: 20px; padding: 14px 24px; font-size: 0.95rem; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI智慧生活應用｜林口社區大學 115年度秋季班</title>
+<meta name="description" content="林口社區大學115年度秋季班 AI智慧生活應用課程，專為樂齡族設計，13週學會 ChatGPT、Gemini、Google Lens、Suno、MyEdit 等實用工具。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+:root{--primary:#0F4C75;--primary-light:#1B6B93;--primary-dark:#082B44;--accent:#FF6B35;--accent-light:#FF9A6C;--accent-gradient:linear-gradient(135deg,#FF6B35 0%,#FF9A6C 100%);--bg-warm:#FFF9F5;--text:#1A1A2E;--text-medium:#4A4A68;--text-light:#7A7A8C;--success:#00C897;--purple:#8B5CF6;--pink:#EC4899;--radius:20px;--radius-lg:32px;--shadow:0 8px 32px rgba(0,0,0,0.08);--shadow-hover:0 16px 48px rgba(0,0,0,0.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC',-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text);background:var(--bg-warm);line-height:1.8;font-size:18px;overflow-x:hidden}
+.bg-particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;border-radius:50%;opacity:0.4;animation:float 20s infinite ease-in-out}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-30px) rotate(90deg)}50%{transform:translateY(0) rotate(180deg)}75%{transform:translateY(30px) rotate(270deg)}}
+.particle:nth-child(1){width:300px;height:300px;background:radial-gradient(circle,rgba(255,107,53,0.1) 0%,transparent 70%);top:10%;right:-100px}
+.particle:nth-child(2){width:400px;height:400px;background:radial-gradient(circle,rgba(15,76,117,0.08) 0%,transparent 70%);bottom:20%;left:-150px}
+.particle:nth-child(3){width:200px;height:200px;background:radial-gradient(circle,rgba(139,92,246,0.1) 0%,transparent 70%);top:50%;right:10%}
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 32px;transition:all 0.4s}
+.nav.scrolled{background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);box-shadow:0 4px 24px rgba(0,0,0,0.08);padding:12px 32px}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.nav-logo{font-size:1.3rem;font-weight:700;color:white;text-decoration:none;display:flex;align-items:center;gap:10px}
+.nav.scrolled .nav-logo{color:var(--primary-dark)}
+.nav-logo-icon{width:40px;height:40px;background:var(--accent-gradient);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.nav-links{display:flex;gap:8px}
+.nav-link{padding:10px 18px;border-radius:50px;text-decoration:none;font-weight:500;font-size:0.95rem;transition:all 0.3s;color:white;opacity:0.9}
+.nav-link:hover{background:rgba(255,255,255,0.2)}
+.nav.scrolled .nav-link{color:var(--text);opacity:0.7}
+.nav.scrolled .nav-link:hover{background:var(--bg-warm);opacity:1}
+.nav-cta{background:var(--accent-gradient);color:white!important;opacity:1!important;box-shadow:0 4px 16px rgba(255,107,53,0.3)}
+.mobile-toggle{display:none;flex-direction:column;gap:6px;cursor:pointer;padding:8px}
+.mobile-toggle span{width:28px;height:3px;background:white;border-radius:2px}
+.nav.scrolled .mobile-toggle span{background:var(--primary-dark)}
+.hero{min-height:100vh;background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 50%,var(--primary-light) 100%);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:120px 24px 80px}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");opacity:0.5}
+.hero-content{max-width:900px;text-align:center;position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:12px 24px;border-radius:50px;color:white;font-size:1rem;font-weight:500;margin-bottom:32px;border:1px solid rgba(255,255,255,0.2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.hero-title{font-size:clamp(2.5rem,6vw,4rem);font-weight:900;color:white;line-height:1.2;margin-bottom:24px;text-shadow:0 4px 24px rgba(0,0,0,0.2)}
+.hero-title span{background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(1.2rem,2.5vw,1.6rem);color:rgba(255,255,255,0.9);margin-bottom:48px;font-weight:300}
+.hero-stats{display:flex;justify-content:center;gap:48px;margin-bottom:48px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat-value{font-size:3rem;font-weight:900;color:white;line-height:1}
+.hero-stat-value span{color:var(--accent)}
+.hero-stat-label{color:rgba(255,255,255,0.7);font-size:1rem;margin-top:8px}
+.hero-buttons{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:18px 36px;border-radius:60px;text-decoration:none;font-weight:700;font-size:1.1rem;transition:all 0.4s;cursor:pointer;border:none}
+.btn-primary{background:var(--accent-gradient);color:white;box-shadow:0 8px 32px rgba(255,107,53,0.4)}
+.btn-primary:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 12px 40px rgba(255,107,53,0.5)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:white;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.3)}
+.btn-secondary:hover{background:rgba(255,255,255,0.2);transform:translateY(-4px)}
+.hero-scroll{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;color:rgba(255,255,255,0.6);font-size:0.9rem;animation:bounce 2s infinite;cursor:pointer;text-decoration:none}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(10px)}}
+.info-bar{background:white;padding:32px;border-radius:var(--radius-lg);box-shadow:var(--shadow);margin:-60px auto 60px;max-width:1000px;position:relative;z-index:10;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
+.info-item{display:flex;align-items:center;gap:16px;padding:16px 24px;background:var(--bg-warm);border-radius:var(--radius);transition:all 0.3s}
+.info-item:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+.info-icon{font-size:2rem;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:var(--accent-gradient);border-radius:16px;flex-shrink:0}
+.info-text{font-size:0.95rem}
+.info-text strong{display:block;font-size:1.1rem;color:var(--text);margin-bottom:2px}
+.info-text span{color:var(--text-light)}
+section{position:relative;z-index:1}
+.section{padding:80px 24px;max-width:1100px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:64px}
+.section-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(255,107,53,0.1) 0%,rgba(139,92,246,0.1) 100%);padding:10px 20px;border-radius:50px;font-size:0.9rem;font-weight:600;color:var(--accent);margin-bottom:16px}
+.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--text);margin-bottom:16px}
+.section-desc{font-size:1.15rem;color:var(--text-light);max-width:600px;margin:0 auto}
+.audience-section{background:linear-gradient(180deg,var(--bg-warm) 0%,white 100%)}
+.audience-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+.audience-card{background:white;border-radius:var(--radius-lg);padding:40px 32px;text-align:center;box-shadow:var(--shadow);transition:all 0.4s;border:2px solid transparent}
+.audience-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-hover);border-color:var(--accent)}
+.audience-icon{font-size:4rem;margin-bottom:24px}
+.audience-title{font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:12px}
+.audience-desc{color:var(--text-medium);line-height:1.7}
+.audience-check{display:inline-flex;align-items:center;gap:12px;margin-top:24px;padding:16px 24px;background:linear-gradient(135deg,rgba(0,200,151,0.1) 0%,rgba(0,200,151,0.05) 100%);border-radius:16px;color:var(--success);font-weight:600}
+.weeks-section{background:white}
+.weeks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:32px}
+.week-card{background:var(--bg-warm);border-radius:var(--radius-lg);overflow:hidden;transition:all 0.4s;position:relative}
+.week-card:hover{transform:translateY(-8px) scale(1.02);box-shadow:var(--shadow-hover)}
+.week-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent-gradient);transform:scaleX(0);transition:transform 0.4s}
+.week-card:hover::before{transform:scaleX(1)}
+.week-header{padding:28px 28px 20px;display:flex;align-items:flex-start;gap:20px}
+.week-number{width:64px;height:64px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;color:white;flex-shrink:0;box-shadow:0 8px 24px rgba(15,76,117,0.3)}
+.week-header.special{background:linear-gradient(135deg,var(--purple) 0%,var(--pink) 100%);box-shadow:0 8px 24px rgba(139,92,246,0.3)}
+.week-header.break{background:linear-gradient(135deg,#6B7280 0%,#9CA3AF 100%);box-shadow:0 8px 24px rgba(107,114,128,0.3)}
+.week-header.final{background:linear-gradient(135deg,var(--success) 0%,#00E5AA 100%);box-shadow:0 8px 24px rgba(0,200,151,0.3)}
+.week-title{font-size:1.2rem;font-weight:700;color:var(--text);line-height:1.4}
+.week-date{font-size:0.85rem;color:var(--text-light);margin-top:4px}
+.week-steps{padding:0 28px 28px;display:flex;flex-direction:column;gap:12px}
+.week-step{display:flex;align-items:flex-start;gap:12px;padding:16px;background:white;border-radius:var(--radius);border-left:4px solid var(--accent);transition:all 0.3s}
+.week-step:hover{transform:translateX(8px);box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+.step-label{font-size:0.85rem;font-weight:700;color:var(--accent);min-width:80px}
+.step-content{font-size:0.95rem;color:var(--text-medium)}
+.instructor-section{background:linear-gradient(180deg,white 0%,var(--bg-warm) 100%)}
+.instructor-card{background:white;border-radius:var(--radius-lg);padding:64px;box-shadow:var(--shadow);display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center;max-width:900px;margin:0 auto}
+.instructor-avatar{width:180px;height:180px;background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:5rem;box-shadow:0 16px 48px rgba(15,76,117,0.2)}
+.instructor-info{flex:1}
+.instructor-name{font-size:2rem;font-weight:900;color:var(--text);margin-bottom:8px}
+.instructor-title{font-size:1.1rem;color:var(--accent);font-weight:600;margin-bottom:20px}
+.instructor-bio{color:var(--text-medium);line-height:1.8;margin-bottom:24px}
+.instructor-links{display:flex;gap:16px;flex-wrap:wrap}
+.instructor-link{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg-warm);border-radius:50px;color:var(--primary);text-decoration:none;font-weight:600;transition:all 0.3s}
+.instructor-link:hover{background:var(--primary);color:white;transform:translateY(-2px)}
+.register-section{background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 50%,var(--primary-light) 100%);padding:100px 24px;position:relative;overflow:hidden}
+.register-section::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.register-content{max-width:800px;margin:0 auto;text-align:center;position:relative;z-index:2}
+.register-title{font-size:clamp(2rem,4vw,3rem);font-weight:900;color:white;margin-bottom:24px}
+.register-desc{font-size:1.2rem;color:rgba(255,255,255,0.8);margin-bottom:48px}
+.register-box{background:rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-radius:var(--radius-lg);padding:48px;border:1px solid rgba(255,255,255,0.2)}
+.register-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;text-align:left;margin-bottom:40px}
+.register-item{display:flex;align-items:center;gap:16px;padding:20px;background:rgba(255,255,255,0.1);border-radius:var(--radius);color:white}
+.register-item-icon{font-size:1.8rem}
+.register-item-text{font-size:1.05rem}
+.register-item-text strong{display:block;margin-bottom:4px}
+.register-item-text span{opacity:0.8}
+.footer{background:var(--primary-dark);color:rgba(255,255,255,0.6);text-align:center;padding:48px 24px;font-size:1rem}
+.footer-logo{font-size:1.4rem;font-weight:700;color:white;margin-bottom:16px}
+.footer-links{display:flex;justify-content:center;gap:32px;margin-bottom:24px}
+.footer-link{color:rgba(255,255,255,0.6);text-decoration:none;transition:color 0.3s}
+.footer-link:hover{color:var(--accent)}
+.floating-cta{position:fixed;bottom:32px;right:32px;z-index:999;display:flex;align-items:center;gap:12px;padding:16px 28px;background:var(--accent-gradient);color:white;border-radius:60px;text-decoration:none;font-weight:700;font-size:1rem;box-shadow:0 8px 32px rgba(255,107,53,0.4);transition:all 0.4s;opacity:0;transform:translateY(100px)}
+.floating-cta.visible{opacity:1;transform:translateY(0)}
+.floating-cta:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 12px 40px rgba(255,107,53,0.5)}
+[data-aos]{transition-timing-function:cubic-bezier(0.4,0,0.2,1)!important}
+@media(max-width:900px){.nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:white;flex-direction:column;padding:24px;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,0.1);border-radius:0 0 var(--radius) var(--radius)}.nav-links.active{display:flex}.nav-links .nav-link{color:var(--text)!important;opacity:1!important}.mobile-toggle{display:flex}.hero{padding:100px 24px 60px}.hero-stats{gap:32px}.info-bar{margin:-40px 16px 40px;padding:24px;grid-template-columns:1fr 1fr}.instructor-card{grid-template-columns:1fr;text-align:center;padding:40px}.instructor-avatar{margin:0 auto}.instructor-links{justify-content:center}}
+@media(max-width:600px){.info-bar{grid-template-columns:1fr}.weeks-grid{grid-template-columns:1fr}.register-items{grid-template-columns:1fr}.register-box{padding:32px 24px}.hero-stat-value{font-size:2.2rem}.floating-cta{bottom:20px;right:20px;padding:14px 24px;font-size:0.95rem}}
+</style>
 </head>
 <body>
-
-<div class="bg-particles">
-  <div class="particle"></div>
-  <div class="particle"></div>
-  <div class="particle"></div>
-</div>
-
-<nav class="nav" id="nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-logo"><div class="nav-logo-icon">📱</div><span>AI智慧生活</span></a>
-    <div class="nav-links" id="navLinks">
-      <a href="#audience" class="nav-link">誰適合</a>
-      <a href="#curriculum" class="nav-link">課程內容</a>
-      <a href="#instructor" class="nav-link">師資</a>
-      <a href="#register" class="nav-link nav-cta">立即報名</a>
-    </div>
-    <div class="mobile-toggle" id="mobileToggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
-  </div>
-</nav>
-
-<section class="hero" id="hero">
-  <div class="hero-content">
-    <div class="hero-badge">🎓 115年度秋季班限額招生中</div>
-    <h1 class="hero-title"><span>AI</span>智慧生活應用<br>樂齡族的第一堂AI課</h1>
-    <p class="hero-subtitle">13週完整學習 · 從零開始 · 學會改變生活的科技工具</p>
-    <div class="hero-stats">
-      <div class="hero-stat" data-aos="zoom-in" data-aos-delay="0"><div class="hero-stat-value">39<span>小時</span></div><div class="hero-stat-label">課程時數</div></div>
-      <div class="hero-stat" data-aos="zoom-in" data-aos-delay="100"><div class="hero-stat-value">13<span>週</span></div><div class="hero-stat-label">完整學習</div></div>
-      <div class="hero-stat" data-aos="zoom-in" data-aos-delay="200"><div class="hero-stat-value">8<span>單元</span></div><div class="hero-stat-label">實用技能</div></div>
-    </div>
-    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="400">
-      <a href="#register" class="btn btn-primary">📞 立即報名</a>
-      <a href="#curriculum" class="btn btn-secondary">查看課程大綱</a>
-    </div>
-  </div>
-  <a href="#audience" class="hero-scroll"><span>向下滑動探索</span><span>↓</span></a>
-</section>
-
-<div class="info-bar" data-aos="fade-up">
-  <div class="info-item"><div class="info-icon">📅</div><div class="info-text"><strong>9月4日開課</strong><span>每週五晚間</span></div></div>
-  <div class="info-item"><div class="info-icon">⏰</div><div class="info-text"><strong>19:00-22:00</strong><span>3小時/週</span></div></div>
-  <div class="info-item"><div class="info-icon">📍</div><div class="info-text"><strong>林口社區大學</strong><span>新北市林口區</span></div></div>
-  <div class="info-item"><div class="info-icon">🎓</div><div class="info-text"><strong>限額招生</strong><span>報名從速</span></div></div>
-</div>
-
-<section class="audience-section" id="audience">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge">👋 適合對象</div>
-      <h2 class="section-title">這門課是為你設計的嗎？</h2>
-      <p class="section-desc">不需要任何科技背景，我們會用最簡單的方式，一步一步帶你操作</p>
-    </div>
-    <div class="audience-cards">
-      <div class="audience-card" data-aos="fade-up" data-aos-delay="0">
-        <div class="audience-icon">📱</div>
-        <div class="audience-title">會用手機就會學</div>
-        <div class="audience-desc">不需要任何科技背景，只要會滑手機、會拍照就可以加入</div>
-        <div class="audience-check">✓ 零基礎 OK</div>
-      </div>
-      <div class="audience-card" data-aos="fade-up" data-aos-delay="100">
-        <div class="audience-icon">🏠</div>
-        <div class="audience-title">想要生活更便利</div>
-        <div class="audience-desc">想用 AI 工具讓日常生活更方便、省時、有趣的您</div>
-        <div class="audience-check">✓ 實用導向</div>
-      </div>
-      <div class="audience-card" data-aos="fade-up" data-aos-delay="200">
-        <div class="audience-icon">🤖</div>
-        <div class="audience-title">對 AI 有興趣</div>
-        <div class="audience-desc">對 AI 好奇但不知道從哪裡開始，我們帶你踏出第一步</div>
-        <div class="audience-check">✓ 輕鬆入門</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="weeks-section" id="curriculum">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge">📚 課程內容</div>
-      <h2 class="section-title">13週滿滿乾貨</h2>
-      <p class="section-desc">每週一個主題，學會實際可用的技能</p>
-    </div>
-    <div class="weeks-grid">
-      <div class="week-card" data-aos="fade-up">
-        <div class="week-header"><div class="week-number">1</div><div class="week-title">🤖 認識 AI 助手：ChatGPT 是什麼？</div></div>
-        <div class="week-image"><img src="week-images/week01.jpg" alt="ChatGPT"><div class="week-image-caption">📱 這是 ChatGPT 手機版畫面</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">認識 AI 聊天機器人，了解它能幫我們做什麼</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">打開手機 APP，跟著老師一步一步設定</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">可以問 AI 問題，得到生活大小事的答案</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="50">
-        <div class="week-header"><div class="week-number">2</div><div class="week-title">💬 LINE 結合 AI 聊天機器人</div></div>
-        <div class="week-image"><img src="week-images/week02.jpg" alt="LINE AI"><div class="week-image-caption">💬 用 LINE 就能問 AI 問題</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">把 AI 加到 LINE 裡面</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">加入 LINE 官方帳號，設定自己的小幫手</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">在 LINE 裡問天氣、翻譯、查資料</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="100">
-        <div class="week-header"><div class="week-number">3</div><div class="week-title">🗣️ 語音助理：Siri 與 Google 助理</div></div>
-        <div class="week-image"><img src="week-images/week03.jpg" alt="語音助理"><div class="week-image-caption">🗣️ 對著手機說話就能做事</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用說話指揮手機</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">長按手機按鈕，開口說出指令</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">說話就能設鬧鐘、查路線、播音樂</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="150">
-        <div class="week-header"><div class="week-number">4</div><div class="week-title">📸 AI 相機：Google Lens 應用</div></div>
-        <div class="week-image"><img src="week-images/week04.jpg" alt="Google Lens"><div class="week-image-caption">📸 拍照就知道這是什麼</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用相機辨識東西</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">打開 Google Lens，對著東西拍照</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">拍照翻譯英文、辨識不認識的植物花草</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="200">
-        <div class="week-header"><div class="week-number">5</div><div class="week-title">🎨 AI 圖片：搜尋與生成</div></div>
-        <div class="week-image"><img src="week-images/week05.jpg" alt="AI圖片"><div class="week-image-caption">🎨 用說明文字就能產出圖片</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 搜尋和生成圖片</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">輸入描述文字，找到想要的圖片</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">做出自己的賀卡、圖片、裝飾素材</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="250">
-        <div class="week-header special"><div class="week-number" style="background:linear-gradient(135deg,var(--purple),var(--pink))">6-7</div><div class="week-title">🎵 AI 音樂：Suno 創作自己的歌</div></div>
-        <div class="week-image"><img src="week-images/week06.jpg" alt="Suno音樂"><div class="week-image-caption">🎵 說出你的想法，AI幫你作詞作曲</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 做音樂</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">選擇曲風、寫歌詞，生成自己的歌</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">創作屬於自己的歌曲，分享給朋友</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="300">
-        <div class="week-header special"><div class="week-number" style="background:linear-gradient(135deg,var(--purple),var(--pink))">8-9</div><div class="week-title">🌟 Google AI：Gemini 助理</div></div>
-        <div class="week-image"><img src="week-images/week08.jpg" alt="Gemini"><div class="week-image-caption">🌟 Google 的 AI 小幫手</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 Google AI 幫忙做事</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">對著手機說出需求，AI 幫你處理</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">規劃旅遊、写文章、整理資料</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="350">
-        <div class="week-header"><div class="week-number">10-11</div><div class="week-title">📸 AI 修圖：美圖秀秀與更多</div></div>
-        <div class="week-image"><img src="week-images/week10.jpg" alt="AI修圖"><div class="week-image-caption">📸 一鍵美化你的照片</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">美化照片</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">用修圖 APP 一鍵美化</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">做出好看的照片、海報、貼文</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="400">
-        <div class="week-header"><div class="week-number">12</div><div class="week-title">🛡️ 安全上網與個資保護</div></div>
-        <div class="week-image"><img src="week-images/week12.jpg" alt="網路安全"><div class="week-image-caption">🛡️ 保護自己，安心上網</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">保護自己在網路上的安全</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">學會辨識假訊息和詐騙</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">安心上網，不會被騙</div></div>
-        </div>
-      </div>
-      <div class="week-card" data-aos="fade-up" data-aos-delay="450">
-        <div class="week-header final"><div class="week-number" style="background:linear-gradient(135deg,var(--success),#00E5AA)">13</div><div class="week-title">🎉 成果展示與總複習</div></div>
-        <div class="week-image"><img src="week-images/week13.jpg" alt="成果展示"><div class="week-image-caption">🎉 展示自己的作品</div></div>
-        <div class="week-steps">
-          <div class="week-step"><div class="step-label">📍 做什麼</div><div class="step-content">展示自己的作品</div></div>
-          <div class="week-step"><div class="step-label">✋ 怎麼做</div><div class="step-content">跟同學分享這學期學到的東西</div></div>
-          <div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">把 AI 應用帶回日常生活中</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="instructor-section" id="instructor">
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge">👨‍🏫 授課教師</div>
-      <h2 class="section-title">遇見你的老師</h2>
-    </div>
-    <div class="instructor-card" data-aos="fade-up">
-      <div class="instructor-avatar">👨‍🏫</div>
-      <div class="instructor-info">
-        <div class="instructor-name">Jerry Kao</div>
-        <div class="instructor-title">AI 智慧生活應用課程講師</div>
-        <p class="instructor-bio">致力於將複雜的 AI 工具轉化為簡單易懂的日常生活應用，幫助樂齡族建立數位自信。擁有豐富的教學經驗，授課風格親切耐心，強調「做中學」的實作導向。</p>
-        <div class="instructor-links">
-          <a href="https://youtube.com/@cooking-d4l" target="_blank" class="instructor-link">📺 烹飪 ASMR</a>
-          <a href="https://youtube.com/@oldman8481" target="_blank" class="instructor-link">📺 AI 教學</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="register-section" id="register">
-  <div class="register-content">
-    <h2 class="register-title">📋 報名資訊</h2>
-    <p class="register-desc">名額有限，動作要快！</p>
-    <div class="register-box" data-aos="fade-up">
-      <div class="register-items">
-        <div class="register-item"><div class="register-item-icon">📅</div><div class="register-item-text"><strong>開課日期</strong><span>115年9月4日（每週五）</span></div></div>
-        <div class="register-item"><div class="register-item-icon">⏰</div><div class="register-item-text"><strong>上課時間</strong><span>19:00 - 22:00（每週3小時）</span></div></div>
-        <div class="register-item"><div class="register-item-icon">📍</div><div class="register-item-text"><strong>上課地點</strong><span>林口社區大學</span></div></div>
-        <div class="register-item"><div class="register-item-icon">📚</div><div class="register-item-text"><strong>報名期限</strong><span>即日起至開課前一週</span></div></div>
-      </div>
-      <a href="tel:" class="btn btn-primary" style="background:white;color:var(--accent);">📞 立即致電報名</a>
-    </div>
-  </div>
-</section>
-
-<footer class="footer">
-  <div class="footer-logo">📱 AI智慧生活應用</div>
-  <div class="footer-links">
-    <a href="#audience" class="footer-link">誰適合</a>
-    <a href="#curriculum" class="footer-link">課程內容</a>
-    <a href="#instructor" class="footer-link">師資</a>
-    <a href="#register" class="footer-link">報名</a>
-  </div>
-  <p>林口社區大學 · 115年度秋季班</p>
-</footer>
-
+<div class="bg-particles"><div class="particle"></div><div class="particle"></div><div class="particle"></div></div>
+<nav class="nav" id="nav"><div class="nav-inner"><a href="#" class="nav-logo"><div class="nav-logo-icon">🤖</div><span>AI智慧生活</span></a><div class="nav-links" id="navLinks"><a href="#audience" class="nav-link">誰適合</a><a href="#curriculum" class="nav-link">課程內容</a><a href="#instructor" class="nav-link">師資</a><a href="#register" class="nav-link nav-cta">立即報名</a></div><div class="mobile-toggle" id="mobileToggle" onclick="toggleMenu()"><span></span><span></span><span></span></div></div></nav>
+<section class="hero" id="hero"><div class="hero-content"><div class="hero-badge">🎓 115年度秋季班限額招生中</div><h1 class="hero-title"><span>🤖 AI</span>智慧生活應用<br>樂齡族的第一堂AI課</h1><p class="hero-subtitle">📸 含真實 App 截圖操作教學 · 動口不動手，輕鬆變高手</p><div class="hero-stats"><div class="hero-stat" data-aos="zoom-in" data-aos-delay="0"><div class="hero-stat-value">39<span>小時</span></div><div class="hero-stat-label">課程時數</div></div><div class="hero-stat" data-aos="zoom-in" data-aos-delay="100"><div class="hero-stat-value">13<span>週</span></div><div class="hero-stat-label">完整學習</div></div><div class="hero-stat" data-aos="zoom-in" data-aos-delay="200"><div class="hero-stat-value">8<span>單元</span></div><div class="hero-stat-label">實用技能</div></div></div><div class="hero-buttons" data-aos="fade-up" data-aos-delay="400"><a href="#register" class="btn btn-primary">📞 立即報名</a><a href="#curriculum" class="btn btn-secondary">查看課程大綱</a></div></div><a href="#audience" class="hero-scroll"><span>向下滑動探索</span><span>↓</span></a></section>
+<div class="info-bar" data-aos="fade-up"><div class="info-item"><div class="info-icon">📅</div><div class="info-text"><strong>9月4日開課</strong><span>每週五上午</span></div></div><div class="info-item"><div class="info-icon">⏰</div><div class="info-text"><strong>09:00-12:00</strong><span>3小時/週</span></div></div><div class="info-item"><div class="info-icon">📍</div><div class="info-text"><strong>林口社區大學</strong><span>新北市林口區</span></div></div><div class="info-item"><div class="info-icon">🎓</div><div class="info-text"><strong>限額招生</strong><span>報名從速</span></div></div></div>
+<section class="audience-section" id="audience"><div class="section"><div class="section-header"><div class="section-badge">👋 適合對象</div><h2 class="section-title">這門課是為你設計的嗎？</h2><p class="section-desc">不需要任何科技背景，我們會用最簡單的方式，一步一步帶你操作</p></div><div class="audience-cards"><div class="audience-card" data-aos="fade-up" data-aos-delay="0"><div class="audience-icon">📱</div><div class="audience-title">會用手機就會學</div><div class="audience-desc">不需要任何科技背景，只要會滑手機、會拍照就可以加入</div><div class="audience-check">✓ 零基礎 OK</div></div><div class="audience-card" data-aos="fade-up" data-aos-delay="100"><div class="audience-icon">🏠</div><div class="audience-title">想要生活更便利</div><div class="audience-desc">想用 AI 工具讓日常生活更方便、省時、有趣的您</div><div class="audience-check">✓ 實用導向</div></div><div class="audience-card" data-aos="fade-up" data-aos-delay="200"><div class="audience-icon">🤖</div><div class="audience-title">對 AI 有興趣</div><div class="audience-desc">對 AI 好奇但不知道從哪裡開始，我們帶你踏出第一步</div><div class="audience-check">✓ 輕鬆入門</div></div></div></div></section>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">1</div><div><div class="week-title">🤖 AI 智慧生活：能說也會看──初體驗</div><div class="week-date">9/4</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">認識 AI、安裝 ChatGPT 與 Gemini、第一次語音對話</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">安裝 App、用語音輸入對 AI 說話、問三個常見問題</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">用 ChatGPT 和 Gemini 問問題、取得生活資訊答案</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">2</div><div><div class="week-title">🏥 AI 生活管家：養生及健康百科</div><div class="week-date">9/11</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 查養生食譜、Google Lens 智慧識圖、健康資訊使用守則</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">對 AI 描述健康需求、Google Lens 翻譯營養標示、辨識食品</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">用 AI 設計個人化食譜、拍照翻譯營養成分</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">3</div><div><div class="week-title">✈️ AI 智慧旅遊：規劃不求人</div><div class="week-date">9/18</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 規劃行程、找美食、算預算、結合 Google 地圖</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">輸入目的地和人數，AI 自動生成行程建議</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">自己用 AI 安排三天兩夜行程</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">4</div><div><div class="week-title">💬 AI 社交應用：安全與問候</div><div class="week-date">9/25</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 寫祝福語、數位防詐、兩步驟驗證設定</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">AI 生成 LINE 祝福訊息、學會識別假訊息</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">寫出打動人心的 LINE 祝福、保護帳號安全</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header special"><div class="week-number" style="background:linear-gradient(135deg,var(--purple),var(--pink))">5-6</div><div><div class="week-title">📸 AI 影像魔法：一鍵修圖術 + 美拍</div><div class="week-date">10/2-10/9</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">MyEdit 線上修圖、CapCut AI 短片、美圖秀秀自然美顏</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">用瀏覽器修圖、一鍵生成字幕配樂短片</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">修出自然漂亮的照片和旅遊回顧短片</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">7</div><div><div class="week-title">🎨 AI 創意應用：個人 LINE 貼圖</div><div class="week-date">10/16</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">LINE 拍貼功能、照片去背、趣味大字貼圖製作</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">上傳照片、去背修整、加上文字、上架審核</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">製作專屬 LINE 個人貼圖組</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">8</div><div><div class="week-title">🎵 AI 音樂創作：心情隨手彈</div><div class="week-date">10/23</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">認識 Suno AI 音樂創作、選擇曲風與主題</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">用文字描述歌曲需求、點 Create 生成</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">創作自己的專屬歌曲分享給朋友</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header break"><div class="week-number" style="background:linear-gradient(135deg,#6B7280,#9CA3AF)">9</div><div><div class="week-title">📖 公民教育週（自主複習）</div><div class="week-date">10/30</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">自主複習前八週所學內容</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">檢查清單確認各項技能是否熟練</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">預習提示詞、跟家人分享 AI 作品</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">10</div><div><div class="week-title">💡 AI 溝通技巧：提示詞魔法</div><div class="week-date">11/6</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">什麼是提示詞、黃金公式、三種常用模板</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">角色+任務+細節+格式、設計自己的萬用提示詞</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">精準對 AI 下指令、提高回覆品質</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">11</div><div><div class="week-title">🌍 AI 全球通：翻譯與場景實作</div><div class="week-date">11/13</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">AI 即時翻譯工具、Google 翻譯語音、出國旅遊五大場景</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">機場報到、餐廳點餐、飯店入住、問路、購物結帳</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">出國旅遊時用 AI 輕鬆與外語人士溝通</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">12</div><div><div class="week-title">📋 AI 生活作品總修整與回顧</div><div class="week-date">11/20</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">13週學習總回顧、個人作品整理大作戰</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">老師一對一疑難雜症指導、準備成果分享</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">整理並展示這學期所有 AI 作品</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header final"><div class="week-number" style="background:linear-gradient(135deg,var(--success),#00E5AA)">13</div><div><div class="week-title">🎉 AI 應用成果分享會</div><div class="week-date">11/27</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">學員成果分享、作品展示、結業證書頒發</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">上台報告 2-3 分鐘、師生座談會茶會</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">恭喜結業！把 AI 應用帶回日常生活</div></div></div></div>
+<section class="weeks-section" id="curriculum"><div class="section"><div class="section-header"><div class="section-badge">📚 課程內容</div><h2 class="section-title">13週滿滿乾貨</h2><p class="section-desc">每週一個主題，學會實際可用的技能</p></div><div class="weeks-grid">
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">1</div><div><div class="week-title">🤖 AI 智慧生活：能說也會看──初體驗</div><div class="week-date">9/4</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">認識 AI、安裝 ChatGPT 與 Gemini、第一次語音對話</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">安裝 App、用語音輸入對 AI 說話、問三個常見問題</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">用 ChatGPT 和 Gemini 問問題、取得生活資訊答案</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">2</div><div><div class="week-title">🏥 AI 生活管家：養生及健康百科</div><div class="week-date">9/11</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 查養生食譜、Google Lens 智慧識圖、健康資訊使用守則</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">對 AI 描述健康需求、Google Lens 翻譯營養標示、辨識食品</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">用 AI 設計個人化食譜、拍照翻譯營養成分</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">3</div><div><div class="week-title">✈️ AI 智慧旅遊：規劃不求人</div><div class="week-date">9/18</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 規劃行程、找美食、算預算、結合 Google 地圖</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">輸入目的地和人數，AI 自動生成行程建議</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">自己用 AI 安排三天兩夜行程</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">4</div><div><div class="week-title">💬 AI 社交應用：安全與問候</div><div class="week-date">9/25</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">用 AI 寫祝福語、數位防詐、兩步驟驗證設定</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">AI 生成 LINE 祝福訊息、學會識別假訊息</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">寫出打動人心的 LINE 祝福、保護帳號安全</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header special"><div class="week-number" style="background:linear-gradient(135deg,var(--purple),var(--pink))">5-6</div><div><div class="week-title">📸 AI 影像魔法：一鍵修圖術 + 美拍</div><div class="week-date">10/2-10/9</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">MyEdit 線上修圖、CapCut AI 短片、美圖秀秀自然美顏</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">用瀏覽器修圖、一鍵生成字幕配樂短片</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">修出自然漂亮的照片和旅遊回顧短片</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">7</div><div><div class="week-title">🎨 AI 創意應用：個人 LINE 貼圖</div><div class="week-date">10/16</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">LINE 拍貼功能、照片去背、趣味大字貼圖製作</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">上傳照片、去背修整、加上文字、上架審核</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">製作專屬 LINE 個人貼圖組</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">8</div><div><div class="week-title">🎵 AI 音樂創作：心情隨手彈</div><div class="week-date">10/23</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">認識 Suno AI 音樂創作、選擇曲風與主題</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">用文字描述歌曲需求、點 Create 生成</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">創作自己的專屬歌曲分享給朋友</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header break"><div class="week-number" style="background:linear-gradient(135deg,#6B7280,#9CA3AF)">9</div><div><div class="week-title">📖 公民教育週（自主複習）</div><div class="week-date">10/30</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">自主複習前八週所學內容</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">檢查清單確認各項技能是否熟練</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">預習提示詞、跟家人分享 AI 作品</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">10</div><div><div class="week-title">💡 AI 溝通技巧：提示詞魔法</div><div class="week-date">11/6</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">什麼是提示詞、黃金公式、三種常用模板</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">角色+任務+細節+格式、設計自己的萬用提示詞</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">精準對 AI 下指令、提高回覆品質</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">11</div><div><div class="week-title">🌍 AI 全球通：翻譯與場景實作</div><div class="week-date">11/13</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">AI 即時翻譯工具、Google 翻譯語音、出國旅遊五大場景</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">機場報到、餐廳點餐、飯店入住、問路、購物結帳</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">出國旅遊時用 AI 輕鬆與外語人士溝通</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header"><div class="week-number">12</div><div><div class="week-title">📋 AI 生活作品總修整與回顧</div><div class="week-date">11/20</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">13週學習總回顧、個人作品整理大作戰</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">老師一對一疑難雜症指導、準備成果分享</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">整理並展示這學期所有 AI 作品</div></div></div></div>
+<div class="week-card" data-aos="fade-up"><div class="week-header final"><div class="week-number" style="background:linear-gradient(135deg,var(--success),#00E5AA)">13</div><div><div class="week-title">🎉 AI 應用成果分享會</div><div class="week-date">11/27</div></div></div><div class="week-steps"><div class="week-step"><div class="step-label">📍 學什麼</div><div class="step-content">學員成果分享、作品展示、結業證書頒發</div></div><div class="week-step"><div class="step-label">✋ 怎麼操作</div><div class="step-content">上台報告 2-3 分鐘、師生座談會茶會</div></div><div class="week-step"><div class="step-label">🎯 學會做</div><div class="step-content">恭喜結業！把 AI 應用帶回日常生活</div></div></div></div>
+</div></div></section>
+<section class="instructor-section" id="instructor"><div class="section"><div class="section-header"><div class="section-badge">👨‍🏫 授課教師</div><h2 class="section-title">遇見你的老師</h2></div><div class="instructor-card" data-aos="fade-up"><div class="instructor-avatar">👨‍🏫</div><div class="instructor-info"><div class="instructor-name">Jerry Kao</div><div class="instructor-title">AI 智慧生活應用課程講師</div><p class="instructor-bio">致力於將複雜的 AI 工具轉化為簡單易懂的日常生活應用，幫助樂齡族建立數位自信。擁有豐富的教學經驗，授課風格親切耐心，強調「做中學」的實作導向。</p><div class="instructor-links"><a href="https://youtube.com/@cooking-d4l" target="_blank" class="instructor-link">📺 烹飪 ASMR</a><a href="https://youtube.com/@oldman8481" target="_blank" class="instructor-link">📺 AI 教學</a></div></div></div></div></section>
+<section class="register-section" id="register"><div class="register-content"><h2 class="register-title">📋 報名資訊</h2><p class="register-desc">名額有限，動作要快！</p><div class="register-box" data-aos="fade-up"><div class="register-items"><div class="register-item"><div class="register-item-icon">📅</div><div class="register-item-text"><strong>開課日期</strong><span>115年9月4日（每週五）</span></div></div><div class="register-item"><div class="register-item-icon">⏰</div><div class="register-item-text"><strong>上課時間</strong><span>09:00 - 12:00（每週3小時）</span></div></div><div class="register-item"><div class="register-item-icon">📍</div><div class="register-item-text"><strong>上課地點</strong><span>林口社區大學</span></div></div><div class="register-item"><div class="register-item-icon">📚</div><div class="register-item-text"><strong>報名期限</strong><span>即日起至開課前一週</span></div></div></div><a href="#" class="btn btn-primary" style="background:white;color:var(--accent);">📞 立即致電報名</a></div></div></section>
+<footer class="footer"><div class="footer-logo">🤖 AI智慧生活應用</div><div class="footer-links"><a href="#audience" class="footer-link">誰適合</a><a href="#curriculum" class="footer-link">課程內容</a><a href="#instructor" class="footer-link">師資</a><a href="#register" class="footer-link">報名</a></div><p>林口社區大學 · 115年度秋季班</p></footer>
 <a href="#register" class="floating-cta" id="floatingCta">📞 立即報名</a>
-
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
   AOS.init({ duration: 800, easing: 'ease-out-cubic', once: true, offset: 100 });
-  
-  // Nav scroll
   window.addEventListener('scroll', () => {
     const nav = document.getElementById('nav');
     nav.classList.toggle('scrolled', window.scrollY > 50);
     const cta = document.getElementById('floatingCta');
     cta.classList.toggle('visible', window.scrollY > 600);
   });
-  
-  // Mobile menu
-  function toggleMenu() {
-    document.getElementById('navLinks').classList.toggle('active');
-  }
-  
-  // Smooth scroll
+  function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
   document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const t = document.querySelector(a.getAttribute('href'));
-      if(t) { e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
-    });
+    a.addEventListener('click', e => { const t = document.querySelector(a.getAttribute('href')); if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); } });
   });
 </script>
 </body>
