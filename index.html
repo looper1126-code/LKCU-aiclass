@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI智慧生活應用｜動口不動手｜林口社區大學</title>
+  <style>
+    :root {
+      --primary: #2B6CB0;
+      --primary-dark: #1A4A7A;
+      --accent: #ED8936;
+      --accent-light: #FBD38D;
+      --bg: #FFFBF5;
+      --bg2: #FFF5E6;
+      --text: #2D3748;
+      --text-light: #4A5568;
+      --white: #FFFFFF;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 16px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 18px;
+    }
+
+    /* ---------- NAV ---------- */
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(255,251,245,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+      border-bottom: 2px solid var(--accent-light);
+      padding: 0 24px;
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+      max-width: 960px;
+      margin: 0 auto;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 0;
+    }
+    nav a {
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 17px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    nav a:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 60px;
+      background: linear-gradient(160deg, #EBF4FF 0%, #FFFBF5 60%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, var(--accent-light) 0%, transparent 70%);
+      opacity: 0.5;
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, #BEE3F8 0%, transparent 70%);
+      opacity: 0.4;
+      border-radius: 50%;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 6px 20px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 56px);
+      color: var(--primary-dark);
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero .subtitle {
+      font-size: clamp(20px, 3vw, 28px);
+      color: var(--text-light);
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+    .badge {
+      background: var(--white);
+      border: 2px solid var(--accent-light);
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow);
+    }
+    .badge .emoji { font-size: 22px; }
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      font-size: 20px;
+      font-weight: 700;
+      padding: 18px 40px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(237,137,54,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(237,137,54,0.45);
+    }
+    .btn-secondary {
+      background: var(--white);
+      color: var(--primary);
+      font-size: 20px;
+      font-weight: 700;
+      padding: 18px 40px;
+      border: 3px solid var(--primary);
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    /* ---------- SECTION ---------- */
+    section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 64px 24px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(26px, 4vw, 38px);
+      color: var(--primary-dark);
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center;
+      font-size: 18px;
+      color: var(--text-light);
+      margin-bottom: 48px;
+    }
+    .section-icon { font-size: 40px; margin-bottom: 16px; display: block; text-align: center; }
+
+    /* ---------- WHAT ---------- */
+    .bg-alt { background: var(--bg2); }
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .what-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .what-card:hover { transform: translateY(-4px); }
+    .what-icon { font-size: 52px; margin-bottom: 16px; display: block; }
+    .what-card h3 { font-size: 22px; color: var(--primary-dark); margin-bottom: 12px; }
+    .what-card p { font-size: 16px; color: var(--text-light); }
+
+    /* ---------- SCHEDULE ---------- */
+    .schedule-list { list-style: none; }
+    .schedule-list li {
+      display: flex;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 2px solid var(--accent-light);
+      align-items: flex-start;
+    }
+    .schedule-list li:last-child { border-bottom: none; }
+    .week-tag {
+      background: var(--primary);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 999px;
+      min-width: 80px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .week-content h4 { font-size: 20px; color: var(--primary-dark); margin-bottom: 6px; }
+    .week-content p { font-size: 16px; color: var(--text-light); margin: 0; }
+
+    /* ---------- WHO ---------- */
+    .who-flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: center;
+    }
+    .who-text { flex: 1 1 340px; }
+    .who-text h3 { font-size: 28px; color: var(--primary-dark); margin-bottom: 20px; }
+    .who-text ul { list-style: none; }
+    .who-text li {
+      font-size: 19px;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .who-text li::before { content: "✅"; font-size: 20px; }
+    .who-img {
+      flex: 1 1 280px;
+      text-align: center;
+    }
+    .who-img .emoji-big { font-size: 120px; display: block; margin-bottom: 16px; }
+    .who-img p {
+      font-size: 18px;
+      color: var(--text-light);
+      max-width: 240px;
+      margin: 0 auto;
+    }
+
+    /* ---------- QUOTE ---------- */
+    .quote {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: var(--white);
+      text-align: center;
+      padding: 72px 24px;
+    }
+    .quote blockquote {
+      font-size: clamp(24px, 4vw, 36px);
+      line-height: 1.6;
+      max-width: 760px;
+      margin: 0 auto 24px;
+      font-weight: 400;
+    }
+    .quote cite {
+      font-size: 18px;
+      opacity: 0.8;
+      font-style: normal;
+    }
+
+    /* ---------- CTA ---------- */
+    .cta-section { text-align: center; background: var(--bg2); }
+    .cta-section h2 { font-size: clamp(26px, 4vw, 38px); color: var(--primary-dark); margin-bottom: 16px; }
+    .cta-section p { font-size: 18px; color: var(--text-light); margin-bottom: 40px; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      max-width: 700px;
+      margin: 0 auto 40px;
+    }
+    .info-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .info-card .info-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+    .info-card h4 { font-size: 17px; color: var(--primary-dark); margin-bottom: 8px; }
+    .info-card p { font-size: 16px; color: var(--text-light); }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+      background: var(--primary-dark);
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 15px;
+    }
+    footer strong { color: var(--white); font-size: 17px; display: block; margin-bottom: 8px; }
+
+    /* ---------- ANIMATION ---------- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.6s ease both; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 600px) {
+      body { font-size: 17px; }
+      section { padding: 48px 16px; }
+      nav a { font-size: 15px; padding: 6px 12px; }
+      .hero { padding: 60px 16px 48px; }
+      .hero-badges { gap: 8px; }
+      .badge { font-size: 14px; padding: 8px 16px; }
+      .btn-primary, .btn-secondary { font-size: 18px; padding: 16px 32px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <ul>
+    <li><a href="#about">課程介紹</a></li>
+    <li><a href="#what">學什麼</a></li>
+    <li><a href="#schedule">時間表</a></li>
+    <li><a href="#who">誰適合</a></li>
+    <li><a href="#register">報名</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">📋 115年秋季班招生中</div>
+  <h1>AI智慧生活應用<br><span>動口不動手</span></h1>
+  <p class="subtitle">林口社區大學｜輕鬆學 AI，讓生活更方便</p>
+
+  <div class="hero-badges">
+    <div class="badge"><span class="emoji">🗣️</span> 動口不動手</div>
+    <div class="badge"><span class="emoji">📱</span> 生活實戰應用</div>
+    <div class="badge"><span class="emoji">👴</span> 樂齡友善</div>
+    <div class="badge"><span class="emoji">🎓</span> 13 週完整課程</div>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#register" class="btn-primary">立即報名</a>
+    <a href="#about" class="btn-secondary">了解課程</a>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <span class="section-icon">🏠</span>
+  <h2 class="section-title">這是什麼課？</h2>
+  <p class="section-sub">專為樂齡族設計的 AI 入門課，用生活情境帶你認識 AI 工具</p>
+
+  <div class="what-grid">
+    <div class="what-card fade-up">
+      <span class="what-icon">🤖</span>
+      <h3>ChatGPT / Gemini</h3>
+      <p>學會用自然語言跟 AI 對話，日常問題、生活大小事都可以問</p>
+    </div>
+    <div class="what-card fade-up">
+      <span class="what-icon">📸</span>
+      <h3>影像辨識與生成</h3>
+      <p>用手機鏡頭翻譯、查植物、找商品；用 AI 生成圖片表達創意</p>
+    </div>
+    <div class="what-card fade-up">
+      <span class="what-icon">🎵</span>
+      <h3>AI 音樂創作</h3>
+      <p>用 Suno 等工具創作自己的音樂，讓興趣更多元</p>
+    </div>
+    <div class="what-card fade-up">
+      <span class="what-icon">🗣️</span>
+      <h3>語音指令活用</h3>
+      <p>動口不下手，透過語音控制手機、查資料、設提醒</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT -->
+<section id="what" class="bg-alt">
+  <span class="section-icon">✨</span>
+  <h2 class="section-title">你會學到什麼</h2>
+  <p class="section-sub">13 週滿滿乾貨，理論與實作並行</p>
+
+  <div class="what-grid">
+    <div class="what-card">
+      <span class="what-icon">💬</span>
+      <h3>日常對話 AI</h3>
+      <p>LINE、ChatGPT、Gemini，用聊天解決生活問題</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🔍</span>
+      <h3>聰明查資料</h3>
+      <p>用 AI 快速找答案、整理資訊、做功課不失手</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🎨</span>
+      <h3>AI 圖片生成</h3>
+      <p>用 Lexica.art 搜尋創意圖片、用 AI 生成視覺素材</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🎶</span>
+      <h3>AI 音樂創作</h3>
+      <p>用 Suno 創作、編曲、配詞，輕鬆做出自己的歌</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">📱</span>
+      <h3>手機語音助理</h3>
+      <p>解放雙手，動口就能打電話、設鬧鐘、查天氣</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🛡️</span>
+      <h3>安全上網</h3>
+      <p>學會辨別假訊息、保護個資、安心使用 AI 工具</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section id="schedule">
+  <span class="section-icon">📅</span>
+  <h2 class="section-title">13 週課程表</h2>
+  <p class="section-sub">每週二 09:00 - 12:00｜9/4 開課｜11/25 結業</p>
+
+  <ul class="schedule-list">
+    <li>
+      <span class="week-tag">第 1 週</span>
+      <div class="week-content">
+        <h4>認識 AI 工具</h4>
+        <p>ChatGPT 是什麼？能做什麼？打開手機立刻開始體驗</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 2 週</span>
+      <div class="week-content">
+        <h4>LINE 與 AI 聊天機器人</h4>
+        <p>用 LINE 查天氣、翻譯、記錄生活，結合 AI 更聰明</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 3 週</span>
+      <div class="week-content">
+        <h4>語音助理實戰</h4>
+        <p>動口不下手——用 Siri / Google 助理處理日常大小事</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 4 週</span>
+      <div class="week-content">
+        <h4>Google Lens 視覺搜尋</h4>
+        <p>拍照翻譯、查植物、找商品——鏡頭就是你的百科全書</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 5 週</span>
+      <div class="week-content">
+        <h4>AI 圖片生成入門</h4>
+        <p>用 Lexica.art 搜尋圖片、用 AI 生成創意視覺素材</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 6-7 週</span>
+      <div class="week-content">
+        <h4>AI 音樂創作（Suno）</h4>
+        <p>創作自己的歌曲——選曲風、寫歌詞、生成完整作品</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 8-9 週</span>
+      <div class="week-content">
+        <h4>Gemini 應用實作</h4>
+        <p>Google AI 工具實戰——文件整理、旅遊規劃、學習輔助</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 10-11 週</span>
+      <div class="week-content">
+        <h4>影像工具應用</h4>
+        <p>美圖秀秀、AI 修圖、生成個人化視覺素材</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 12 週</span>
+      <div class="week-content">
+        <h4>安全上網與個資保護</h4>
+        <p>識別假訊息、保護帳號、安心使用 AI</p>
+      </div>
+    </li>
+    <li>
+      <span class="week-tag">第 13 週</span>
+      <div class="week-content">
+        <h4>成果展示與總複習</h4>
+        <p>分享作品、課程總結、延伸學習資源推薦</p>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- WHO -->
+<section id="who" class="bg-alt">
+  <div class="who-flex">
+    <div class="who-text">
+      <h3>誰適合這門課？</h3>
+      <ul>
+        <li>想認識 AI 但不知道從何開始</li>
+        <li>會用手機但想要更有效率</li>
+        <li>對新科技有興趣但不喜歡複雜的技術</li>
+        <li>想要讓生活更便利、更充實的樂齡朋友</li>
+        <li>願意帶著手機來實作、不怕動手體驗</li>
+      </ul>
+    </div>
+    <div class="who-img">
+      <span class="emoji-big">👨‍👩‍👧‍👦</span>
+      <p>不用會寫程式<br>不用擔心年紀<br>只要有好奇心就能來</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote">
+  <blockquote>「AI 不是要取代我們<br>而是讓我們生活更輕鬆」</blockquote>
+  <cite>— 課程理念</cite>
+</div>
+
+<!-- CTA / REGISTER -->
+<section id="register" class="cta-section">
+  <h2>準備好開始了嗎？</h2>
+  <p>115年秋季班｜9/4 開課｜林口社區大學</p>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="info-icon">📅</span>
+      <h4>上課時間</h4>
+      <p>每週二 09:00 - 12:00</p>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">📍</span>
+      <h4>上課地點</h4>
+      <p>林口社區大學</p>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">📅</span>
+      <h4>開課日期</h4>
+      <p>115年9月4日</p>
+    </div>
+    <div class="info-card">
+      <span class="info-icon">⏰</span>
+      <h4>課程時長</h4>
+      <p>13 週（共39小時）</p>
+    </div>
+  </div>
+
+  <div class="hero-cta" style="margin-bottom:32px">
+    <a href="#" class="btn-primary">立即報名</a>
+    <a href="https://kevintsai1202.github.io/realtime-web-workshop/" target="_blank" class="btn-secondary">延伸學習：即時通訊工作坊</a>
+  </div>
+
+  <p style="font-size:15px; color:var(--text-light); margin-top:16px;">
+    想更深入？推薦 Kevin Tsai「網頁即時通訊技術工作坊」<br>
+    從生活應用到技術實作，AI 學習路徑完整串連 ✨
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <strong>AI智慧生活應用｜動口不動手</strong>
+  林口社區大學 115年度秋季班<br>
+  授課教師：Jerry Kao｜烹飪 ASMR <a href="https://youtube.com/@cooking-d4l" target="_blank" style="color:#FBD38D">@cooking-d4l</a><br><br>
+  <small>© 2026 All rights reserved.</small>
+</footer>
+
+</body>
+</html>
