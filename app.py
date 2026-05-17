@@ -197,7 +197,11 @@ def get_week_content(week):
 # ========== 靜態檔案 ==========
 @app.route("/week-images/<path:filename>")
 def week_images(filename):
-    return send_from_directory("../week-images", filename)
+    return send_from_directory("week-images", filename)
+
+@app.route("/week-images-fixed/<path:filename>")
+def week_images_fixed(filename):
+    return send_from_directory("week-images-fixed", filename)
 
 @app.route("/lecture-notes/<path:filename>")
 def lecture_notes(filename):
