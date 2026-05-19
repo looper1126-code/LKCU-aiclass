@@ -115,9 +115,9 @@ def generate_week_content(week: int, topic: str) -> dict:
 }}"""
 
     payload = {
-        "model": "MiniMax-Text-01",
-        "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
-        "max_tokens": 600
+        "model": "MiniMax-M2.7",
+        "max_tokens": 600,
+        "messages": [{"role": "user", "content": prompt}]
     }
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
