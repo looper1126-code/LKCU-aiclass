@@ -121,7 +121,7 @@ def generate_week_content(week: int, topic: str) -> dict:
     }
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        f"{MINIMAX_API_HOST}/v1/text/chatcompletion_v2",
+        f"{MINIMAX_API_HOST}/anthropic/v1/messages",
         data=data,
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {MINIMAX_API_KEY}"},
         method="POST"
