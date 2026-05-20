@@ -70,19 +70,19 @@ def admin_required(f):
 # ========== MiniMax 課程內容產生 ==========
 
 COURSE_WEEKS = {
-    1: "認識 AI：聊天機器的原理",
-    2: "LINE AI 機器人：製作你的第一個客服",
-    3: "AI 影像生成：從文字變出圖片",
-    4: "AI 音樂創作：用 AI 譜曲",
-    5: "AI 簡報助手：快速製作專業簡報",
-    6: "AI 翻譯與文案：跨語言溝通無障礙",
-    7: "手機 AI App：把 AI 帶在身上走",
-    8: "AI 與生活：智慧管家應用",
-    9: "AI 學習術：打造個人化學習地圖",
-    10: "AI 職場應用：提升工作效率的秘密武器",
-    11: "AI 創意實作：結合烹飪與科技",
-    12: "AI 倫理與安全：負責任地使用 AI",
-    13: "成果展現：AI 應用總整理與未來展望",
+    1: "AI 初體驗：認識 AI、安裝 ChatGPT/Gemini",
+    2: "AI 生活管家：查食譜、智慧識圖",
+    3: "AI 智慧旅遊：規劃行程",
+    4: "AI 社交應用：祝福語、防詐",
+    5: "AI 修圖：MyEdit、CapCut",
+    6: "AI 美拍：美圖秀秀",
+    7: "LINE 個人貼圖",
+    8: "AI 音樂：Suno 創作",
+    9: "公民教育週（休息）",
+    10: "提示詞魔法",
+    11: "AI 翻譯：出國應用",
+    12: "作品整理回顧",
+    13: "成果分享會",
 }
 
 def generate_week_content(week: int, topic: str) -> dict:
@@ -90,7 +90,7 @@ def generate_week_content(week: int, topic: str) -> dict:
     week_title = COURSE_WEEKS.get(week, f"第{week}週：{topic}")
     prompt = f"""你是「AI智慧生活應用」課程的老師，請為學員產生本週（第{week}週）的課程內容。
 
-本週主題：「{week_title}」（老師指定：{topic}）
+本週主題：「{topic}」（第{week}週課程）
 
 請產生以下內容（用繁體中文，適合樂齡族學習）：
 
