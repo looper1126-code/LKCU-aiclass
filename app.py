@@ -132,10 +132,13 @@ def generate_week_content(week: int, topic: str) -> dict:
             # Anthropic 格式：{"content": [{"type": "text", "text": "..."}]}
             content_blocks = result.get("content", [])
             text = ""
+            texts = []
             for block in content_blocks:
                 if isinstance(block, dict) and block.get("type") == "text":
-                    text = block.get("text", "")
-                    break
+                    t = block.get("text", "")
+                    if t:
+                        texts.append(t)
+            text = "\n".join(texts)
             try:
                 json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
                 if json_match:
