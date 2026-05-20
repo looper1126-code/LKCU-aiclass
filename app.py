@@ -116,7 +116,7 @@ def generate_week_content(week: int, topic: str) -> dict:
 
     payload = {
         "model": "MiniMax-M2.7",
-        "max_tokens": 600,
+        "max_tokens": 1500,
         "messages": [{"role": "user", "content": prompt}]
     }
     data = json.dumps(payload).encode("utf-8")
