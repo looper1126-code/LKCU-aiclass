@@ -143,7 +143,6 @@ def generate_week_content(week: int, topic: str) -> dict:
                 json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
                 if json_match:
                     return json.loads(json_match.group(1))
-                brace_match = re.search(r"\{.*\}", content, re.DOTALL)
                 brace_match = re.search(r"\{.*\}", text, re.DOTALL)
                 if brace_match:
                     return json.loads(brace_match.group())
