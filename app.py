@@ -85,6 +85,22 @@ COURSE_WEEKS = {
     13: "成果分享會",
 }
 
+TOPIC_MAP = {
+    1: {"name": "AI 初體驗：認識 AI、安裝 ChatGPT/Gemini", "examples": "ChatGPT 是什麼、怎麼申請帳號、跟 AI 聊天是什麼感覺"},
+    2: {"name": "AI 生活管家：查食譜、智慧識圖", "examples": "用 AI 查食譜（如今晚吃什麼）、用 Google Lens 或 ChatGPT 識圖"},
+    3: {"name": "AI 智慧旅遊：規劃行程", "examples": "用 AI 規劃一日遊、推薦美食、翻譯景點解說"},
+    4: {"name": "AI 社交應用：祝福語、防詐", "examples": "春節中秋祝福語生成、辨識可疑訊息、防騙技巧"},
+    5: {"name": "AI 修圖：MyEdit、CapCut", "examples": "去背、裁切、加上文字、剪輯短影片"},
+    6: {"name": "AI 美拍：美圖秀秀", "examples": "美顏、濾鏡、拼圖、人像美容"},
+    7: {"name": "LINE 個人貼圖", "examples": "製作個人專屬 LINE 貼圖、上架、自己畫"},
+    8: {"name": "AI 音樂：Suno 創作", "examples": "用 Suno 生成喜歡的歌曲、詞曲創作、分享"},
+    9: {"name": "公民教育週（休息）", "examples": "休息"},
+    10: {"name": "提示詞魔法", "examples": "怎麼問 AI 才能得到好答案、有效的 Prompt 技巧"},
+    11: {"name": "AI 翻譯：出國應用", "examples": "出國翻譯神器、即時翻譯、點餐、問路"},
+    12: {"name": "作品整理回顧", "examples": "整理本學期作品、回顧所学、製作學習檔案"},
+    13: {"name": "成果分享會", "examples": "成果展示、分享心得、互相觀摩"},
+}
+
 def generate_week_content(week: int, topic: str) -> dict:
     """用 MiniMax M2.7 產生本週課程內容"""
     # 第9週是公民教育週，直接返回休息提示
