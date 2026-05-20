@@ -131,21 +131,22 @@ def generate_week_content(week: int, topic: str) -> dict:
             result = json.loads(resp.read())
             # Anthropic 格式：{"content": [{"type": "text", "text": "..."}]}
             content_blocks = result.get("content", [])
-            content = ""
+            text = ""
             for block in content_blocks:
                 if isinstance(block, dict) and block.get("type") == "text":
-                    content = block.get("text", "")
+                    text = block.get("text", "")
                     break
             try:
-                json_match = re.search(r"```json\s*(.*?)\s*```", content, re.DOTALL)
+                json_match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
                 if json_match:
                     return json.loads(json_match.group(1))
                 brace_match = re.search(r"\{.*\}", content, re.DOTALL)
+                brace_match = re.search(r"\{.*\}", text, re.DOTALL)
                 if brace_match:
                     return json.loads(brace_match.group())
             except json.JSONDecodeError:
                 pass
-            return {"raw": content}
+            return {"raw": text}
     except Exception as e:
         return {"error": str(e)}
 
