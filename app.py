@@ -87,6 +87,14 @@ COURSE_WEEKS = {
 
 def generate_week_content(week: int, topic: str) -> dict:
     """用 MiniMax M2.7 產生本週課程內容"""
+    # 第9週是公民教育週，直接返回休息提示
+    if week == 9:
+        return {
+            "summary": "本期課程暫停一次，學員可利用這週時間練習前面所學的 AI 工具，為後續課程做好準備。",
+            "resources": ["AI 工具練習建議 | 利用這週多練習前面學過的工具，例如 ChatGPT 對話、Google Lens 識圖等", "LINE 官方帳號 | 持續練習建立自己的 LINE Bot，加強熟悉度"],
+            "exercises": ["回顧第1-8週所學，選擇一個最喜歡的工具深入練習", "整理課堂筆記，為接下來的課程做好準備"],
+            "tip": "休息是為了走更遠的路！好好利用這週，回顧並熟練學過的內容吧！"
+        }
     week_title = COURSE_WEEKS.get(week, f"第{week}週：{topic}")
     prompt = f"""你是「AI智慧生活應用」課程的老師，請為學員產生本週（第{week}週）的課程內容。
 
