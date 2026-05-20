@@ -1211,11 +1211,13 @@ function populateWeekSelect() {
 // ========== Generate Content ==========
 async function generateContent() {
   const week = document.getElementById('gen-week').value;
-  const topic = document.getElementById('gen-topic').value.trim();
+  const userTopic = document.getElementById('gen-topic').value.trim();
+  const topic = userTopic || WEEK_TOPICS[week] || '';
   const btn = document.getElementById('gen-btn');
   const result = document.getElementById('gen-result');
 
   if (!week) { alert('請選擇週次'); return; }
+  if (!topic) { alert('找不到週次，請重新整理頁面'); return; }
 
   btn.disabled = true;
   btn.textContent = '產生中...';
