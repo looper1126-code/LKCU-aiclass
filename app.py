@@ -129,7 +129,13 @@ def generate_week_content(week: int, topic: str) -> dict:
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
             result = json.loads(resp.read())
-            content = result["choices"][0]["message"]["content"]
+            # Anthropic 格式：{"content": [{"type": "text", "text": "..."}]}
+            content_blocks = result.get("content", [])
+            content = ""
+            for block in content_blocks:
+                if isinstance(block, dict) and block.get("type") == "text":
+                    content = block.get("text", "")
+                    break
             try:
                 json_match = re.search(r"```json\s*(.*?)\s*```", content, re.DOTALL)
                 if json_match:
