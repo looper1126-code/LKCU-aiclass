@@ -25,7 +25,7 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "jerry1234")
 MINIMAX_API_KEY = os.environ.get("MINIMAX_API_KEY", "sk-cp-...")
 MINIMAX_API_HOST = os.environ.get("MINIMAX_API_HOST", "https://api.minimax.io")
 
-# ========== 靜態檔案（直接讀取）==========
+# ========== 靜態檔案 ==========
 @app.route("/")
 def index():
     return send_from_directory(".", "index.html")
@@ -33,11 +33,13 @@ def index():
 @app.route("/<path:filename>")
 def static_files(filename):
     """處理所有靜態檔案請求"""
-    # 嘗試不同目錄
     root_dirs = [".", "public"]
     for d in root_dirs:
         try:
             return send_from_directory(d, filename)
-        except:
-            pass
-    return send_from_directory(".", filename)  # 最後嘗試根目錄
+        except Exception as e:
+            continue
+    # 最後嘗試根目錄
+    return send_from_directory(".", filename)
+
+# ========== API ==========
