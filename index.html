@@ -400,6 +400,23 @@
     }
 
     .week-card-body {
+
+    /* Week link button */
+    .week-link {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: linear-gradient(90deg, #ff9500, #ff6d00);
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .week-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(255,149,0,0.4);
+    }
       padding: 20px;
     }
 
@@ -698,7 +715,8 @@
     <li><a href="#features">課程特色</a></li>
     <li><a href="#schedule">13週課程</a></li>
     <li><a href="#instructor">授課教師</a></li>
-    <li><a href="/course.html" target="_blank">📚 課程教材</a></li>
+    <li><a href="/course.html">📚 課程教材</a></li>
+    <li><a href="/course.html" target="blank">📚 課程教材</a></li>
     <li><a href="#register">我要報名</a></li>
   </ul>
   <button onclick="document.getElementById('teacher-panel').style.display=document.getElementById('teacher-panel').style.display==='none'?'block':'none'" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.85rem;">👤 老師</button>
@@ -829,7 +847,8 @@
         </div>
         <div class="week-card-body">
           <h3>AI 初體驗：認識 AI、安裝 ChatGPT/Gemini</h3>
-          <p>什麼是 AI？從聊天機器人開始了解未來趨勢，並在課堂上實際安裝 ChatGPT 與 Gemini 兩大工具，邁出 AI 體驗第一步。</p>
+          </p>
+          <a href="/course.html" class="week-link">📚 查看教材</a>
         </div>
       </div>
 
@@ -972,7 +991,7 @@
       <div       <!-- Week 10 提示詞範例 -->
       <div class="prompt-examples-section" style="background:#FFF8F0;padding:40px 24px;margin-top:24px;border-radius:16px;border:1px solid #E0E6ED;">
         <h3 style="font-size:1.3rem;color:#1A3A5C;margin-bottom:8px;">💡 ChatGPT Image 2.0 提示詞範例（50組精選）</h3>
-        <p style="font-size:0.85rem;color:#666;margin-bottom:24px;">來源：<a href="https://www.bnext.com.tw/article/90908/chatgpt-image-2-prompt-guide-complete" target="_blank" style="color:#E8912D;">數位時代｜ChatGPT Image 2.0 指令大全</a></p>
+        <p style="font-size:0.85rem;color:#666;margin-bottom:24px;">來源：<a href="https://www.bnext.com.tw/article/90908/chatgpt-image-2-prompt-guide-complete" target="blank" style="color:#E8912D;">數位時代｜ChatGPT Image 2.0 指令大全</a></p>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
           <div class="prompt-card" style="background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(26,58,92,0.08);">
             <div style="font-size:0.85rem;color:#E8912D;font-weight:700;margin-bottom:8px;">🍽️ 生活實用｜菜單設計</div>
@@ -1005,7 +1024,7 @@
             <div style="font-size:0.8rem;color:#888;">📌 應用：社群發文、照片回憶冊、個人形象照</div>
           </div>
         </div>
-        <p style="font-size:0.8rem;color:#888;margin-top:16px;">💡 更多範例（50組）：<a href="https://www.bnext.com.tw/article/90908/chatgpt-image-2-prompt-guide-complete" target="_blank" style="color:#E8912D;font-weight:600;">數位時代完整文章</a>｜涵蓋品牌社群、工作應用、生活實用、靈感創意、照片風格轉換五大類</p>
+        <p style="font-size:0.8rem;color:#888;margin-top:16px;">💡 更多範例（50組）：<a href="https://www.bnext.com.tw/article/90908/chatgpt-image-2-prompt-guide-complete" target="blank" style="color:#E8912D;font-weight:600;">數位時代完整文章</a>｜涵蓋品牌社群、工作應用、生活實用、靈感創意、照片風格轉換五大類</p>
       </div>
 
       <!-- Week 11 --><!-- Week 11 -->
@@ -1126,18 +1145,18 @@
 
 <script>
 // ========== Telegram Login ==========
-const BOT_TOKEN = '8147903549:AAEQ4d1O2o_X3szlDea0hW1LlCFBalKmT6I'; // @hermesidog_bot
+const BOTTOKEN = '8147903549:AAEQ4d1O2oX3szlDea0hW1LlCFBalKmT6I'; // @hermesidogbot
 
 async function telegramLogin() {
   try {
     const user = await Telegram.WebApp.initDataUnsafe;
     const initData = Telegram.WebApp.initData;
-    const resp = await fetch(`/api/telegram-login?init_data=${encodeURIComponent(initData)}`);
+    const resp = await fetch(`/api/telegram-login?initdata=${encodeURIComponent(initData)}`);
     const data = await resp.json();
     if (data.ok) {
       document.getElementById('teacher-login-area').style.display = 'none';
       document.getElementById('teacher-logged-area').style.display = 'block';
-      document.getElementById('teacher-name').textContent = data.user.first_name;
+      document.getElementById('teacher-name').textContent = data.user.firstname;
       document.getElementById('teacher-panel').style.display = 'block';
       populateWeekSelect();
     } else {
@@ -1183,7 +1202,7 @@ function showTelegramLogin() {
 }
 
 // ========== Week Select ==========
-const WEEK_TOPICS = {
+const WEEKTOPICS = {
   1:'AI 初體驗：認識 AI、安裝 ChatGPT/Gemini',
   2:'AI 生活管家：查食譜、智慧識圖',
   3:'AI 智慧旅遊：規劃行程',
@@ -1201,10 +1220,10 @@ const WEEK_TOPICS = {
 
 function populateWeekSelect() {
   const sel = document.getElementById('gen-week');
-  Object.keys(WEEK_TOPICS).forEach(w => {
+  Object.keys(WEEKTOPICS).forEach(w => {
     const opt = document.createElement('option');
     opt.value = w;
-    opt.textContent = `第${w}週｜${WEEK_TOPICS[w]}`;
+    opt.textContent = `第${w}週｜${WEEKTOPICS[w]}`;
     sel.appendChild(opt);
   });
 }
@@ -1213,7 +1232,7 @@ function populateWeekSelect() {
 async function generateContent() {
   const week = document.getElementById('gen-week').value;
   const userTopic = document.getElementById('gen-topic').value.trim();
-  const topic = userTopic || WEEK_TOPICS[week] || '';
+  const topic = userTopic || WEEKTOPICS[week] || '';
   const btn = document.getElementById('gen-btn');
   const result = document.getElementById('gen-result');
 
