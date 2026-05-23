@@ -266,3 +266,11 @@ def lecture_notes(filename):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 3000))
     app.run("0.0.0.0", port)
+
+@app.route("/course.html")
+def course():
+    return send_from_directory("public", "course.html")
+
+@app.route("/course_materials/<path:filename>")
+def course_materials(filename):
+    return send_from_directory("public/course_materials", filename)
