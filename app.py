@@ -182,6 +182,11 @@ def generate_week_content(week: int, topic: str) -> dict:
 def index():
     return send_from_directory(".", "index.html")
 
+# 指定路由
+@app.route("/course.html")
+def course_html():
+    return send_from_directory("public", "course.html")
+
 # 靜態檔案路由
 @app.route("/<path:filename>")
 def static_file(filename):
