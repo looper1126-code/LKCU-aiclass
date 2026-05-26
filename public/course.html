@@ -27,7 +27,6 @@
         }
         .subtitle { text-align: center; color: #888; margin-bottom: 20px; }
         
-        /* Week tabs */
         .week-tabs {
             display: flex;
             flex-wrap: wrap;
@@ -53,7 +52,6 @@
             border-color: transparent;
         }
         
-        /* Back button */
         .back-link {
             display: inline-block;
             color: #ff9500;
@@ -63,7 +61,6 @@
         }
         .back-link:hover { text-decoration: underline; }
         
-        /* Content */
         .content-box {
             background: rgba(255,255,255,0.03);
             border-radius: 16px;
@@ -118,7 +115,19 @@
         }
         
         .loading { text-align: center; padding: 40px; color: #666; }
-        
+        .error { color: #ff6b6b; text-align: center; padding: 20px; }
+        .pdf-link {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff9500, #ff6d00);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .pdf-link:hover { opacity: 0.9; }
+
         footer {
             text-align: center;
             margin-top: 30px;
@@ -132,9 +141,8 @@
         <a href="/" class="back-link">← 返回首頁</a>
         
         <h1>📚 課程教材</h1>
-        <p class="subtitle">AI 智慧生活應用｜13週完整教材 - 點擊各週查看內容</p>
+        <p class="subtitle">AI 智慧生活應用｜13週完整教材</p>
         
-        <!-- Week tabs -->
         <div class="week-tabs">
             <span class="week-tab active" data-week="1">第1週</span>
             <span class="week-tab" data-week="2">第2週</span>
@@ -151,7 +159,6 @@
             <span class="week-tab" data-week="13">第13週</span>
         </div>
         
-        <!-- Content -->
         <div class="content-box" id="content">
             <div class="loading">載入中...</div>
         </div>
@@ -163,264 +170,107 @@
     </div>
     
     <script>
-    const weekData = {
-        1: { title: "🤖 AI 初體驗", time: "19:00-22:00", content: `
-<h2>第1週｜AI 初體驗：認識 AI、安裝 ChatGPT/Gemini</h2>
-<h3>📅 課程資訊</h3>
-<ul>
-<li>授課日期：115年9月4日（週五）</li>
-<li>上課時間：19:00 - 22:00（共3小時）</li>
-<li>本週主題：什麼是 AI？從聊天機器人開始了解未來趨勢，並在課堂上實際安裝 ChatGPT 與 Gemini 兩大工具。</li>
-</ul>
+    // Week metadata for dates
+    const weekDates = {
+        1: { date: "9/4", title: "🤖 AI 初體驗：認識 AI、安裝 ChatGPT/Gemini" },
+        2: { date: "9/11", title: "🏠 AI 生活管家：查食譜、智慧識圖" },
+        3: { date: "9/18", title: "✈️ AI 智慧旅遊：規劃行程" },
+        4: { date: "9/25", title: "💬 AI 社交應用：祝福語、防詐" },
+        5: { date: "10/2", title: "🎨 AI 修圖：MyEdit、CapCut" },
+        6: { date: "10/9", title: "📸 AI 美拍：美圖秀秀" },
+        7: { date: "10/16", title: "🎭 LINE 個人貼圖" },
+        8: { date: "10/23", title: "🎵 AI 音樂：Suno 創作" },
+        9: { date: "10/30", title: "😴 公民教育週（休息）" },
+        10: { date: "11/6", title: "✨ 提示詞魔法" },
+        11: { date: "11/13", title: "🌐 AI 翻譯：出國應用" },
+        12: { date: "11/20", title: "📁 作品整理回顧" },
+        13: { date: "11/27", title: "🏆 成果分享會" }
+    };
 
-<h3>⏰ 時間安排（只有三節）</h3>
-<table>
-<tr><th>節次</th><th>時間</th><th>主題</th></tr>
-<tr><td>第一節</td><td>19:00-20:00</td><td>什麼是 AI？</td></tr>
-<tr><td>第二節</td><td>20:00-21:00</td><td>安裝 ChatGPT</td></tr>
-<tr><td>第三節</td><td>21:00-22:00</td><td>安裝 Gemini + 第一次對話體驗</td></tr>
-</table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>
+    // GitHub raw URLs for MD files
+    const weekUrls = {
+        1: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-01.md",
+        2: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-02.md",
+        3: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-03.md",
+        4: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-04.md",
+        5: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-05.md",
+        6: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-06.md",
+        7: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-07.md",
+        8: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-08.md",
+        9: null, // 公民教育週
+        10: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-10.md",
+        11: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-11.md",
+        12: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-12.md",
+        13: "https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/materials/week-13.md"
+    };
 
-<h3>✅ 課前準備</h3>
-<ul>
-<li>手機或平板（iOS 或 Android）</li>
-<li>Apple ID 或 Google 帳號</li>
-<li>確保手機已連接 Wi-Fi</li>
-<li>事前下載：LINE</li>
-</ul>
-
-<h3>📖 教學內容</h3>
-<h4>第一節：什麼是 AI？（19:00-20:00）</h4>
-<ul>
-<li><span class="highlight">比喻</span>：AI 就像很厲害的机器人秘书</li>
-<li><span class="highlight">生活例子</span>：Siri、Google 助理、导航、Netflix 推荐</li>
-<li><span class="highlight">AI 能做</span>：回答问题、写文章、做图、翻译、作曲</li>
-</ul>
-
-<h4>第二節：安裝 ChatGPT（20:00-21:00）</h4>
-<p>iOS/Android 步驟教学，现场安装注册</p>
-
-<h4>第三節：安裝 Gemini + 第一次对话体验（21:00-22:00）</h4>
-<p>Google AI 工具，与 ChatGPT 差異比較 + 每位學員对 AI 说一句话建立信心</p>
-
-<h3>💬 練習題目</h3>
-<ul>
-<li>「你好，我是[名字]，請多多指教」</li>
-<li>���今��天氣怎麼樣？」</li>
-<li>「教我做一道簡單的蛋炒飯」</li>
-</ul>
-
-<h3>📝 課後作業</h3>
-<ul>
-<li>每天和 ChatGPT 聊 5 分鐘</li>
-<li>把和 AI 的對話分享到 LINE 家庭群</li>
-</ul>
-        `},
-        
-        2: { title: "🏠 AI 生活管家", time: "19:00-22:00", content: `
-<h2>第2週｜AI 生活管家：查食譜、智慧識圖</h2>
-<h3>📅 課程資訊</h3>
-<ul>
-<li>授課日期：115年9月11日（週五）</li>
-<li>上課時間：19:00 - 22:00</li>
-<li>本週主題：用 AI 查菜餚、用 Google Lens 辨識植物、翻譯文句</li>
-</ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table>
-<tr><th>節次</th><th>時間</th><th>主題</th></tr>
-<tr><td>第一節</td><td>19:00-20:00</td><td>AI 查食譜</td></tr>
-<tr><td>第二節</td><td>20:00-21:00</td><td>Google Lens 智慧識圖</td></tr>
-<tr><td>第三節</td><td>21:00-22:00</td><td>AI 翻譯 + 生活疑難問答</td></tr>
-</table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>
-
-<h3>📱 教學內容</h3>
-<h4>第一節：AI 查食譜（19:00-20:00）</h4>
-<p>問法：「我冰箱有雞蛋、番茄能做什麼菜？」</p>
-<table>
-<tr><th>食材</th><th>問法</th></tr>
-<tr><td>剩飯、雞蛋</td><td>「剩飯加雞蛋能做什麼？」</td></tr>
-<tr><td>馬鈴薯</td><td>「馬鈴薯怎麼煮好吃？」</td></tr>
-</table>
-
-<h4>第二節：Google Lens 智慧識別（20:00-21:00）</h4>
-<p>對著植物拍照→知道植物名稱</p>
-<p>對著文字拍照→直接翻譯</p>
-
-<h4>第三節：AI 翻譯 + 生活疑難（21:00-22:00）</h4>
-<p>任何外文都能翻：日文、韓文、英文...</p>
-<p>各种生活问题都可以问 AI！</p>
-
-<h3>📝 課後作業</h3>
-<ul>
-<li>用 AI 查一次今晚的晚餐食譜</li>
-<li>用 Google Lens 拍一種家裡的植物</li>
-</ul>
-        `},
-        
-        3: { title: "✈️ AI 智慧旅遊", time: "19:00-22:00", content: `
-<h2>第3週｜AI 智慧旅遊：規劃行程</h2>
-<h3>📅 課程資訊</h3>
-<ul>
-<li>授課日期：115年9月18日（週五）</li>
-<li>上課時間：19:00 - 22:00</li>
-<li>本週主題：AI 幫你整合航班、景點、美食，輕鬆整理出專屬的旅遊攻略</li>
-</ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table>
-<tr><th>節次</th><th>時間</th><th>主題</th></tr>
-<tr><td>第一節</td><td>19:00-20:00</td><td>AI 規劃行程</td></tr>
-<tr><td>第二節</td><td>20:00-21:00</td><td>機票住宿比價</td></tr>
-<tr><td>第三節</td><td>21:00-22:00</td><td>景點美食 + 製作計畫</td></tr>
-</table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>
-
-<h3>💬 問法教學</h3>
-<table>
-<tr><th>目的地</th><th>問法</th></tr>
-<tr><td>東京</td><td>「幫我規劃東京5天4夜行程」</td></tr>
-<tr><td>首爾</td><td>「首爾3天2夜，求必吃美食」</td></tr>
-<tr><td>沖繩</td><td>「帶父母去沖繩4天3夜，輕鬆行程」</td></tr>
-</table>
-
-<h3>📱 省錢祕技</h3>
-<ul>
-<li>「什麼時候機票最便宜？」</li>
-<li>「[地點] 市中心推薦哪家飯店？」</li>
-<li>「[城市] 必玩的景點？」</li>
-</ul>
-        `},
-        
-        4: { title: "💬 AI 社交應用", time: "19:00-22:00", content: `
-<h2>第4週｜AI 社交應用：祝福語、防詐</h2>
-<h3>📅 課程資訊</h3>
-<ul>
-<li>授課日期：115年9月25日（週五）</li>
-<li>上課時間：19:00 - 22:00</li>
-<li>本週主題：AI 幫撰寫 LINE 祝福語、學會辨識詐騙手法</li>
-</ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table>
-<tr><th>節次</th><th>時間</th><th>主題</th></tr>
-<tr><td>第一節</td><td>19:00-20:00</td><td>AI 寫祝福語</td></tr>
-<tr><td>第二節</td><td>20:00-21:00</td><td>LINE 卡片製作</td></tr>
-<tr><td>第三節</td><td>21:00-22:00</td><td>防詐騙識別 + 實際演練</td></tr>
-</table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>
-
-<h3>💬 祝福語問法</h3>
-<table>
-<tr><th>場合</th><th>問法</th></tr>
-<tr><td>生日</td><td>「幫我寫生日祝福，要感人的」</td></tr>
-<tr><td>母親節</td><td>「母親節祝福，四句話以內」</td></tr>
-<tr><td>過年</td><td>「新年祝福長輩，四字成語」</td></tr>
-</table>
-
-<h3>🚨 防詐重點</h3>
-<ul>
-<li><span class="highlight">不貪</span>：穩賺不賠都是假的</li>
-<li><span class="highlight">不急</span>：逼你趕快匯款是騙局</li>
-<li><span class="highlight">不點</span>：不明連結不要點</li>
-<li><span class="highlight">不通</span>：借錢要打電話確認</li>
-</ul>
-
-<h3>📝 課後作業</h3>
-<ul>
-<li>製作一張祝 卡（用 Canva）</li>
-<li>加入 LINE 反詐騙：@tw165</li>
-</ul>
-        `},
-        
-        5: { title: "🎨 AI 修圖", time: "19:00-22:00", content: `
-<h2>第5週｜AI 修圖：MyEdit、CapCut</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年10月2日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：AI 修圖工具移除路人、調整尺寸</li></ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>認識工具</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>AI 去背</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>移除路人 + 調整輸出</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>
-
-<h3>📱 工具介紹</h3><ul><li>MyEdit：免費好用</li><li>CapCut：專業剪輯</li></ul>`},
-        
-        6: { title: "📸 AI 美拍", time: "19:00-22:00", content: `
-<h2>第6週｜AI 美拍：美圖秀秀</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年10月9日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：AI 美顏、濾鏡、貼圖</li></ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>認識工具</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>AI 美顏</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>濾鏡應用 + 封面製作</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>`},
-        
-        7: { title: "🎭 LINE 貼圖", time: "19:00-22:00", content: `
-<h2>第7週｜LINE 個人貼圖</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年10月16日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：製作並上架自己的 LINE 貼圖</li></ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>了解功能</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>素材準備</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>上傳審核 + 發布分享</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>`},
-        
-        8: { title: "🎵 AI 音樂", time: "19:00-22:00", content: `
-<h2>第8週｜AI 音樂：Suno 創作</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年10月23日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：用 Suno 創作自己的歌曲！</li></ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>初識 Suno</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>設定風格 + 輸入歌詞</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>生成下載 + 分享</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>`},
-        
-        9: { title: "😴 公民教育週", time: "19:00-22:00", content: `
+    // Week 9 static content
+    const week9Content = `
 <h2>第9週｜公民教育週（休息）</h2>
 <h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年10月30日（週五）</li><li>本週主題：課程暫停一次</li></ul>
-
+<ul>
+<li>授課日期：115年10月30日（週五）</li>
+<li>本週主題：課程暫停一次</li>
+</ul>
 <h3>📝 這週可以做什麼？</h3>
-<ul><li>複習之前所學 1-8 週</li><li>每天和 AI 聊天 10 分鐘</li><li>修一張滿意的照片</li><li>完善 LINE 貼圖素材</li></ul>`},
+<ul>
+<li>複習之前所學 1-8 週內容</li>
+<li>每天和 AI 聊天 10 分鐘</li>
+<li>修一張滿意的照片</li>
+<li>完善 LINE 貼圖素材</li>
+<li>用 Suno 創作一首歌曲</li>
+</ul>
+<h3>💡 複習建議</h3>
+<p>利用這週沒有上课的时间，好好练习前面学过的 AI 工具，把不熟的地方多加练习，下週继续学习会更顺手！</p>
+`;
+
+    // Simple MD to HTML converter
+    function mdToHtml(md) {
+        let html = md;
         
-        10: { title: "✨ 提示詞魔法", time: "19:00-22:00", content: `
-<h2>第10週｜提示詞魔法</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年11月6日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：學會跟 AI 好好說話！</li></ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>什麼是好的 Prompt</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>有效提問範例</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>常見錯誤修正 + 練習回饋</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>`},
+        // Escape HTML
+        html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         
-        11: { title: "🖼️ ChatGPT Image", time: "19:00-22:00", content: `
-<h2>第11週｜ChatGPT Image 2.0 提示詞範例</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年11月13日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：50組精選提示詞範例</li></ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>基礎功能</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>生活實用 + 工作應用</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>創意發想練習</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>`},
+        // Headers
+        html = html.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+        html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
         
-        12: { title: "🌐 AI 翻譯", time: "19:00-22:00", content: `
-<h2>第12週｜AI 翻譯：出國應用</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年11月20日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：出國旅遊翻譯應用</li></ul>
-
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>翻譯工具</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>機場 + 餐廳情境</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>商店對話 + 模擬演練</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>`},
+        // Bold
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         
-        13: { title: "🏆 作品整理", time: "19:00-22:00", content: `
-<h2>第13週｜作品整理回顧</h2>
-<h3>📅 課程資訊</h3>
-<ul><li>授課日期：115年11月27日（週五）</li><li>上課時間：19:00 - 22:00</li><li>本週主題：建立個人 AI 學習作品集</li></ul>
+        // Inline code
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // Lists
+        html = html.replace(/^\- (.+)$/gm, '<li>$1</li>');
+        html = html.replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>');
+        
+        // Wrap consecutive li in ul
+        html = html.replace(/(<li>.*<\/li>\n?)+/g, function(match) {
+            return '<ul>' + match + '</ul>';
+        });
+        
+        // Paragraphs
+        html = html.replace(/\n\n+/g, '</p><p>');
+        html = '<p>' + html + '</p>';
+        
+        // Clean up
+        html = html.replace(/<p>\s*<\/p>/g, '');
+        html = html.replace(/<p>(<h[23]>)/g, '$1');
+        html = html.replace(/(<\/h[23]>)<\/p>/g, '$1');
+        html = html.replace(/<p>(<ul>)/g, '$1');
+        html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+        html = html.replace(/<p>(<li>)/g, '$1');
+        html = html.replace(/(<\/li>)<\/p>/g, '$1');
+        html = html.replace(/<p>(<code>)/g, '$1');
+        html = html.replace(/(<\/code>)<\/p>/g, '$1');
+        html = html.replace(/<p>(<strong>)/g, '$1');
+        html = html.replace(/(<\/strong>)<\/p>/g, '$1');
+        
+        return html;
+    }
 
-<h3>⏰ 時間安排（只有三節）</h3>
-<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>回顧作品</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>整理成冊 + 雲端儲存</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>成果分享 + 結業證書</td></tr></table>
-<p class="note">※ 每節1小時，含上課50分 + 休息10分</p>
-
-<h3>🎓 結業證書</h3>
-<p>完成13週課程的學員將頒發結業證書！</p>`}
-    };
-    
     // Tab click
     document.querySelectorAll('.week-tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -430,11 +280,34 @@
             this.classList.add('active');
             
             const contentDiv = document.getElementById('content');
-            if (weekData[week]) {
-                contentDiv.innerHTML = weekData[week].content;
-            } else {
-                contentDiv.innerHTML = '<div class="loading">載入中...</div>';
+            contentDiv.innerHTML = '<div class="loading">載入中...</div>';
+            
+            if (week === '9') {
+                contentDiv.innerHTML = week9Content;
+                return;
             }
+            
+            const url = weekUrls[week];
+            if (!url) {
+                contentDiv.innerHTML = '<div class="error">教材載入中...</div>';
+                return;
+            }
+            
+            fetch(url)
+                .then(response => response.text())
+                .then(md => {
+                    let html = mdToHtml(md);
+                    
+                    // Add PDF download link
+                    const pdfUrl = url.replace('.md', '.pdf').replace('/materials/', '/materials/');
+                    const weekNum = week.padStart(2, '0');
+                    html = html + '<a class="pdf-link" href="' + pdfUrl + '" target="_blank">📥 下載 PDF 講義</a>';
+                    
+                    contentDiv.innerHTML = html;
+                })
+                .catch(err => {
+                    contentDiv.innerHTML = '<div class="error">教材載入失敗，請稍後再試</div>';
+                });
         });
     });
     
