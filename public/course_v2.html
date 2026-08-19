@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程教材｜AI 智慧生活應用（優化版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 18px;
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .version-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .version-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .version-tab:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        .version-tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+        .back-link {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .weeks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .week-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .week-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .week-card .week-num {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .week-card .week-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .week-card .week-date {
+            color: #999;
+            font-size: 14px;
+        }
+        .week-card.new {
+            border-left: 4px solid #f5576c;
+        }
+        .week-card.new .badge {
+            margin-left: 0;
+            margin-top: 10px;
+        }
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回首頁</a>
+        
+        <div class="header">
+            <h1>📚 課程教材</h1>
+            <p>AI 智慧生活應用｜13週完整教材 <span class="badge">優化新版</span></p>
+        </div>
+        
+        <div class="version-tabs">
+            <button class="version-tab" onclick="location.href='/course.html'">📖 原始版</button>
+            <button class="version-tab active">✨ 優化新版</button>
+        </div>
+        
+        <div class="weeks-grid">
+            <a href="/course_v2/week01.html" class="week-card new">
+                <div class="week-num">第 1 週</div>
+                <div class="week-title">🤖 AI 入門與手機設定</div>
+                <div class="week-date">9/4（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week02.html" class="week-card new">
+                <div class="week-num">第 2 週</div>
+                <div class="week-title">💬 LINE + AI 助手</div>
+                <div class="week-date">9/11（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week03.html" class="week-card new">
+                <div class="week-num">第 3 週</div>
+                <div class="week-title">🗣️ 語音助理實戰</div>
+                <div class="week-date">9/18（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week04.html" class="week-card new">
+                <div class="week-num">第 4 週</div>
+                <div class="week-title">🔍 Google Lens 視覺搜尋</div>
+                <div class="week-date">10/2（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week05.html" class="week-card new">
+                <div class="week-num">第 5 週</div>
+                <div class="week-title">🎨 AI 圖片生成基礎</div>
+                <div class="week-date">10/16（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week06.html" class="week-card">
+                <div class="week-num">第 6 週</div>
+                <div class="week-title">🌸 公論週（複習）</div>
+                <div class="week-date">10/23（五）</div>
+            </a>
+            
+            <a href="/course_v2/week07.html" class="week-card new">
+                <div class="week-num">第 7 週</div>
+                <div class="week-title">✂️ AI 修圖 - MyEdit</div>
+                <div class="week-date">10/30（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week08.html" class="week-card new">
+                <div class="week-num">第 8 週</div>
+                <div class="week-title">🎬 AI 修圖 - CapCut</div>
+                <div class="week-date">11/6（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week09.html" class="week-card new">
+                <div class="week-num">第 9 週</div>
+                <div class="week-title">📸 美圖秀秀 - 人像美化</div>
+                <div class="week-date">11/13（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week10.html" class="week-card new">
+                <div class="week-num">第 10 週</div>
+                <div class="week-title">🎭 LINE 個人貼圖</div>
+                <div class="week-date">11/20（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week11.html" class="week-card new">
+                <div class="week-num">第 11 週</div>
+                <div class="week-title">🎵 AI 音樂 - Suno</div>
+                <div class="week-date">11/27（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week12.html" class="week-card new">
+                <div class="week-num">第 12 週</div>
+                <div class="week-title">🌐 AI 翻譯出國應用</div>
+                <div class="week-date">12/4（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+            
+            <a href="/course_v2/week13.html" class="week-card new">
+                <div class="week-num">第 13 週</div>
+                <div class="week-title">🎓 成果展與作品集</div>
+                <div class="week-date">12/11（五）</div>
+                <span class="badge">NEW</span>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>✨ 優化版教材特色：每週含課前預習、課堂內容、課後複習、家庭作業</p>
+        </div>
+    </div>
+</body>
+</html>
