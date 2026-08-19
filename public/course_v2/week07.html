@@ -15,13 +15,16 @@
         h3 { color: #555; margin: 15px 0 10px; }
         .meta { color: #999; margin-bottom: 20px; }
         .badge { display: inline-block; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; margin-left: 10px; }
+        .download-btn { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin: 10px 5px; }
+        .download-btn:hover { transform: scale(1.05); }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #667eea; }
         ul, ol { margin: 10px 0 10px 20px; }
         li { margin: 8px 0; }
-        .tip { background: #e8f5e9; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #4caf50; }
-        .highlight { background: #fff9db; padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .tip-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #4caf50; }
+        .highlight { background: #fff9db; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .warning { background: #fff3e0; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #ff9800; }
         .checklist { background: #e3f2fd; padding: 20px; border-radius: 10px; margin: 15px 0; }
         .checklist label { display: block; margin: 8px 0; }
     </style>
@@ -29,38 +32,123 @@
 <body>
     <div class="container">
         <a href="/course_v2.html" class="back-link">← 返回教材總覽</a>
+        
         <div class="card">
             <h1>第 7 週｜AI 修圖 - MyEdit <span class="badge">NEW</span></h1>
-            <p class="meta">📅 日期：10/30（五）⏰ 時間：19:00 - 22:00</p>
+            <p class="meta">📅 日期：10/30（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+            <a href="/course_materials/week07/week07.pdf" class="download-btn">📥 下載本週教材 PDF</a>
         </div>
+        
+        <div class="tip-box">
+            <strong>💡 本週目標：</strong>學會用 AI 幫照片去除路人，讓旅遊照片更完美！
+        </div>
+        
         <div class="card">
             <h2>🎯 本週學習目標</h2>
-            <ul><li>學會 AI 去路人</li><li>照片尺寸調整</li><li>基本濾鏡套用</li><li>證件照排版</li></ul>
+            <ul>
+                <li>學會使用 MyEdit App</li>
+                <li>掌握 AI 去路人功能</li>
+                <li>照片尺寸調整技巧</li>
+                <li>基本濾鏡應用</li>
+                <li>證件照排版</li>
+            </ul>
         </div>
+        
         <div class="card">
             <h2>📖 課前準備</h2>
-            <div class="checklist"><label><input type="checkbox"> 已下載 MyEdit App</label><label><input type="checkbox"> 準備一張有路人的照片</label></div>
+            <div class="checklist">
+                <label><input type="checkbox"> 已下載 MyEdit App（App Store / Play 商店）</label>
+                <label><input type="checkbox"> 準備一張有路人的旅遊照片</label>
+                <label><input type="checkbox"> 準備一張證件照或大頭照</label>
+                <label><input type="checkbox"> 手機已充滿電</label>
+            </div>
         </div>
+        
         <div class="card">
             <h2>🖥️ 課堂內容</h2>
-            <h3>第一節：MyEdit 基礎</h3>
-            <ol><li>打開 MyEdit → 點擊「AI 去背」或「AI 去路人」</li><li>選擇照片 → 等待 AI 處理</li></ol>
-            <h3>第二節：AI 去路人</h3>
-            <ol><li>選擇「AI 去路人」功能</li><li>用畫筆塗抹要移除的物件</li><li>AI 會自動補背景</li></ol>
-            <h3>第三節：尺寸調整與濾鏡</h3>
-            <ul><li>裁切：16:9、4:3、1:1 等比例</li><li>濾鏡：日系、復古、鮮豔</li></ul>
-            <h3>第四節：證件照排版</h3>
-            <ul><li>選擇證件照模板</li><li>自動排版 1 吋、2 吋</li></ul>
+            
+            <h3>第一節：MyEdit 基礎介紹（19:00-19:45）</h3>
+            <ul>
+                <li>下載並註冊 MyEdit</li>
+                <li>認識主要功能介面</li>
+                <li>基本操作：匯入照片、儲存照片</li>
+            </ul>
+            
+            <h3>第二節：AI 去路人（19:45-20:30）</h3>
+            <div class="highlight">
+                <strong>🎯 這是本週最厲害的功能！</strong>
+            </div>
+            <ol>
+                <li>選擇「AI 去路人」功能</li>
+                <li>從相簿選擇一張有路人的照片</li>
+                <li>用畫筆輕輕塗抹要移除的物件（路人、石頭、雜物等）</li>
+                <li>放開手指，AI 會自動補上背景</li>
+                <li>如果不滿意，可以重複操作</li>
+                <li>滿意後點擊「儲存」</li>
+            </ol>
+            <div class="warning">
+                <strong>⚠️ 小技巧：</strong>塗抹時盡量只塗到目標物，範圍不要太大，修復效果會更好！
+            </div>
+            
+            <h3>第三節：照片尺寸調整（20:30-21:15）</h3>
+            <ul>
+                <li><strong>常用比例：</strong>16:9（電視）、4:3（傳統相機）、1:1（Instagram）、9:16（手機版）</li>
+                <li><strong>證件照尺寸：</strong>1 吋（2.5x3.5cm）、2 吋（3.5x4.5cm）</li>
+                <li><strong>裁切技巧：</strong>保持主體在畫面中央</li>
+            </ul>
+            
+            <h3>第四節：濾鏡與證件照排版（21:15-22:00）</h3>
+            <ul>
+                <li><strong>濾鏡效果：</strong>日系清新、復古風、鮮豔、黑白</li>
+                <li><strong>證件照排版：</strong>一鍵生成 1 吋、2 吋證件照</li>
+                <li><strong>課堂練習：</strong>製作一張完美的證件照</li>
+            </ul>
         </div>
+        
+        <div class="card">
+            <h2>📝 課後複習</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> 我會使用 MyEdit 基本操作</label>
+                <label><input type="checkbox"> 我會用 AI 去路人</label>
+                <label><input type="checkbox"> 我會調整照片尺寸</label>
+                <label><input type="checkbox"> 我會使用濾鏡效果</label>
+                <label><input type="checkbox"> 我會製作證件照</label>
+            </div>
+        </div>
+        
         <div class="card">
             <h2>🏠 家庭作業</h2>
-            <ol><li>修一張自己的旅遊照片，去掉路人</li></ol>
+            <ol>
+                <li><strong>去路人練習：</strong>找一張過去的旅遊照片，用 AI 去除路人</li>
+                <li><strong>證件照製作：</strong>製作一張自己的證件照</li>
+                <li><strong>分享作品：</strong>把作品傳到 LINE 群組分享</li>
+            </ol>
         </div>
+        
+        <div class="card">
+            <h2>💡 本週重點速查</h2>
+            <table>
+                <tr><th>功能</th><th>怎麼做</th></tr>
+                <tr><td>AI 去路人</td><td>MyEdit → AI 去路人 → 塗抹 → 儲存</td></tr>
+                <tr><td>調整尺寸</td><td>裁切 → 選擇比例 → 確認</td></tr>
+                <tr><td>套用濾鏡</td><td>濾鏡 → 選擇效果 → 儲存</td></tr>
+                <tr><td>證件照</td><td>證件照 → 選擇尺寸 → 排版</td></tr>
+            </table>
+        </div>
+        
         <div class="card">
             <h2>📅 下週預告</h2>
-            <p><strong>第 8 週：CapCut 影片剪輯</strong></p>
+            <h3>第 8 週：CapCut 影片剪輯</h3>
+            <ul>
+                <li>📹 影片剪輯基礎</li>
+                <li>✂️ 裁剪、合併影片</li>
+                <li>🎵 加入音樂與音效</li>
+                <li>📝 加入文字與字幕</li>
+            </ul>
+            <p style="margin-top:15px;"><strong>課前準備：</strong>下載 CapCut App、準備一段影片素材</p>
         </div>
-        <p style="text-align: center; color: #999;">*優化版 v1.0*</p>
+        
+        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v1.1*</p>
     </div>
 </body>
 </html>

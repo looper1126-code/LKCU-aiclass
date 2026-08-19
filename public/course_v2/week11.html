@@ -4,17 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第 11 週｜AI 音樂 Suno - AI 智慧生活應用</title>
-    <style>body{font-family:"Microsoft JhengHei",sans-serif;background:#f5f7fa;padding:20px;line-height:1.8}.container{max-width:800px;margin:0 auto}.back-link{color:#667eea;text-decoration:none;margin-bottom:20px;font-weight:block}.card{background:white;border-radius:20px;padding:30px;margin-bottom:20px;box-shadow:0 5px 20px rgba(0,0,0,0.1)}h1{color:#333}h2{color:#667eea;margin:25px 0 15px;border-bottom:2px solid #667eea;padding-bottom:10px}.meta{color:#999}.badge{display:inline-block;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;padding:5px 15px;border-radius:15px;font-size:12px;margin-left:10px}ul,ol{margin:10px 0 10px 20px}.checklist{background:#e3f2fd;padding:20px;border-radius:10px}.checklist label{display:block;margin:8px 0}</style>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; background: #f5f7fa; padding: 20px; line-height: 1.8; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: #667eea; text-decoration: none; margin-bottom: 20px; font-weight: bold; }
+        .card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 10px; }
+        h2 { color: #667eea; margin: 25px 0 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #555; margin: 15px 0 10px; }
+        .meta { color: #999; margin-bottom: 20px; }
+        .badge { display: inline-block; background: linear-gradient(135deg, #9c27b0, #673ab7); color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; margin-left: 10px; }
+        .download-btn { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin: 10px 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #667eea; }
+        ul, ol { margin: 10px 0 10px 20px; }
+        li { margin: 8px 0; }
+        .tip-box { background: #f3e5f5; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #9c27b0; }
+        .highlight { background: #fff9db; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .checklist { background: #f3e5f5; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .checklist label { display: block; margin: 8px 0; }
+    </style>
 </head>
 <body>
     <div class="container">
         <a href="/course_v2.html" class="back-link">← 返回教材總覽</a>
-        <div class="card"><h1>第 11 週｜AI 音樂 - Suno <span class="badge">NEW</span></h1><p class="meta">📅 日期：11/27（五）⏰ 19:00-22:00</p></div>
-        <div class="card"><h2>🎯 學習目標</h2><ul><li>Suno 操作介面</li><li>音樂風格選擇</li><li>歌詞撰寫技巧</li><li>生成並下載歌曲</li></ul></div>
-        <div class="card"><h2>📖 課前準備</h2><div class="checklist"><label><input type="checkbox"> 申請 Suno 帳號</label><label><input type="checkbox"> 想好想創作的歌曲風格</label></div></div>
-        <div class="card"><h2>🖥️ 課堂內容</h2><ol><li><strong>認識 Suno</strong>：AI 音樂生成平台</li><li><strong>輸入提示詞</strong>：描述想要的音樂風格、情緒</li><li><strong>選擇曲風</strong>：流行、搖滾、抒情、古典、爵士等</li><li><strong>生成音樂</strong>：等待 AI 生成（約 1-2 分鐘）</li><li><strong>下載分享</strong>：下載 MP3 或分享連結</li></ol><h3>提示詞範例：</h3><ul><li>「歡快的流行歌曲，關於夏天」</li><li>「抒情的鋼琴曲，表達思念」</li><li>「搖滾風格，關於夢想」</li></ul></div>
-        <div class="card"><h2>🏠 家庭作業</h2><p>用 AI 生成一首祝福歌</p></div>
-        <div class="card"><h2>📅 下週預告</h2><p><strong>第 12 週：AI 翻譯出國應用</strong></p></div>
+        
+        <div class="card">
+            <h1>第 11 週｜AI 音樂 - Suno <span class="badge">NEW</span></h1>
+            <p class="meta">📅 日期：11/27（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+            <a href="/course_materials/week11/week11.pdf" class="download-btn">📥 下載本週教材 PDF</a>
+        </div>
+        
+        <div class="tip-box">
+            <strong>💡 本週目標：</strong>用 AI 創作自己的歌曲！不會樂理也能當音樂人～
+        </div>
+        
+        <div class="card">
+            <h2>🎯 本週學習目標</h2>
+            <ul>
+                <li>認識 Suno AI 音樂平台</li>
+                <li>掌握音樂風格選擇</li>
+                <li>學會撰寫提示詞</li>
+                <li>設定歌詞與曲風</li>
+                <li>生成並下載歌曲</li>
+                <li>分享給親友</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>📖 課前準備</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> 申請 Suno 帳號（suno.com）</label>
+                <label><input type="checkbox"> 想好想創作的歌曲主題（如：生日祝福、家庭溫馨）</label>
+                <label><input type="checkbox"> 準備一段歌詞（不會也可以請 AI 幫忙寫）</label>
+                <label><input type="checkbox"> 決定想要的音樂風格</label>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🖥️ 課堂內容</h2>
+            
+            <h3>第一節：認識 Suno（19:00-19:45）</h3>
+            <ul>
+                <li><strong>什麼是 Suno？</strong>AI 音樂生成平台，只要輸入文字就能生成完整歌曲</li>
+                <li><strong>使用方式：</strong>網頁版（suno.com），無需安裝 App</li>
+                <li><strong>版本：</strong>免費版（有限額）、付費版（無限生成）</li>
+                <li><strong>註冊：</strong>可以用 Google 帳號或 Email 註冊</li>
+            </ul>
+            
+            <h3>第二節：音樂風格選擇（19:45-20:30）</h3>
+            <table>
+                <tr><th>風格</th><th>說明</th></tr>
+                <tr><td>流行 Pop</td><td>適合大眾口味的抒情歌</td></tr>
+                <tr><td>搖滾 Rock</td><td>激烈、有節奏感的音樂</td></tr>
+                <tr><td>抒情 Ballad</td><td>溫柔、深情的歌曲</td></tr>
+                <tr><td>爵士 Jazz</td><td>輕鬆、優雅的曲風</td></tr>
+                <tr><td>古典 Classical</td><td>鋼琴、交響樂風格</td></tr>
+                <tr><td>電子 EDM</td><td>現代電子音樂</td></tr>
+                <tr><td>鄉村 Country</td><td>樸實、自然的風格</td></tr>
+                <tr><td>嘻哈 Hip-hop</td><td>說唱節奏</td></tr>
+            </table>
+            
+            <h3>第三節：提示詞與歌詞（20:30-21:15）</h3>
+            <div class="highlight">
+                <strong>📝 提示詞範例：</strong>
+            </div>
+            <ul>
+                <li><strong>範例 1：</strong>「溫暖的流行歌曲，關於家庭的愛，歡快的旋律」</li>
+                <li><strong>範例 2：</strong>「抒情的鋼琴曲，表達對孫子的思念，温柔的」</li>
+                <li><strong>範例 3：</strong>「搖滾風格，關於夢想和勇氣，振奮人心的」</li>
+                <li><strong>範例 4：</strong>「生日快樂歌，活潑開心的，適合慶祝」</li>
+            </ul>
+            <div class="highlight">
+                <strong>🎤 也可以加入歌詞：</strong>
+                <p>如果想要有歌詞，可以輸入完整的歌詞文字，AI 會根據歌詞生成配曲！</p>
+            </div>
+            
+            <h3>第四節：生成與下載（21:15-22:00）</h3>
+            <ol>
+                <li>在提示詞框中輸入你的想法</li>
+                <li>選擇音樂風格（可多選）</li>
+                <li>（可選）輸入歌詞</li>
+                <li>點擊「Generate」按鈕</li>
+                <li>等待 1-2 分鐘生成</li>
+                <li>試聽並選擇最滿意的版本</li>
+                <li>點擊「Download」下載 MP3</li>
+                <li>分享到 LINE 或社群</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>📝 課後複習</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> 我會使用 Suno 平台</label>
+                <label><input type="checkbox"> 我知道如何選擇音樂風格</label>
+                <label><input type="checkbox"> 我會撰寫提示詞</label>
+                <label><input type="checkbox"> 我生成了自己的 AI 歌曲</label>
+                <label><input type="checkbox"> 我會下載並分享歌曲</label>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🏠 家庭作業</h2>
+            <ol>
+                <li><strong>創作祝福歌：</strong>用 AI 為家人或朋友生成一首祝福歌曲</li>
+                <li><strong>嘗試不同風格：</strong>試試不同曲風的效果</li>
+                <li><strong>分享：</strong>把歌曲傳給想祝福的人</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>💡 本週重點速查</h2>
+            <table>
+                <tr><th>功能</th><th>怎麼做</th></tr>
+                <tr><td>生成歌曲</td><td>輸入提示詞 → 選擇風格 → Generate</td></tr>
+                <tr><td>加入歌詞</td><td>在 Lyrics 欄位輸入歌詞</td></tr>
+                <tr><td>下載</td><td>點擊 Download → 選擇 MP3</td></tr>
+                <tr><td>分享</td><td>複製連結或傳送 MP3 檔案</td></tr>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>📅 下週預告</h2>
+            <h3>第 12 週：AI 翻譯出國應用</h3>
+            <ul>
+                <li>🌐 即時翻譯相機</li>
+                <li>💬 對話翻譯模式</li>
+                <li>✈️ 常用旅遊句子</li>
+                <li>📴 離線翻譯</li>
+            </ul>
+            <p style="margin-top:15px;"><strong>課前準備：</strong>下載 Google 翻譯 App</p>
+        </div>
+        
+        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v1.1*</p>
     </div>
 </body>
 </html>

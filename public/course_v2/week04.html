@@ -15,13 +15,16 @@
         h3 { color: #555; margin: 15px 0 10px; }
         .meta { color: #999; margin-bottom: 20px; }
         .badge { display: inline-block; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; margin-left: 10px; }
+        .download-btn { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin: 10px 5px; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #667eea; }
         ul, ol { margin: 10px 0 10px 20px; }
         li { margin: 8px 0; }
-        .tip { background: #e8f5e9; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #4caf50; }
-        .highlight { background: #fff9db; padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .tip-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #4caf50; }
+        .highlight { background: #fff9db; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .warning { background: #fff3e0; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #ff9800; }
+        .intro { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; }
         .checklist { background: #e3f2fd; padding: 20px; border-radius: 10px; margin: 15px 0; }
         .checklist label { display: block; margin: 8px 0; }
     </style>
@@ -30,98 +33,147 @@
     <div class="container">
         <a href="/course_v2.html" class="back-link">← 返回教材總覽</a>
         
-        <div class="card">
-            <h1>第 4 週｜Google Lens 視覺搜尋 <span class="badge">優化版</span></h1>
-            <p class="meta">📅 日期：10/2（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+        <div class="intro">
+            <h1>第 4 週｜Google Lens 視覺搜尋 <span class="badge">🔍 手機天眼</span></h1>
+            <p>📅 日期：10/2（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+            <a href="/course_materials/week04/week04.pdf" class="download-btn" style="background:white;color:#667eea;">📥 下載教材 PDF</a>
         </div>
         
         <div class="card">
-            <h2>🎯 本週學習目標</h2>
-            <ul>
-                <li>學會使用 Google Lens</li>
-                <li>拍照翻譯看不懂的外文</li>
-                <li>用相機辨識植物、花卉、寵物</li>
-                <li>用手機鏡頭當百科全書</li>
-            </ul>
+            <h2>💬 老師的話</h2>
+            <p>這週我们要學一個「超能力」——用手機相機「看」世界！</p>
+            <p style="margin-top:10px;">看到路邊一朵漂亮的花，不知道叫什麼？</p>
+            <p>去日本旅遊，菜單都是日文，看不懂？</p>
+            <p>這些問題，Google Lens 幫你解決！</p>
+            <div class="tip-box" style="margin-top:15px;">
+                <strong>🎯 Google Lens = 手機的天眼</strong>
+                <p>就像有一個聰明的朋友站在你旁邊，你拍照給它看，它就告訴你這是什麼！</p>
+            </div>
         </div>
         
         <div class="card">
             <h2>📖 課前準備</h2>
             <div class="checklist">
                 <label><input type="checkbox"> 確認手機相機權限已開啟</label>
-                <label><input type="checkbox"> 已下載 Google 相簿（iPhone）/ Google Lens（Android）</label>
+                <label><input type="checkbox"> Android：用戶下載 Google Lens App</label>
+                <label><input type="checkbox"> iPhone：用戶下載 Google 相簿 App</label>
                 <label><input type="checkbox"> 手機網路已連線</label>
+                <label><input type="checkbox"> 準備一些想辨識的物品（植物、產品等）</label>
             </div>
         </div>
         
         <div class="card">
-            <h2>🖥️ 課堂內容</h2>
-            
-            <h3>第一節：什麼是 Google Lens？（19:00-19:45）</h3>
-            <div class="tip">
-                <strong>💡 Google Lens = 手機的「天眼」</strong><br>
-                就像有一個聰明的朋友站在你旁邊，你拍照給它看，它就會告訴你這是什麼！
-            </div>
-            <h4>如何開啟 Google Lens：</h4>
-            <ul>
-                <li><strong>Android</strong>：Google 相簿 → 點擊 Lens 圖示</li>
-                <li><strong>iPhone</strong>：下載 Google 應用 → 開啟 Google Lens</li>
-            </ul>
-            
-            <h3>第二節：翻譯功能（19:45-20:30）</h3>
+            <h2>📱 Google Lens 哪裡找？</h2>
+            <h3>Android 用戶</h3>
+            <ol>
+                <li>打開 Google 相簿 App</li>
+                <li>選一張照片</li>
+                <li>點擊下方「Lens」圖示（相機圖案）</li>
+                <li>就可以使用各種功能！</li>
+            </ol>
+            <h3>iPhone 用戶</h3>
+            <ol>
+                <li>下載「Google」App</li>
+                <li>打開 Google App</li>
+                <li>點擊相機圖示</li>
+                <li>就能使用 Google Lens</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>🔍 Google Lens 可以做什麼？</h2>
+            <table>
+                <tr><th>功能</th><th>可以做什麼</th></tr>
+                <tr><td>🌸 植物辨識</td><td>拍照就知道花、草、樹的名字</td></tr>
+                <tr><td>🐕 寵物辨識</td><td>知道狗、貓的品種</td></tr>
+                <tr><td>🌐 翻譯</td><td>拍照即時翻譯各國語言</td></tr>
+                <tr><td>📚 書籍搜尋</td><td>知道書名、作者</td></tr>
+                <tr><td>🛒 物品辨識</td><td>知道這是什麼產品、哪裡買</td></tr>
+                <tr><td>🏠 地點辨識</td><td>這是哪裡、餐廳評價</td></tr>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>🌐 翻譯功能 - 出國必學</h2>
+            <h3>如何使用？</h3>
             <ol>
                 <li>打開 Google Lens</li>
+                <li>選擇「翻譯」功能</li>
+                <li>選擇「從什麼語言」翻「到什麼語言」</li>
                 <li>對準要翻譯的文字</li>
-                <li>選擇語言（從...翻譯成中文）</li>
-                <li>對準菜單、說明書、路標</li>
+                <li>手機螢幕就會顯示翻譯後的文字！</li>
             </ol>
-            <div class="highlight">
-                <strong>📸 課堂練習：</strong>翻譯老師準備的各國文字範例
-            </div>
-            
-            <h3>第三節：圖像辨識（20:30-21:15）</h3>
-            <table>
-                <tr><th>辨識類型</th><th>範例</th></tr>
-                <tr><td>🌸 植物花卉</td><td>路邊的花叫什麼名字？</td></tr>
-                <tr><td>🐕 寵物品種</td><td>這隻狗是什麼品種？</td></tr>
-                <tr><td>🏠 物品辨識</td><td>這是什麼東西？</td></tr>
-                <tr><td>📚 書籍搜尋</td><td>這本書的作者是誰？</td></tr>
-            </table>
-            
-            <h3>第四節：生活應用實戰（21:15-22:00）</h3>
-            <div class="highlight">
-                <strong>課堂練習：</strong>
-                <ol>
-                    <li>拍攝不認識的植物並辨識</li>
-                    <li>翻譯餐廳菜單上的日文</li>
-                    <li>搜尋物品的購買資訊</li>
-                </ol>
+            <div class="warning">
+                <strong>💡 應用場景：</strong>
+                <ul>
+                    <li>看不懂的日本菜單 → 拍照翻譯</li>
+                    <li>韓國路標 → 拍照翻譯</li>
+                    <li>美國餐廳菜單 → 拍照翻譯</li>
+                    <li>產品說明書 → 拍照翻譯</li>
+                </ul>
             </div>
         </div>
         
         <div class="card">
-            <h2>📝 課後複習</h2>
+            <h2>🌸 圖像辨識 - 認識花草寵物</h2>
+            <h3>辨識植物</h3>
+            <ol>
+                <li>打開 Google Lens</li>
+                <li>選擇「搜尋」功能</li>
+                <li>對準路邊的花或植物</li>
+                <li>手機會告訴你植物名稱！</li>
+            </ol>
+            <div class="highlight">
+                <strong>💡 以後去公園：</strong>
+                <p>看到漂亮的花不知叫什麼？拍照就知道！還可以分享給朋友～</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>❓ 常見問題 Q&A</h2>
+            <div class="faq-q" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:10px 0;font-weight:bold;">Q1: 沒有網路能用嗎？</div>
+            <div style="padding:10px 0 10px 20px;">A: 部分功能需要網路，但翻譯可以下載離線語言包使用。</div>
+            
+            <div class="faq-q" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:10px 0;font-weight:bold;">Q2: 辨識結果準確嗎？</div>
+            <div style="padding:10px 0 10px 20px;">A: 大部分情況很準確，但如有疑慮可以多方查證。</div>
+            
+            <div class="faq-q" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:10px 0;font-weight:bold;">Q3: 很暗的地方可以辨識嗎？</div>
+            <div style="padding:10px 0 10px 20px;">A: 尽量在光线充足的地方拍摄，效果更好！</div>
+        </div>
+        
+        <div class="card">
+            <h2>✅ 課後複習</h2>
             <div class="checklist">
-                <label><input type="checkbox"> 我會使用 Google Lens</li>
-                <label><input type="checkbox"> 我會拍照翻譯</li>
-                <label><input type="checkbox"> 我會辨識植物和物品</li>
+                <label><input type="checkbox"> 誰會用 Google Lens 了？（請舉手）</label>
+                <label><input type="checkbox"> 誰成功翻譯了？（請舉手）</label>
+                <label><input type="checkbox"> 誰辨識了植物或物品？（請舉手）</label>
             </div>
         </div>
         
         <div class="card">
             <h2>🏠 家庭作業</h2>
+            <h3>必做</h3>
             <ol>
-                <li><strong>植物辨識</strong>：在家附近拍一張不認識的植物，用 Google Lens 辨識</li>
-                <li><strong>翻譯練習</strong>：找一個有英文的產品，拍照翻譯</li>
+                <li><strong>🌸 植物辨識</strong>：在家附近拍一張不認識的植物，用 Google Lens 辨識</li>
+                <li><strong>🌐 翻譯練習</strong>：找一個有英文的產品，拍照翻譯</li>
+            </ol>
+            <h3>選做</h3>
+            <ol>
+                <li><strong>🛒 物品辨識</strong>：拍一個家裡的物品，看看 AI 說什麼</li>
             </ol>
         </div>
         
         <div class="card">
             <h2>📅 下週預告</h2>
-            <p><strong>第 5 週：AI 圖片生成基礎</strong> - 用文字創造圖片！</p>
+            <h3>第 5 週：AI 圖片生成基礎</h3>
+            <ul>
+                <li>🎨 用文字創造圖片</li>
+                <li>✨ Lexica.art 操作教學</li>
+                <li>📝 提示詞語法</li>
+            </ul>
         </div>
         
-        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v1.0*</p>
+        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v2.0*</p>
     </div>
 </body>
 </html>

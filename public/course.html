@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+.download-btn { margin: 15px 0; }
+.download-btn a { display: inline-block; padding: 12px 24px; background: linear-gradient(90deg, #ff9500, #ff6d00); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
+.download-btn a:hover { opacity: 0.9; }
+.download-full { display: inline-block; margin-top: 10px; padding: 14px 28px; background: #2ecc71; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
+.download-full:hover { background: #27ae60; }
+</style>
+<style>
+.download-btn { margin: 15px 0; }
+.download-btn a { display: inline-block; padding: 12px 24px; background: linear-gradient(90deg, #ff9500, #ff6d00); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
+.download-btn a:hover { opacity: 0.9; }
+.download-full { display: inline-block; margin-top: 10px; padding: 14px 28px; background: #2ecc71; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
+.download-full:hover { background: #27ae60; }
+</style>
+<title>📚 課程教材｜AI 智慧生活應用</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #eee;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ff9500, #ff6d00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle { text-align: center; color: #888; margin-bottom: 20px; }
+        
+        /* Week tabs */
+        .week-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .week-tab {
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .week-tab:hover, .week-tab.active {
+            background: linear-gradient(90deg, #ff9500, #ff6d00);
+            color: #fff;
+            border-color: transparent;
+        }
+        
+        /* Back button */
+        .back-link {
+            display: inline-block;
+            color: #ff9500;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        
+        /* Content */
+        .content-box {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-height: 400px;
+        }
+        .content-box h2 { 
+            color: #ff9500; 
+            margin-bottom: 16px; 
+            padding-bottom: 10px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 1.3em;
+        }
+        .content-box h3 { 
+            color: #fff; 
+            margin: 20px 0 10px; 
+            font-size: 1.1em;
+        }
+        .content-box h4 { 
+            color: #ccc; 
+            margin: 15px 0 8px; 
+            font-size: 1em;
+        }
+        .content-box ul { padding-left: 20px; }
+        .content-box li { margin: 6px 0; color: #bbb; }
+        .content-box p { color: #ccc; margin: 10px 0; }
+        .content-box table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .content-box td, .content-box th { 
+            padding: 10px 12px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            text-align: left;
+        }
+        .content-box th { background: rgba(255,149,0,0.2); color: #ff9500; }
+        
+        .highlight { 
+            background: rgba(255,149,0,0.15); 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            color: #ff9500;
+        }
+        
+        .note {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+        
+        .loading { text-align: center; padding: 40px; color: #666; }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回首頁</a>
+        
+        <h1>📚 課程教材</h1>
+        
+<p class="subtitle">AI 智慧生活應用｜13週完整教材 - 點擊各週查看內容</p>
+        
+        <!-- Week tabs -->
+        <div class="week-tabs">
+            <span class="week-tab active" data-week="1">第1週</span>
+            <span class="week-tab" data-week="2">第2週</span>
+            <span class="week-tab" data-week="3">第3週</span>
+            <span class="week-tab" data-week="4">第4週</span>
+            <span class="week-tab" data-week="5">第5週</span>
+            <span class="week-tab" data-week="6">第6週</span>
+            <span class="week-tab" data-week="7">第7週</span>
+            <span class="week-tab" data-week="8">第8週</span>
+            <span class="week-tab" data-week="9">第9週</span>
+            <span class="week-tab" data-week="10">第10週</span>
+            <span class="week-tab" data-week="11">第11週</span>
+            <span class="week-tab" data-week="12">第12週</span>
+            <span class="week-tab" data-week="13">第13週</span>
+        </div>
+        
+        <!-- Content -->
+        <div class="content-box" id="content">
+            <div class="loading">載入中...</div>
+        </div>
+        
+        <footer>
+            <p>📚 AI 智慧生活應用課程｜林口社區大學 115年度秋季班</p>
+            <p>授課教師：Jerry Kao</p>
+        </footer>
+    </div>
+    
+    <script>
+    const weekData = {
+        1: { title: "🤖 AI 初體驗", time: "19:00-22:00", content: `
+<h2>第1週｜AI 初體驗：認識 AI、安裝 ChatGPT/Gemini</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年9月4日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：什麼是 AI？從聊天機器人開始了解未來趨勢，並實際安裝 ChatGPT 與 Gemini 兩大工具。</li></ul>
+<h3>⏰ 時間安排</h3>
+<table><tr><th>節次</th><th>時間</th><th>主題</th></tr><tr><td>第一節</td><td>19:00-20:00</td><td>什麼是 AI？</td></tr><tr><td>第二節</td><td>20:00-21:00</td><td>安裝 ChatGPT</td></tr><tr><td>第三節</td><td>21:00-22:00</td><td>安裝 Gemini + 第一次對話體驗</td></tr></table>
+        `},
+        2: { title: "🏠 AI 生活管家", time: "19:00-22:00", content: `
+<h2>第2週｜AI 生活管家：查食譜、智慧識圖</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年9月11日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：用 AI 查菜餚、用 Google Lens 辨識植物、翻譯文句</li></ul>
+        `},
+        3: { title: "✈️ AI 智慧旅遊", time: "19:00-22:00", content: `
+<h2>第3週｜AI 智慧旅遊：規劃行程</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年9月18日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：AI 幫你整合航班、景點、美食，輕鬆整理出專屬的旅遊攻略</li></ul>
+        `},
+        4: { title: "💬 AI 社交應用", time: "19:00-22:00", content: `
+<h2>第4週｜AI 社交應用：祝福語、防詐</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年10月2日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：AI 幫撰寫 LINE 祝福語、學會辨識詐騙手法</li></ul>
+        `},
+        5: { title: "🎨 AI 修圖", time: "19:00-22:00", content: `
+<h2>第5週｜AI 影像魔法：MyEdit、CapCut</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年10月16日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：AI 修圖工具移除路人、調整尺寸、一鍵成片</li></ul>
+        `},
+        6: { title: "🌸 公論週（休息）", time: "暫停一次", content: `
+<h2>第6週｜公論週（休息）</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年10月23日（週五）</li><li>本週主題：本期課程暫停一次，依「林口社區大學行事曆」公論週辦理</li><li>上課地點：林口高中校本部</li></ul>
+<h3>📝 這週可以做什麼？</h3>
+<ul><li>複習前 5 週所學 AI 工具</li><li>整理手機裡的 AI 作品素材</li><li>為第 7 週「AI 美拍」做好準備</li></ul>
+        `},
+        7: { title: "📸 AI 美拍", time: "19:00-22:00", content: `
+<h2>第7週｜AI 美拍：修出自然自信</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年10月30日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：美圖秀秀 AI 美顏、濾鏡、貼圖裝飾</li></ul>
+        `},
+        8: { title: "🎭 LINE 貼圖", time: "19:00-22:00", content: `
+<h2>第8週｜AI 創意應用：LINE 個人貼圖</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年11月6日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：將前幾週修圖成果，加上趣味問候大字，做成 LINE 個人特色貼圖</li></ul>
+        `},
+        9: { title: "🎵 AI 音樂", time: "19:00-22:00", content: `
+<h2>第9週｜AI 音樂創作：心情隨手彈</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年11月13日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：體驗 Suno AI，語音敘述心情，由 AI 生成專屬歌曲</li></ul>
+        `},
+        10: { title: "✨ 提示詞魔法", time: "19:00-22:00", content: `
+<h2>第10週｜AI 溝通技巧：提示詞魔法</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年11月20日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：學會跟 AI 好好說話！掌握有效提問的技巧與心法</li></ul>
+        `},
+        11: { title: "🌐 AI 翻譯", time: "19:00-22:00", content: `
+<h2>第11週｜AI 全球通：翻譯與場景實作</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年11月27日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：語音即時翻譯，模擬「出國旅遊、問路、購物」實際場景</li></ul>
+        `},
+        12: { title: "🎁 作品整理", time: "19:00-22:00", content: `
+<h2>第12週｜AI 生活作品總修整與回顧</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年12月4日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：複習各週 AI 工具，協助學員修整本學期的照片、歌曲與短片成果</li></ul>
+        `},
+        13: { title: "🏆 成果分享會", time: "19:00-22:00", content: `
+<h2>第13週｜AI 應用成果分享會</h2>
+<h3>📅 課程資訊</h3>
+<ul><li>授課日期：115年12月11日（週五）</li><li>上課時間：19:00 - 22:00</li><li>上課地點：林口高中校本部</li><li>本週主題：分享「我最喜歡的 AI 生活應用小撇步」+ 全班大合照 + 結業證書</li></ul>
+        `}
+    };
+    
+    // Tab click
+    document.querySelectorAll('.week-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const week = this.dataset.week;
+            
+            document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            const contentDiv = document.getElementById('content');
+            if (weekData[week]) {
+                contentDiv.innerHTML = weekData[week].content;
+            } else {
+                contentDiv.innerHTML = '<div class="loading">載入中...</div>';
+            }
+        });
+    });
+    
+    // Load week 1
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.week-tab[data-week="1"]').click();
+    });
+    </script>
+</body>
+</html>

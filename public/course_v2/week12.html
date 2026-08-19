@@ -4,17 +4,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第 12 週｜AI 翻譯出國應用 - AI 智慧生活應用</title>
-    <style>body{font-family:"Microsoft JhengHei",sans-serif;background:#f5f7fa;padding:20px;line-height:1.8}.container{max-width:800px;margin:0 auto}.back-link{color:#667eea;text-decoration:none;margin-bottom:20px;font-weight:block}.card{background:white;border-radius:20px;padding:30px;margin-bottom:20px;box-shadow:0 5px 20px rgba(0,0,0,0.1)}h1{color:#333}h2{color:#667eea;margin:25px 0 15px;border-bottom:2px solid #667eea;padding-bottom:10px}.meta{color:#999}.badge{display:inline-block;background:linear-gradient(135deg,#f093fb,#f5576c);color:white;padding:5px 15px;border-radius:15px;font-size:12px;margin-left:10px}ul,ol{margin:10px 0 10px 20px}.checklist{background:#e3f2fd;padding:20px;border-radius:10px}.checklist label{display:block;margin:8px 0}</style>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; background: #f5f7fa; padding: 20px; line-height: 1.8; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: #667eea; text-decoration: none; margin-bottom: 20px; font-weight: bold; }
+        .card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 10px; }
+        h2 { color: #667eea; margin: 25px 0 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #555; margin: 15px 0 10px; }
+        .meta { color: #999; margin-bottom: 20px; }
+        .badge { display: inline-block; background: linear-gradient(135deg, #00bcd4, #009688); color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; margin-left: 10px; }
+        .download-btn { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin: 10px 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #667eea; }
+        ul, ol { margin: 10px 0 10px 20px; }
+        li { margin: 8px 0; }
+        .tip-box { background: #e0f7fa; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #00bcd4; }
+        .highlight { background: #fff9db; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .warning { background: #fff3e0; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #ff9800; }
+        .checklist { background: #e0f7fa; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .checklist label { display: block; margin: 8px 0; }
+    </style>
 </head>
 <body>
     <div class="container">
         <a href="/course_v2.html" class="back-link">← 返回教材總覽</a>
-        <div class="card"><h1>第 12 週｜AI 翻譯出國應用 <span class="badge">NEW</span></h1><p class="meta">📅 日期：12/4（五）⏰ 19:00-22:00</p></div>
-        <div class="card"><h2>🎯 學習目標</h2><ul><li>即時翻譯相機</li><li>對話翻譯模式</li><li>常用旅遊句子</li><li>離線翻譯下載</li></ul></div>
-        <div class="card"><h2>📖 課前準備</h2><div class="checklist"><label><input type="checkbox"> 下載 Google 翻譯 App</label><label><input type="checkbox"> 準備護照資料（測試用）</label></div></div>
-        <div class="card"><h2>🖥️ 課堂內容</h2><ol><li><strong>即時翻譯相機</strong>：對準文字即時翻譯</li><li><strong>對話模式</strong>：兩人對話即時翻譯</li><li><strong>離線翻譯</strong>：下載語言包，沒網路也能用</li><li><strong>常用旅遊句</strong>：點餐、問路、購物的常用語</li></ol><h3>出國翻譯 App 推薦：</h3><ul><li>Google 翻譯</li><li>DeepL 翻譯</li><li>VoiceTra</li></ul></div>
-        <div class="card"><h2>🏠 家庭作業</h2><p>翻譯一張外國菜單</p></div>
-        <div class="card"><h2>📅 下週預告</h2><p><strong>第 13 週：成果展與作品集</strong></p></div>
+        
+        <div class="card">
+            <h1>第 12 週｜AI 翻譯出國應用 <span class="badge">NEW</span></h1>
+            <p class="meta">📅 日期：12/4（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+            <a href="/course_materials/week12/week12.pdf" class="download-btn">📥 下載本週教材 PDF</a>
+        </div>
+        
+        <div class="tip-box">
+            <strong>💡 本週目標：</strong>出國旅遊不再怕語言障礙！學會用 AI 翻譯工具暢遊世界～
+        </div>
+        
+        <div class="card">
+            <h2>🎯 本週學習目標</h2>
+            <ul>
+                <li>使用 Google 翻譯 App</li>
+                <li>即時翻譯相機功能</li>
+                <li>對話翻譯模式</li>
+                <li>常用旅遊句子</li>
+                <li>下載離線翻譯包</li>
+                <li>語音翻譯功能</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>📖 課前準備</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> 下載 Google 翻譯 App</label>
+                <label><input type="checkbox"> 護照（測試用）</label>
+                <label><input type="checkbox"> 國外旅遊的相關資料（行程、菜單等）</label>
+                <label><input type="checkbox"> 確定手機有足夠儲存空間（下載離線包）</label>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🖥️ 課堂內容</h2>
+            
+            <h3>第一節：Google 翻譯基礎（19:00-19:45）</h3>
+            <ul>
+                <li>下載並開啟 Google 翻譯</li>
+                <li>設定主要語言和翻譯語言</li>
+                <li>基本打字翻譯操作</li>
+                <li>翻譯歷史記錄</li>
+            </ul>
+            
+            <h3>第二節：即時翻譯相機（19:45-20:30）</h3>
+            <div class="highlight">
+                <strong>📸 這是最強大的功能！</strong>
+                <p>對準文字，即時翻譯！就像帶著一個翻譯員在身邊～</p>
+            </div>
+            <ol>
+                <li>打開 Google 翻譯</li>
+                <li>點擊「相機」圖示</li>
+                <li>對準要翻譯的文字</li>
+                <li>選擇「即時」模式</li>
+                <li>手機螢幕就會顯示翻譯後的文字</li>
+                <li>也可以選擇「拍攝」或「匯入」</li>
+            </ol>
+            <div class="warning">
+                <strong>💡 應用場景：</strong>
+                <ul>
+                    <li>看不懂的菜單 → 拍照翻譯</li>
+                    <li>路標指示 → 對準即時翻譯</li>
+                    <li>產品說明書 → 拍照翻譯</li>
+                    <li>火車時刻表 → 拍照翻譯</li>
+                </ul>
+            </div>
+            
+            <h3>第三節：對話翻譯模式（20:30-21:15）</h3>
+            <ol>
+                <li>點擊「對話」圖示</li>
+                <li>選擇雙方語言（如：中文 ↔ 英文）</li>
+                <li>手機會自動偵測誰在說話</li>
+                <li>對著手機說話，即時翻譯</li>
+                <li>對方說的話也會即時翻譯給你聽</li>
+            </ol>
+            <div class="highlight">
+                <strong>💡 適合場合：</strong>
+                <ul>
+                    <li>點餐時跟服務生溝通</li>
+                    <li>問路時理解當地人說明</li>
+                    <li>購物時了解價格和說明</li>
+                    <li>飯店入住時辦理手續</li>
+                </ul>
+            </div>
+            
+            <h3>第四節：離線翻譯與常用句（21:15-22:00）</h3>
+            <ul>
+                <li><strong>下載離線翻譯包：</strong>
+                    <ol>
+                        <li>點擊語言名稱旁的「下載」圖示</li>
+                        <li>選擇要下載的語言包</li>
+                        <li>等待下載完成</li>
+                        <li>沒有網路也能用！</li>
+                    </ol>
+                </li>
+                <li><strong>常用旅遊句子收藏：</strong>
+                    <ul>
+                        <li>「請問...怎麼走？」</li>
+                        <li>「這個多少錢？」</li>
+                        <li>「我要這個」</li>
+                        <li>「請幫我結帳」</li>
+                        <li>「不好意思」</li>
+                        <li>「謝謝」</li>
+                    </ul>
+                </li>
+                <li><strong>語音翻譯：</strong>點擊麥克風直接說話，會自動翻譯並朗讀</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>📝 課後複習</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> 我會使用 Google 翻譯基本操作</label>
+                <label><input type="checkbox"> 我會用相機即時翻譯</label>
+                <label><input type="checkbox"> 我會使用對話翻譯模式</label>
+                <label><input type="checkbox"> 我下載了離線翻譯包</label>
+                <label><input type="checkbox"> 我學會了常用旅遊句子</label>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🏠 家庭作業</h2>
+            <ol>
+                <li><strong>翻譯練習：</strong>找一張外國餐廳的菜單，拍照翻譯</li>
+                <li><strong>下載離線包：</strong>下載要去旅遊的國家的語言包</li>
+                <li><strong>收藏句子：</strong>把常用旅遊句子存到收藏</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>💡 本週重點速查</h2>
+            <table>
+                <tr><th>功能</th><th>怎麼做</th></tr>
+                <tr><td>即時翻譯</td><td>相機 → 對準文字</td></tr>
+                <tr><td>對話翻譯</td><td>對話模式 → 雙方說話</td></tr>
+                <tr><td>語音翻譯</td><td>點麥克風 → 說話</td></tr>
+                <tr><td>離線翻譯</td><td>下載語言包</td></tr>
+                <tr><td>收藏句子</td><td>點擊星號收藏</td></tr>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>📅 下週預告</h2>
+            <h3>第 13 週：成果展與作品集</h3>
+            <ul>
+                <li>🎓 整理本學期作品</li>
+                <li>🏆 成果發表</li>
+                <li>📜 頒發結業證書</li>
+                <li>💬 課程回饋</li>
+            </ul>
+        </div>
+        
+        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v1.1*</p>
     </div>
 </body>
 </html>

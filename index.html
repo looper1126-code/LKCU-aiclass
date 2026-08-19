@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI智慧生活應用｜林口社區大學 115年度秋季班</title>
+  <style>
+    /* ==================== RESET & BASE ==================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #1A3A5C;       /* 深藍 */
+      --primary-light: #2E6BA6;
+      --accent: #E8912D;        /* 暖橙 */
+      --accent-light: #F5A623;
+      --bg: #FAFBFC;
+      --bg-warm: #FFF8F0;
+      --text: #2C2C2C;
+      --text-light: #666;
+      --white: #FFFFFF;
+      --border: #E0E6ED;
+      --shadow: rgba(26,58,92,0.08);
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    img { max-width: 100%; display: block; }
+
+    /* ==================== NAV ==================== */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(26,58,92,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.15);
+      color: var(--white);
+    }
+
+    /* ==================== HERO ==================== */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #234E7A 60%, #2E6BA6 100%);
+      color: var(--white);
+      padding: 120px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(232,145,45,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%; left: -10%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(46,107,166,0.3) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--white);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 18px;
+      border-radius: 50px;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem;
+      opacity: 0.9;
+      margin-bottom: 32px;
+      font-weight: 400;
+    }
+
+    .hero-info-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .hero-info-item {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-info-item .icon {
+      font-size: 1.2rem;
+    }
+
+    .hero-btns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      padding: 14px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(232,145,45,0.4);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(232,145,45,0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.15);
+      color: var(--white);
+      padding: 14px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-2px);
+    }
+
+    /* ==================== SECTIONS ==================== */
+    .section {
+      padding: 80px 24px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ==================== ABOUT / OVERVIEW ==================== */
+    .about { background: var(--white); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .about-text p {
+      font-size: 1.05rem;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    /* ==================== FEATURES ==================== */
+    .features { background: var(--bg-warm); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      box-shadow: 0 2px 16px var(--shadow);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(26,58,92,0.14);
+    }
+
+    .feature-icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 18px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 0.92rem;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    /* ==================== SCHEDULE ==================== */
+    .schedule { background: var(--white); }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .week-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 12px var(--shadow);
+      transition: all 0.3s;
+    }
+
+    .week-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(26,58,92,0.12);
+    }
+
+    .week-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .week-card-header.week-accent {
+      background: linear-gradient(135deg, var(--accent), #D97706);
+    }
+
+    .week-num {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      opacity: 0.85;
+    }
+
+    .week-tag-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .week-img-wrap {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      background: #f0f4f8;
+    }
+
+    .week-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+
+    .week-card:hover .week-img-wrap img {
+      transform: scale(1.04);
+    }
+
+    .week-card-body {
+
+    /* Week link button */
+    .week-link {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: linear-gradient(90deg, #ff9500, #ff6d00);
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .week-link:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(255,149,0,0.4);
+    }
+      padding: 20px;
+    }
+
+    .week-card-body h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .week-card-body p {
+      font-size: 0.88rem;
+      color: var(--text-light);
+      line-height: 1.65;
+    }
+
+    /* ==================== INSTRUCTOR ==================== */
+    .instructor { background: var(--bg-warm); }
+
+    .instructor-card {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 48px;
+      box-shadow: 0 4px 24px var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .instructor-avatar {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 4px solid var(--primary);
+    }
+
+    .instructor-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .instructor-info h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .instructor-title {
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .instructor-bio {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .channel-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .channel-list li {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    /* ==================== CTA / REGISTER ==================== */
+    .cta {
+      background: linear-gradient(135deg, var(--primary) 0%, #234E7A 100%);
+      color: var(--white);
+      text-align: center;
+    }
+
+    .cta-title {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .cta-desc {
+      font-size: 1.05rem;
+      opacity: 0.85;
+      max-width: 560px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .cta-box {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--radius-lg);
+      padding: 36px 48px;
+      display: inline-block;
+      text-align: left;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .cta-box h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--accent-light);
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      align-items: flex-start;
+    }
+
+    .cta-row .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+
+    /* ==================== TEACHER PANEL ==================== */
+    .teacher-panel {
+      background: var(--white);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius-lg);
+      padding: 36px 40px;
+      margin: 0 auto 48px;
+      max-width: 680px;
+    }
+    .teacher-panel h3 { font-size: 1.2rem; color: var(--primary); margin-bottom: 20px; }
+    .login-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.login-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #555;
+  transition: all 0.2s;
+}
+.login-tab.active {
+  background: #1A3A5C;
+  color: white;
+  border-color: #1A3A5C;
+}
+#password-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#password-login-form input {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.teacher-login-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #0088cc; color: white; border: none;
+      padding: 12px 24px; border-radius: 8px; font-size: 1rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .teacher-login-btn:hover { background: #006699; }
+    .teacher-logged-in { color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; }
+
+    .gen-form { display: grid; gap: 16px; margin-top: 16px; }
+    .gen-form select, .gen-form input {
+      padding: 12px 16px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 1rem; font-family: inherit;
+    }
+    .gen-form select:focus, .gen-form input:focus {
+      outline: none; border-color: var(--accent);
+    }
+    .gen-form button {
+      background: var(--accent); color: white; border: none;
+      padding: 14px 24px; border-radius: 8px; font-size: 1rem;
+      font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .gen-form button:hover { background: var(--accent-light); }
+    .gen-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .gen-result {
+      margin-top: 20px; background: var(--bg-warm);
+      border-radius: 12px; padding: 24px; text-align: left;
+      white-space: pre-wrap; font-size: 0.95rem; line-height: 1.7;
+      display: none;
+    }
+    .gen-result.show { display: block; }
+
+    /* ==================== WEEK CONTENT DISPLAY ==================== */
+    .week-content-section { display: none; }
+    .week-content-section.has-content { display: block; }
+    .week-content-card {
+      background: white; border-radius: var(--radius); padding: 24px;
+      margin: 16px auto; max-width: 720px; box-shadow: 0 2px 12px var(--shadow);
+    }
+    .week-content-card h4 { color: var(--primary); margin-bottom: 12px; font-size: 1.1rem; }
+    .week-content-card ul { padding-left: 20px; }
+    .week-content-card li { margin-bottom: 8px; }
+    .week-content-card .tip-box {
+      background: var(--bg-warm); border-left: 4px solid var(--accent);
+      padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 12px;
+    }
+
+    /* ==================== FOOTER ==================== */
+    .footer {
+      background: #0F2540;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      .about-grid { grid-template-columns: 1fr; gap: 32px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .week-grid { grid-template-columns: 1fr; }
+      .instructor-card { flex-direction: column; padding: 32px 24px; gap: 24px; }
+      .instructor-avatar { width: 100px; height: 100px; }
+      .cta-box { padding: 28px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-info-grid { flex-direction: column; align-items: center; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .section { padding: 60px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== TEACHER PANEL ==================== -->
+<div id="teacher-panel" class="teacher-panel" style="display:none;">
+  <h3>📝 老師專區：產生課程內容</h3>
+  <div id="teacher-login-area">
+    <div class="login-toggle">
+      <button class="login-tab active" onclick="showPasswordLogin()">帳密登入</button>
+      <button class="login-tab" onclick="showTelegramLogin()">Telegram 登入</button>
+    </div>
+    <div id="password-login-form">
+      <input type="text" id="login-username" placeholder="帳號" autocomplete="username">
+      <input type="password" id="login-password" placeholder="密碼" autocomplete="current-password">
+      <button class="teacher-login-btn" onclick="passwordLogin()">登入</button>
+    </div>
+    <div id="telegram-login-form" style="display:none;">
+      <button class="teacher-login-btn" onclick="telegramLogin()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+        透過 Telegram 登入（管理員限定）
+      </button>
+    </div>
+  </div>
+  <div id="teacher-logged-area" style="display:none;">
+    <div class="teacher-logged-in">✅ 已登入：<span id="teacher-name"></span></div>
+    <div class="gen-form">
+      <select id="gen-week"><option value="">-- 選擇週次 --</option></select>
+      <input type="text" id="gen-topic" placeholder="輸入本週授課主題（選填，留空則用預設主題）">
+      <button id="gen-btn" onclick="generateContent()">✨ 產生課程內容</button>
+    </div>
+    <div id="gen-result" class="gen-result"></div>
+  </div>
+</div>
+
+<!-- ==================== NAV ==================== -->
+<nav class="nav">
+  <div class="nav-logo">AI智慧生活應用</div>
+  <ul class="nav-links">
+    <li><a href="#about">課程介紹</a></li>
+    <li><a href="#features">課程特色</a></li>
+    <li><a href="#schedule">13週課程</a></li>
+    <li><a href="#instructor">授課教師</a></li>
+    <li><a href="/course.html">📚 課程教材</a> <span style="opacity:0.6">|</span> <a href="/course_v2/complete.html" style="color:#ffd700">✨ 新版教材</a></li>
+    <li><a href="#register">我要報名</a></li>
+  </ul>
+  <button onclick="document.getElementById('teacher-panel').style.display=document.getElementById('teacher-panel').style.display==='none'?'block':'none'" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.85rem;">👤 老師</button>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero" id="top">
+  <div class="hero-badge">🎓 115年度秋季班 · 招生中</div>
+  <h1>AI智慧生活應用<br>動口不動手</h1>
+  <p class="hero-subtitle">林口高中校本部｜115年度秋季班｜AI生活應用課程</p>
+
+  <div class="hero-info-grid">
+    <div class="hero-info-item">
+      <span class="icon">📅</span>
+      <span>開課：115年9月4日～12月11日（每週五，跳過9/25、10/9）</span>
+    </div>
+    <div class="hero-info-item">
+      <span class="icon">⏰</span>
+      <span>19:00 - 22:00（共3小時）</span>
+    </div>
+    <div class="hero-info-item">
+      <span class="icon">📍</span>
+      <span>林口高中校本部</span>
+    </div>
+    <div class="hero-info-item">
+      <span class="icon">⏳</span>
+      <span>13週／39小時</span>
+    </div>
+  </div>
+
+  <div class="hero-btns">
+    <a href="#register" class="btn-primary">立即報名 ✦</a>
+    <a href="#schedule" class="btn-secondary">看課程內容</a>
+    <a href="/course.html" class="btn-secondary" style="background:linear-gradient(135deg,#4caf50,#8bc34a);color:white;">📚 課程教材</a>
+    <a href="/course_v2/complete.html" class="btn-secondary" style="background:linear-gradient(135deg,#ffd700,#ffaa00);color:#333;">✨ 新版教材</a>
+  </div>
+</section>
+
+<!-- ==================== ABOUT ==================== -->
+<section class="section about" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-text">
+        <span class="section-label">About Course</span>
+        <h2 class="section-title">用簡單的方式<br>開啟AI生活新體驗</h2>
+        <p>本課程專為樂齡族設計，無需任何科技背景，只要會用手機，就能學會讓AI成為生活好幫手。從聊天工具到圖片生成，從音樂創作到網路安全，13週帶你全面體驗AI時代的日常應用。</p>
+        <p>課堂全程使用手機平板實際操作，搭配清晰的步驟引導，讓你下課後就能立刻運用在生活中。</p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <div class="stat-number">13</div>
+          <div class="stat-label">週完整課程</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">39</div>
+          <div class="stat-label">總授課時數</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">6</div>
+          <div class="stat-label">大核心工具</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">0</div>
+          <div class="stat-label">科技背景門檻</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FEATURES ==================== -->
+<section class="section features" id="features">
+  <div class="container">
+    <span class="section-label">Core Features</span>
+    <h2 class="section-title">在生活場景中學會AI應用</h2>
+    <p class="section-desc">每一項技能都對應真實生活需求，學完就能用，用了就離不開。</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>LINE 與 AI 聊天</h3>
+        <p>用 LINE 結合 AI 幫你查天氣、翻譯語言、記錄生活備忘，開口問就能得到答案。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗣️</div>
+        <h3>語音助理實戰</h3>
+        <p>Siri、Google 助理讓你動口不下手，設定鬧鐘、查路線、搜尋資料雙手萬能。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Google Lens 視覺搜尋</h3>
+        <p>拍照翻譯看不懂的外文、查不認識的植物花卉、用手機鏡頭打開百科全書。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>AI 圖片創作</h3>
+        <p>使用 Lexica.art 搜尋創意圖片，用 AI 生成屬於自己的卡片、海報與視覺素材。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎶</div>
+        <h3>AI 音樂創作</h3>
+        <p>Suno 讓你只要輸入想法，就能生成完整歌曲——選曲風、寫歌詞，創作個人專屬音樂。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>安全上網與個資保護</h3>
+        <p>學會識別假訊息與網路詐騙，建立安全密碼習慣，安心享受數位生活。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SCHEDULE ==================== -->
+<section class="section schedule" id="schedule">
+  <div class="container">
+    <span class="section-label">Course Schedule</span>
+    <h2 class="section-title">13週完整課程表</h2>
+    <p class="section-desc">每週課堂內容皆附實際操作截圖，按進度學習，循序漸進掌握AI生活應用。</p>
+
+    <div class="week-grid">
+
+      <!-- Week 1 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 01</span>
+          <span class="week-tag-badge">第 1 週 · 9/4</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week01.jpg" alt="第1週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 初體驗：認識 AI、安裝 ChatGPT/Gemini</h3>
+          </p>
+        </div>
+      </div>
+
+      <!-- Week 2 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 02</span>
+          <span class="week-tag-badge">第 2 週 · 9/11</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week02.jpg" alt="第2週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 生活管家：查食譜、智慧識圖</h3>
+          <p>用 AI 查菜餚、做功課、翻譯看不懂的文句。用手機鏡頭一掃，就知道眼前植物叫什麼名字、生活疑難快速得到解答。</p>
+        </div>
+      </div>
+
+      <!-- Week 3 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 03</span>
+          <span class="week-tag-badge">第 3 週 · 9/18</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week03.jpg" alt="第3週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 智慧旅遊：規劃行程</h3>
+          <p>出國旅遊不再需要上網爬文查資料。AI 幫你快速整合航班、景點、美食，輕鬆整理出專屬的旅遊攻略。</p>
+        </div>
+      </div>
+
+      <!-- Week 4 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 04</span>
+          <span class="week-tag-badge">第 4 週 · 10/2</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week04.jpg" alt="第4週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 社交應用：祝福語、防詐</h3>
+          <p>AI 幫你撰寫 LINE 祝福語、卡片文案，讓社交更順暢。同時學習辨識可疑訊息與詐騙手法，安心享受數位生活。</p>
+        </div>
+      </div>
+
+      <!-- Week 5 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 05</span>
+          <span class="week-tag-badge">第 5 週 · 10/16</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week05.jpg" alt="第5週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 修圖：MyEdit、CapCut</h3>
+          <p>告別昂貴的修圖軟體！學習使用免費 AI 修圖工具移除路人、調整尺寸，讓你的照片煥然一新。</p>
+        </div>
+      </div>
+
+      <!-- Week 6 公論週 -->
+      <div class="week-card">
+        <div class="week-card-header week-accent">
+          <span class="week-num">WEEK 06</span>
+          <span class="week-tag-badge">第 6 週 · 10/23（公論週）</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week06.jpg" alt="第6週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>🌸 公論週（休息）</h3>
+          <p>本期課程暫停一次。學員可利用本週時間複習前 5 週所學 AI 工具、練習修圖、累積作品素材，為第 7 週美拍實作做好準備。</p>
+        </div>
+      </div>
+
+      <!-- Week 7 -->
+      <div class="week-card">
+        <div class="week-card-header week-accent">
+          <span class="week-num">WEEK 07</span>
+          <span class="week-tag-badge">第 7 週 · 10/30</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week07.jpg" alt="第7週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 美拍：美圖秀秀</h3>
+          <p>人像自拍一秒變時尚雜誌封面！學習美圖秀秀的 AI 美顏、濾鏡、貼圖裝飾，讓每一張照片都是滿意之作。</p>
+        </div>
+      </div>
+
+      <!-- Week 8 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 08</span>
+          <span class="week-tag-badge">第 8 週 · 11/6</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week08.jpg" alt="第8週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>LINE 個人貼圖</h3>
+          <p>製作並上架自己的 LINE 貼圖！從設計到審核流程，完整教學，讓你與親友的對話充滿個人專屬的獨特表情。</p>
+        </div>
+      </div>
+
+      <!-- Week 9 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 09</span>
+          <span class="week-tag-badge">第 9 週 · 11/13</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week09.jpg" alt="第9週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 音樂：Suno 創作</h3>
+          <p>用 Suno 創作你的第一首歌曲！只要輸入想法與風格，AI 就能生成詞曲兼具的完整音樂，搖身變成業餘音樂人。</p>
+        </div>
+      </div>
+
+      <!-- Week 10 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 10</span>
+          <span class="week-tag-badge">第 10 週 · 11/20</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week10.jpg" alt="第10週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>提示詞魔法</h3>
+          <p>學會跟 AI 好好說話！掌握有效提問的技巧與心法，讓 AI 回答更精準、產出更有價值，大幅提升日常使用效率。</p>
+        </div>
+      </div>
+
+      <!-- Week 10 提示詞範例 -->
+      <div><!-- Week 10 提示詞範例 -->
+      <div class="prompt-examples-section" style="background:#FFF8F0;padding:40px 24px;margin-top:24px;border-radius:16px;border:1px solid #E0E6ED;">
+        <h3 style="font-size:1.3rem;color:#1A3A5C;margin-bottom:8px;">💡 ChatGPT Image 2.0 提示詞範例（50組精選）</h3>
+        <p style="font-size:0.85rem;color:#666;margin-bottom:24px;">來源：<a href="https://www.bnext.com.tw/article/90908/chatgpt-image-2-prompt-guide-complete" target="blank" style="color:#E8912D;">數位時代｜ChatGPT Image 2.0 指令大全</a></p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+          <div class="prompt-card" style="background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(26,58,92,0.08);">
+            <div style="font-size:0.85rem;color:#E8912D;font-weight:700;margin-bottom:8px;">🍽️ 生活實用｜菜單設計</div>
+            <div style="font-size:0.95rem;color:#555;margin-bottom:12px;line-height:1.6;">「請幫我製作一張文青風咖啡館菜單，版面包含飲品、甜點、價格與簡單插畫。使用奶油色背景、手寫字體、咖啡杯與植物元素」</div>
+            <div style="font-size:0.8rem;color:#888;">📌 應用：家族聚會邀請卡、旅遊回憶冊、食譜卡</div>
+          </div>
+          <div class="prompt-card" style="background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(26,58,92,0.08);">
+            <div style="font-size:0.85rem;color:#E8912D;font-weight:700;margin-bottom:8px;">🗓️ 生活實用｜季節月曆</div>
+            <div style="font-size:0.95rem;color:#555;margin-bottom:12px;line-height:1.6;">「請幫我生成一張春季主題月曆設計，畫面包含月份日期排版、櫻花枝、柔和天空與可愛小插圖。整體使用粉色、米白與淺綠色」</div>
+            <div style="font-size:0.8rem;color:#888;">📌 應用：手機桌布、桌曆製作、節日卡片</div>
+          </div>
+          <div class="prompt-card" style="background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(26,58,92,0.08);">
+            <div style="font-size:0.85rem;color:#E8912D;font-weight:700;margin-bottom:8px;">✈️ 生活實用｜旅遊海報</div>
+            <div style="font-size:0.95rem;color:#555;margin-bottom:12px;line-height:1.6;">「幫我生成一張釜山旅遊雜誌拼貼風海報，風格：韓系插畫＋高級旅遊雜誌感，自然光攝影風格」</div>
+            <div style="font-size:0.8rem;color:#888;">📌 應用：家族旅遊紀念冊、旅遊分享圖文</div>
+          </div>
+          <div class="prompt-card" style="background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(26,58,92,0.08);">
+            <div style="font-size:0.85rem;color:#E8912D;font-weight:700;margin-bottom:8px;">🎯 靈感創意｜LINE 貼圖</div>
+            <div style="font-size:0.95rem;color:#555;margin-bottom:12px;line-height:1.6;">「請幫我設計一組 Q 版角色貼圖，角色表情誇張可愛，包含開心、無奈、生氣與驚訝四種情緒，風格簡單乾淨」</div>
+            <div style="font-size:0.8rem;color:#888;">📌 應用：LINE 個人貼圖（第7週會實際製作）</div>
+          </div>
+          <div class="prompt-card" style="background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(26,58,92,0.08);">
+            <div style="font-size:0.85rem;color:#E8912D;font-weight:700;margin-bottom:8px;">📊 工作應用｜簡報封面</div>
+            <div style="font-size:0.95rem;color:#555;margin-bottom:12px;line-height:1.6;">「設計一張 AI 趨勢論壇簡報封面，主題：未來辦公室。風格：科技感、幾何線條、深色背景。包含標題與日期」</div>
+            <div style="font-size:0.8rem;color:#888;">📌 應用：商務簡報、產品發表會、大會主視覺</div>
+          </div>
+          <div class="prompt-card" style="background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(26,58,92,0.08);">
+            <div style="font-size:0.85rem;color:#E8912D;font-weight:700;margin-bottom:8px;">🖼️ 照片風格｜Y2K 風格</div>
+            <div style="font-size:0.95rem;color:#555;margin-bottom:12px;line-height:1.6;">「將這張照片轉換成 Y2K 風格：螢光色系、幾何愛心、復古膠片質感、暖色調顆粒感」</div>
+            <div style="font-size:0.8rem;color:#888;">📌 應用：社群發文、照片回憶冊、個人形象照</div>
+          </div>
+        </div>
+        <p style="font-size:0.8rem;color:#888;margin-top:16px;">💡 更多範例（50組）：<a href="https://www.bnext.com.tw/article/90908/chatgpt-image-2-prompt-guide-complete" target="blank" style="color:#E8912D;font-weight:600;">數位時代完整文章</a>｜涵蓋品牌社群、工作應用、生活實用、靈感創意、照片風格轉換五大類</p>
+      </div>
+
+      <!-- Week 11 --><!-- Week 11 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 11</span>
+          <span class="week-tag-badge">第 11 週 · 11/27</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week11.jpg" alt="第11週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>AI 翻譯：出國應用</h3>
+          <p>出國旅遊不再為語言障礙苦惱！AI 即時翻譯工具協助你在機場、餐廳、商店無障礙溝通，讓旅行更加順暢自如。</p>
+        </div>
+      </div>
+
+      <!-- Week 12 -->
+      <div class="week-card">
+        <div class="week-card-header">
+          <span class="week-num">WEEK 12</span>
+          <span class="week-tag-badge">第 12 週 · 12/4</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week12.jpg" alt="第12週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>作品整理回顧</h3>
+          <p>將本學期所有 AI 作品（圖片、歌曲、翻譯成果等）整理成冊，建立個人專屬的 AI 學習作品集，為未來留下珍貴記錄。</p>
+        </div>
+      </div>
+
+      <!-- Week 13 -->
+      <div class="week-card">
+        <div class="week-card-header week-accent">
+          <span class="week-num">WEEK 13</span>
+          <span class="week-tag-badge">第 13 週 · 12/11</span>
+        </div>
+        <div class="week-img-wrap">
+          <img src="week-images-fixed/week13.jpg" alt="第13週課程圖" loading="lazy">
+        </div>
+        <div class="week-card-body">
+          <h3>成果分享會</h3>
+          <p>展示本學期的學習成果與作品集，课程重點回顧與延伸應用建議，鼓勵學員在生活中持續探索 AI 的各種可能。</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== INSTRUCTOR ==================== -->
+<section class="section instructor" id="instructor">
+  <div class="container">
+    <span class="section-label">Instructor</span>
+    <h2 class="section-title">授課教師</h2>
+
+    <div class="instructor-card">
+      <div class="instructor-avatar">
+        <img src="https://raw.githubusercontent.com/looper1126-code/LKCU-aiclass/main/teacher-photo.jpg" alt="Jerry Kao">
+      </div>
+      <div class="instructor-info">
+        <h3>Jerry Kao</h3>
+        <div class="instructor-title">AI 智慧生活應用課程講師</div>
+        <p class="instructor-bio">
+          致力於將複雜的 AI 工具轉化為簡單易懂的日常生活應用，幫助樂齡族建立數位自信。擁有豐富的教學經驗，授課風格親切耐心，強調「做中學」的實作導向。同時经营多個 YouTube 頻道，涵蓋烹飪料理、 AI 工具實測與新科技探索。
+        </p>
+        <ul class="channel-list">
+          <li>▶️ @cooking-d4l（Cooking ASMR｜美食短片）</li>
+          <li>▶️ @oldman8481（AI 教學與生活應用）</li>
+          <li>▶️ @oldYT-w5p（新平台探索｜AI 工具實測）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CTA / REGISTER ==================== -->
+<section class="section cta" id="register">
+  <div class="container">
+    <h2 class="cta-title">報名資訊</h2>
+    <p class="cta-desc">現在報名，115年9月與我們一起展開 AI 生活新體驗</p>
+
+    <div class="cta-box">
+      <h4>📋 報名須知</h4>
+      <div class="cta-row">
+        <span class="icon">📅</span>
+        <span><strong>開課日期：</strong>115年9月4日～12月11日（每週五，跳過9/25、10/9）</span>
+      </div>
+      <div class="cta-row">
+        <span class="icon">⏰</span>
+        <span><strong>上課時間：</strong>19:00 - 22:00（每週3小時）</span>
+      </div>
+      <div class="cta-row">
+        <span class="icon">📍</span>
+        <span><strong>上課地點：</strong>林口高中校本部</span>
+      </div>
+      <div class="cta-row">
+        <span class="icon">🗓️</span>
+        <span><strong>現場報名：</strong>6/29（一）下午 14:30 起開跑</span>
+      </div>
+      <div class="cta-row">
+        <span class="icon">💻</span>
+        <span><strong>線上報名：</strong>6/30（二）上午 10:00 準時開放</span>
+      </div>
+      <div class="cta-row">
+        <span class="icon">🔗</span>
+        <span><strong>線上報名傳送門：</strong><a href="https://www.lcc.org.tw/student/" target="_blank" style="color:#7dd3fc;text-decoration:underline;">https://www.lcc.org.tw/student/</a></span>
+      </div>
+      <div class="cta-row">
+        <span class="icon">📞</span>
+        <span><strong>洽詢專線：</strong>(02) 2600-8655</span>
+      </div>
+      <div class="cta-row" style="background:rgba(255,215,0,0.12); padding:10px 14px; border-radius:8px; margin-top:6px;">
+        <span class="icon">💡</span>
+        <span style="color:#ffd86b;"><strong>小撇步：</strong>熱門課程通常秒殺，建議先選好心儀課程，時間一到馬上出擊！</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="footer">
+  <p>© 2026 AI智慧生活應用｜林口高中校本部 115年度秋季班｜授課教師：Jerry Kao</p>
+  <p style="margin-top:8px; opacity:0.6;">Designed for 樂齡族｜友善數位學習</p>
+  <p style="margin-top:12px; font-size:0.75rem; opacity:0.4; border-top:1px solid rgba(255,255,255,0.1); padding-top:12px;">
+    版權所有 © 2025-2026｜未經授權禁止轉載｜課程內容保留修改權利
+  </p>
+</footer>
+
+<script>
+// ========== Telegram Login ==========
+const BOTTOKEN = '8147903549:AAEQ4d1O2oX3szlDea0hW1LlCFBalKmT6I'; // @hermesidogbot
+
+async function telegramLogin() {
+  try {
+    const user = await Telegram.WebApp.initDataUnsafe;
+    const initData = Telegram.WebApp.initData;
+    const resp = await fetch(`/api/telegram-login?initdata=${encodeURIComponent(initData)}`);
+    const data = await resp.json();
+    if (data.ok) {
+      document.getElementById('teacher-login-area').style.display = 'none';
+      document.getElementById('teacher-logged-area').style.display = 'block';
+      document.getElementById('teacher-name').textContent = data.user.firstname;
+      document.getElementById('teacher-panel').style.display = 'block';
+      populateWeekSelect();
+    } else {
+      alert('登入失敗：' + (data.error || '未知錯誤'));
+    }
+  } catch (e) {
+    alert('請從 Telegram 內點擊此按鈕，或確認 WebApp 已初始化');
+  }
+}
+
+async function passwordLogin() {
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+  const resp = await fetch('/api/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({username, password})
+  });
+  const data = await resp.json();
+  if (data.ok) {
+    document.getElementById('teacher-login-area').style.display = 'none';
+    document.getElementById('teacher-logged-area').style.display = 'block';
+    document.getElementById('teacher-name').textContent = '老師';
+    document.getElementById('teacher-panel').style.display = 'block';
+    populateWeekSelect();
+  } else {
+    alert('登入失敗：' + (data.error || '帳號或密碼錯誤'));
+  }
+}
+
+function showPasswordLogin() {
+  document.getElementById('password-login-form').style.display = 'flex';
+  document.getElementById('telegram-login-form').style.display = 'none';
+  document.querySelectorAll('.login-tab')[0].classList.add('active');
+  document.querySelectorAll('.login-tab')[1].classList.remove('active');
+}
+
+function showTelegramLogin() {
+  document.getElementById('password-login-form').style.display = 'none';
+  document.getElementById('telegram-login-form').style.display = 'block';
+  document.querySelectorAll('.login-tab')[0].classList.remove('active');
+  document.querySelectorAll('.login-tab')[1].classList.add('active');
+}
+
+// ========== Week Select ==========
+const WEEKTOPICS = {
+  1:'AI 初體驗：認識 AI、安裝 ChatGPT/Gemini',
+  2:'AI 生活管家：查食譜、智慧識圖',
+  3:'AI 智慧旅遊：規劃行程',
+  4:'AI 社交應用：祝福語、防詐',
+  5:'AI 修圖：MyEdit、CapCut',
+  6:'AI 美拍：美圖秀秀',
+  7:'LINE 個人貼圖',
+  8:'AI 音樂：Suno 創作',
+  9:'公民教育週（休息）',
+  10:'提示詞魔法',
+  11:'AI 翻譯：出國應用',
+  12:'作品整理回顧',
+  13:'成果分享會',
+};
+
+function populateWeekSelect() {
+  const sel = document.getElementById('gen-week');
+  Object.keys(WEEKTOPICS).forEach(w => {
+    const opt = document.createElement('option');
+    opt.value = w;
+    opt.textContent = `第${w}週｜${WEEKTOPICS[w]}`;
+    sel.appendChild(opt);
+  });
+}
+
+// ========== Generate Content ==========
+async function generateContent() {
+  const week = document.getElementById('gen-week').value;
+  const userTopic = document.getElementById('gen-topic').value.trim();
+  const topic = userTopic || WEEKTOPICS[week] || '';
+  const btn = document.getElementById('gen-btn');
+  const result = document.getElementById('gen-result');
+
+  if (!week) { alert('請選擇週次'); return; }
+  if (!topic) { alert('找不到週次，請重新整理頁面'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '產生中...';
+  result.classList.remove('show');
+  result.textContent = '';
+
+  try {
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({week: parseInt(week), topic})
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      const c = data.content;
+      let html = '';
+      if (c.summary) html += `📋 課程摘要\n${c.summary}\n\n`;
+      if (c.resources && c.resources.length) html += `📚 延伸學習\n${c.resources.join('\n')}\n\n`;
+      if (c.exercises && c.exercises.length) html += `✏️ 隨堂練習\n${c.exercises.join('\n')}\n\n`;
+      if (c.tip) html += `💡 ${c.tip}`;
+      if (c.raw) html = c.raw;
+      result.textContent = html;
+      result.classList.add('show');
+    } else {
+      result.textContent = '錯誤：' + (data.error || '產生失敗');
+      result.classList.add('show');
+    }
+  } catch(e) {
+    result.textContent = '網路錯誤：' + e.message;
+    result.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ 產生課程內容';
+  }
+}
+
+// ========== Auto-open panel if logged in ==========
+fetch('/api/check-admin').then(r=>r.json()).then(d=>{
+  if (d.admin) {
+    document.getElementById('teacher-login-area').style.display = 'none';
+    document.getElementById('teacher-logged-area').style.display = 'block';
+    populateWeekSelect();
+  }
+});
+</script>
+
+</body>
+</html>

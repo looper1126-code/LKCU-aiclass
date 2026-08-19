@@ -12,64 +12,110 @@
         .card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         h1 { color: #333; margin-bottom: 10px; }
         h2 { color: #667eea; margin: 25px 0 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #555; margin: 15px 0 10px; }
         .meta { color: #999; margin-bottom: 20px; }
         .badge { display: inline-block; background: #ffa726; color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; margin-left: 10px; }
-        .tip { background: #fff9db; padding: 20px; border-radius: 10px; margin: 15px 0; text-align: center; }
-        ul, ol { margin: 10px 0 10px 20px; }
-        li { margin: 8px 0; }
+        .download-btn { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin: 10px 5px; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         th { background: #f8f9fa; color: #667eea; }
+        ul, ol { margin: 10px 0 10px 20px; }
+        li { margin: 8px 0; }
+        .tip-box { background: #fff9db; padding: 20px; border-radius: 10px; margin: 15px 0; text-align: center; }
+        .highlight { background: #e3f2fd; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .intro { background: linear-gradient(135deg, #ffa726, #ff9800); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; }
+        .checklist { background: #f1f8e9; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .checklist label { display: block; margin: 8px 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <a href="/course_v2.html" class="back-link">← 返回教材總覽</a>
         
-        <div class="card">
-            <h1>第 6 週｜公論週（複習） <span class="badge">休息複習</span></h1>
-            <p class="meta">📅 日期：10/23（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+        <div class="intro">
+            <h1>第 6 週｜公論週（複習） <span class="badge">🌸 休息複習週</span></h1>
+            <p>📅 日期：10/23（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+            <a href="/course_materials/week06/week06.pdf" class="download-btn" style="background:white;color:#ffa726;">📥 下載教材 PDF</a>
         </div>
         
-        <div class="tip">
-            <h2>🌸 本週休息！</h2>
-            <p>本期課程暫停一次，好好利用這週時間複習前面所學的 AI 工具！</p>
+        <div class="card">
+            <h2>💬 老師的話</h2>
+            <p>這週我们休息一次！</p>
+            <p style="margin-top:10px;">但是！這是<strong>複習的最好時機</strong>～</p>
+            <div class="tip-box">
+                <h3 style="color:#ffa726;">🌸 休息是為了走更遠的路！</h3>
+                <p>利用這週時間，好好熟練前面學過的 AI 工具，為後續課程做好準備！</p>
+            </div>
         </div>
         
         <div class="card">
             <h2>📚 複習重點回顧</h2>
             <table>
                 <tr><th>週次</th><th>主題</th><th>重點複習</th></tr>
-                <tr><td>第 1 週</td><td>AI 入門</td><td>什麼是 AI？手機基本設定</td></tr>
-                <tr><td>第 2 週</td><td>LINE + AI</td><td>查天氣、翻譯、食譜</td></tr>
-                <tr><td>第 3 週</td><td>語音助理</td><td>Siri、Google 助理操作</td></tr>
-                <tr><td>第 4 週</td><td>Google Lens</td><td>拍照翻譯、圖像辨識</td></tr>
-                <tr><td>第 5 週</td><td>AI 圖片生成</td><td>Lexica.art 操作</td></tr>
+                <tr><td>第 1 週</td><td>AI 入門</td><td>什麼是 AI？手機基本設定、必備 App 下載</td></tr>
+                <tr><td>第 2 週</td><td>LINE + AI</td><td>查天氣、翻譯、食譜、記事本功能</td></tr>
+                <tr><td>第 3 週</td><td>語音助理</td><td>Siri、Google 助理操作、設鬧鐘、傳語音</td></tr>
+                <tr><td>第 4 週</td><td>Google Lens</td><td>拍照翻譯、圖像辨識、植物辨識</td></tr>
+                <tr><td>第 5 週</td><td>AI 圖片生成</td><td>Lexica.art 操作、提示詞語法</td></tr>
             </table>
         </div>
         
         <div class="card">
             <h2>💪 複習任務清單</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> □ 打開 Siri/Google 助理，練習問 3 個問題</label>
+                <label><input type="checkbox"> □ 用 LINE 查一週天氣</label>
+                <label><input type="checkbox"> □ 用 Google Lens 拍攝並翻譯一張圖片</label>
+                <label><input type="checkbox"> □ 用 Lexica 生成一張圖片（嘗試不同風格）</label>
+                <label><input type="checkbox"> □ 整理前 5 週的學習筆記</label>
+                <label><input type="checkbox"> □ 收集自己最滿意的 AI 作品</label>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📖 推薦複習資源</h2>
             <ul>
-                <li>□ 打開 Siri/Google 助理，練習問問題</li>
-                <li>□ 用 LINE 查一週天氣</li>
-                <li>□ 用 Google Lens 拍攝並翻譯一張圖片</li>
-                <li>□ 用 Lexica 生成一張圖片</li>
-                <li>□ 整理前 5 週的學習筆記</li>
+                <li><strong>YouTube 教學影片</strong>：搜尋「AI 教學 樂齡」</li>
+                <li><strong>LINE 群組</strong>：在班級群組分享你的作品</li>
+                <li><strong>課堂筆記</strong>：複習上課教的步驟</li>
+                <li><strong>問同學</strong>：有問題可以問問同學怎麼做</li>
             </ul>
+        </div>
+        
+        <div class="highlight">
+            <h2>🎯 自我檢測</h2>
+            <p>你能回答以下問題嗎？</p>
+            <ol>
+                <li>什麼是 AI？AI 可以幫我做什麼？</li>
+                <li>如何用 Siri 查天氣？</li>
+                <li>Google Lens 可以做什麼事情？</li>
+                <li>AI 圖片生成的提示詞要怎麼寫？</li>
+                <li>用 LINE 怎麼查食譜？</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>🏠 複習小挑戰</h2>
+            <ol>
+                <li><strong>教會一個人</strong>：把學到的教會身邊的人（老伴、子女、孫子）</li>
+                <li><strong>拍一支影片</strong>：用手機錄下自己操作 AI 的過程</li>
+                <li><strong>分享到群組</strong>：把作品傳到 LINE 群組給大家看</li>
+            </ol>
         </div>
         
         <div class="card">
             <h2>📅 下週預告</h2>
-            <p><strong>第 7 週：AI 修圖 - MyEdit</strong></p>
+            <h3>第 7 週：AI 修圖 - MyEdit</h3>
             <ul>
-                <li>AI 去路人</li>
-                <li>照片尺寸調整</li>
-                <li>基本濾鏡套用</li>
+                <li>🤖 AI 去路人（自動移除背景中的路人）</li>
+                <li>✂️ 照片尺寸調整（證件照、海報尺寸）</li>
+                <li>🎨 基本濾鏡套用</li>
+                <li>📄 證件照排版</li>
             </ul>
+            <p style="margin-top:15px;"><strong>課前準備：</strong>下載 MyEdit App、準備一張有路人的旅遊照片</p>
         </div>
         
-        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v1.0*</p>
+        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v2.0*</p>
     </div>
 </body>
 </html>

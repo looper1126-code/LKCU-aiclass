@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第 5 週｜AI 圖片生成基礎 - AI 智慧生活應用</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; background: #f5f7fa; padding: 20px; line-height: 1.8; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .back-link { display: inline-block; color: #667eea; text-decoration: none; margin-bottom: 20px; font-weight: bold; }
+        .card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 10px; }
+        h2 { color: #667eea; margin: 25px 0 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        h3 { color: #555; margin: 15px 0 10px; }
+        .meta { color: #999; margin-bottom: 20px; }
+        .badge { display: inline-block; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 5px 15px; border-radius: 15px; font-size: 12px; margin-left: 10px; }
+        .download-btn { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin: 10px 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #667eea; }
+        ul, ol { margin: 10px 0 10px 20px; }
+        li { margin: 8px 0; }
+        .tip-box { background: #e8f5e9; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #4caf50; }
+        .highlight { background: #fff9db; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .warning { background: #fff3e0; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #ff9800; }
+        .intro { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; }
+        .checklist { background: #e3f2fd; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .checklist label { display: block; margin: 8px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/course_v2.html" class="back-link">← 返回教材總覽</a>
+        
+        <div class="intro">
+            <h1>第 5 週｜AI 圖片生成基礎 <span class="badge">🎨 AI 畫家</span></h1>
+            <p>📅 日期：10/16（五）⏰ 時間：19:00 - 22:00 📍 地點：林口高中校本部</p>
+            <a href="/course_materials/week05/week05.pdf" class="download-btn" style="background:white;color:#667eea;">📥 下載教材 PDF</a>
+        </div>
+        
+        <div class="card">
+            <h2>💬 老師的話</h2>
+            <p>這週我们要學一個「魔法」——用文字畫圖！</p>
+            <p style="margin-top:10px;">以前要畫一幅畫，需要學好幾年的美術。</p>
+            <p>現在！只要會打字（甚至只要會說話），AI 就能幫你畫出美麗的圖片！</p>
+            <div class="tip-box" style="margin-top:15px;">
+                <strong>🎨 這週學會後：</strong>
+                <ul style="margin-top:10px;">
+                    <li>✅ 用文字創造圖片</li>
+                    <li>✅ 設計生日祝福卡</li>
+                    <li>✅ 製作旅遊海報</li>
+                    <li>✅ 創作獨一無二的圖片</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📖 課前準備</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> 已有 Google 帳號（如沒有請提前申請）</label>
+                <label><input type="checkbox"> 已準備好想生成的圖片主題</label>
+                <label><input type="checkbox"> 手機或電腦已連上網路</label>
+                <label><input type="checkbox"> 想一下要用 AI 畫什麼？（如：生日卡、風景圖）</label>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🧠 什麼是 AI 圖片生成？</h2>
+            <div class="highlight">
+                <strong>💡 簡單比喻：</strong>
+                <p>AI 就像一個看過幾百萬張圖片的藝術家。你告訴它你要什麼，它就會畫給你！</p>
+            </div>
+            <table style="margin-top:15px;">
+                <tr><th>傳統畫家</th><th>AI 畫家</th></tr>
+                <tr><td>需要時間，一筆一筆畫</td><td>幾秒鐘就能畫出來</td></tr>
+                <tr><td>需要美術基礎</td><td>只要會打字就好</td></tr>
+                <tr><td>可能畫不像</td><td>想要什麼風格都可以</td></tr>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>🌐 Lexica.art 教學</h2>
+            <h3>認識 Lexica</h3>
+            <p>Lexica 是一個免費的 AI 圖片生成網站，用的是 Stable Diffusion 技術。</p>
+            <ul>
+                <li>✅ 免費使用（有額度限制）</li>
+                <li>✅ 無需安裝軟體（網頁版）</li>
+                <li>✅ 支援中文提示詞</li>
+                <li>✅ 作品可以免費下載</li>
+            </ul>
+            
+            <h3>操作步驟</h3>
+            <ol>
+                <li>打開瀏覽器（Chrome/Safari/Edge）</li>
+                <li>網址列輸入：<strong>lexica.art</strong></li>
+                <li>點擊「Generate」</li>
+                <li>在提示詞框中輸入你想生成的圖片描述</li>
+                <li>調整圖片尺寸：正方形（512x512）或橫向（768x512）</li>
+                <li>點擊「Generate」按鈕</li>
+                <li>等待幾秒鐘，AI 就會畫出圖片！</li>
+                <li>點擊圖片下載</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>📝 提示詞語法 - 怎麼說 AI 才聽得懂？</h2>
+            <h3>基本公式</h3>
+            <div class="highlight">
+                <strong>[主體] + [場景] + [風格] + [細節]</strong>
+            </div>
+            
+            <h3>範例練習</h3>
+            <table>
+                <tr><th>提示詞</th><th>結果</th></tr>
+                <tr><td>貓咪，在沙發上，可愛，插畫風格</td><td>沙發上的可愛貓咪插畫</td></tr>
+                <tr><td>老人，在公園散步，复古照片，夕陽</td><td>夕陽下公園散步的老人</td></tr>
+                <tr><td>生日蛋糕，蠟燭，繽紛，3D 風格</td><td>3D 風格繽紛生日蛋糕</td></tr>
+            </table>
+            
+            <h3>常用風格關鍵字</h3>
+            <table>
+                <tr><th>風格</th><th>關鍵字</th></tr>
+                <tr><td>油畫</td><td>oil painting</td></tr>
+                <tr><td>水彩</td><td>watercolor</td></tr>
+                <tr><td>攝影</td><td>photography</td></tr>
+                <tr><td>動漫</td><td>anime</td></tr>
+                <tr><td>3D</td><td>3D render</td></tr>
+            </table>
+            
+            <div class="warning" style="margin-top:15px;">
+                <strong>⚠️ 避免的詞：</strong>
+                <ul>
+                    <li>不要說「不要...」（AI 聽不懂）</li>
+                    <li>不要太複雜（一次說一個重點）</li>
+                    <li>不要有錯別字</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🎁 主題練習</h2>
+            <h3>課堂練習</h3>
+            <ol>
+                <li><strong>生日祝福卡</strong>：「生日蛋糕，蠟燭，繽紛氣球，祝福語，溫暖氛圍」</li>
+                <li><strong>旅遊海報</strong>：「台北 101，夕陽，城市風景，攝影風格」</li>
+                <li><strong>家庭插畫</strong>：「爺爺奶奶孫子孫女，客廳，幸福的家庭，插畫風格」</li>
+                <li><strong>個人大頭照</strong>：「老人的大頭照，笑容，溫暖，攝影風格」</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>❓ 常見問題 Q&A</h2>
+            <div class="faq-q" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:10px 0;font-weight:bold;">Q1: 生成的圖片免費嗎？</div>
+            <div style="padding:10px 0 10px 20px;">A: 是的！可以免費下載使用。</div>
+            
+            <div class="faq-q" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:10px 0;font-weight:bold;">Q2: 額度用完怎麼辦？</div>
+            <div style="padding:10px 0 10px 20px;">A: 每天會刷新額度，或可以註冊多個帳號。</div>
+            
+            <div class="faq-q" style="background:#f5f5f5;padding:15px;border-radius:10px;margin:10px 0;font-weight:bold;">Q3: 圖片可以商用嗎？</div>
+            <div style="padding:10px 0 10px 20px;">A: 大部分可以個人使用，商用請查看使用條款。</div>
+        </div>
+        
+        <div class="card">
+            <h2>✅ 課後複習</h2>
+            <div class="checklist">
+                <label><input type="checkbox"> 誰會用 Lexica.art 了？（請舉手）</label>
+                <label><input type="checkbox"> 誰成功生成了圖片？（請舉手）</label>
+                <label><input type="checkbox"> 知道提示詞公式了？（請舉手）</label>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🏠 家庭作業</h2>
+            <h3>必做</h3>
+            <ol>
+                <li><strong>🎂 生日祝福圖</strong>：用 AI 為家人或朋友生成一張祝福圖</li>
+            </ol>
+            <h3>選做</h3>
+            <ol>
+                <li><strong>🖼️ 旅遊海報</strong>：生成一張想去的地方的海報</li>
+            </ol>
+        </div>
+        
+        <div class="card">
+            <h2>📅 下週預告</h2>
+            <h3>第 6 週：公論週（休息）</h3>
+            <ul>
+                <li>🌸 休息一週</li>
+                <li>📚 複習前 5 週內容</li>
+                <li>📝 整理作品</li>
+            </ul>
+        </div>
+        
+        <p style="text-align: center; color: #999; margin-top: 30px;">*教材版本：優化版 v2.0*</p>
+    </div>
+</body>
+</html>
