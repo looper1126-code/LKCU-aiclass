@@ -78,6 +78,14 @@
       color: var(--white);
     }
 
+    /* ==================== MOBILE MENU ==================== */
+    .mobile-menu-btn { display: none; background: transparent; border: none; cursor: pointer; padding: 8px; }
+    .mobile-menu-btn span { display: block; width: 24px; height: 2px; background: var(--white); margin: 5px 0; }
+    .mobile-nav { display: none; position: fixed; top: 60px; left: 0; right: 0; background: rgba(26,58,92,0.98); padding: 16px; z-index: 999; }
+    .mobile-nav.active { display: block; }
+    .mobile-nav a { display: block; color: rgba(255,255,255,0.9); text-decoration: none; padding: 12px 16px; border-radius: 8px; }
+    .mobile-nav .new教材 { color: #ffd700 !important; font-weight: 600; }
+
     /* ==================== HERO ==================== */
     .hero {
       background: linear-gradient(135deg, var(--primary) 0%, #234E7A 60%, #2E6BA6 100%);
@@ -658,6 +666,7 @@
     /* ==================== RESPONSIVE ==================== */
     @media (max-width: 768px) {
       .nav-links { display: none; }
+      .mobile-menu-btn { display: block; }
       .hero { padding: 100px 20px 60px; }
       .about-grid { grid-template-columns: 1fr; gap: 32px; }
       .features-grid { grid-template-columns: 1fr; }
@@ -718,6 +727,19 @@
     <li><a href="/course.html">📚 課程教材</a> <span style="opacity:0.6">|</span> <a href="/course_v2/complete.html" style="color:#ffd700">✨ 新版教材</a></li>
     <li><a href="#register">我要報名</a></li>
   </ul>
+  <button class="mobile-menu-btn" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- Mobile Navigation -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about">課程介紹</a>
+  <a href="#features">課程特色</a>
+  <a href="#schedule">13週課程</a>
+  <a href="#instructor">授課教師</a>
+  <a href="/course.html">📚 課程教材</a>
+  <a href="/course_v2/complete.html" class="new教材">✨ 新版教材</a>
+  <a href="#register">我要報名</a>
+</div>
   <button onclick="document.getElementById('teacher-panel').style.display=document.getElementById('teacher-panel').style.display==='none'?'block':'none'" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:0.85rem;">👤 老師</button>
 </nav>
 
@@ -1293,6 +1315,16 @@ fetch('/api/check-admin').then(r=>r.json()).then(d=>{
     document.getElementById('teacher-logged-area').style.display = 'block';
     populateWeekSelect();
   }
+});
+
+// Mobile menu toggle
+function toggleMobileMenu() {
+  document.getElementById('mobileNav').classList.toggle('active');
+}
+document.querySelectorAll('.mobile-nav a').forEach(function(link) {
+  link.addEventListener('click', function() {
+    document.getElementById('mobileNav').classList.remove('active');
+  });
 });
 </script>
 
