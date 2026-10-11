@@ -526,7 +526,8 @@
 
         /* ===== CANVAS ===== */
         .canvas-wrap {
-            background: repeating-conic-gradient(#2a2a2a 0% 25%, #383838 0% 50%) 50% / 18px 18px;
+            background: repeating-conic-gradient(#e8e8e8 0% 25%, #ffffff 0% 50%) 50% / 18px 18px;
+            border: 2px solid var(--border);
             border-radius: 16px;
             padding: 20px;
             display: flex;
@@ -1376,6 +1377,19 @@ function drawCanvas() {
 
         const text = document.getElementById('stickerText').value;
         if (text) drawText(ctx, text, currentSize, currentSize);
+    };
+    img.onerror = () => {
+        // 圖片載入失敗，顯示錯誤提示
+        ctx.clearRect(0, 0, currentSize, currentSize);
+        ctx.fillStyle = 'rgba(255,80,80,0.15)';
+        ctx.fillRect(0, 0, currentSize, currentSize);
+        ctx.fillStyle = '#FF6464';
+        ctx.font = `bold ${Math.round(currentSize*0.07)}px "Noto Sans CJK TC", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('圖片載入失敗', currentSize/2, currentSize/2 - 12);
+        ctx.font = `${Math.round(currentSize*0.05)}px "Noto Sans CJK TC", sans-serif`;
+        ctx.fillText('請重新上傳', currentSize/2, currentSize/2 + 14);
     };
     img.src = images[currentIndex].data;
 }
