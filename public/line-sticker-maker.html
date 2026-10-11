@@ -1521,27 +1521,24 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
 
                 const imgData = ctx.getImageData(0, 0, w, h);
 
-                // 背景取樣：只從絕對角落（最外層 2px）取，避免主體汙染
-                const bgColor = _sampleBgCornerOnly(imgData, w, h);
-                console.log('[去背] 背景色偵測:', bgColor);
+                // 決定背景色
+                let bgColor;
+                if (pickedBgColor) {
+                    bgColor = pickedBgColor;
+                    pickedBgColor = null;
+                    console.log('[去背] 使用者選色:', bgColor);
+                } else {
+                    bgColor = _detectBgColor(imgData, w, h);
+                    console.log('[去背] 自動偵測背景色:', bgColor);
+                }
 
-                // maxDist：保守設計，敏感度 5→18, 30→65, 50→120, 90→280
-                const maxDist = 18 + (tolerance / 90) * 262;
+                // tolerance 0-100 對應 maxDist 5-120（保守設計）
+                const maxDist = 5 + (tolerance / 100) * 115;
 
                 if (mode === 'corner') {
-                    // 角落模式：純 flood-fill
-                    const mask = new Uint8Array(w * h);
-                    const visited = new Uint8Array(w * h);
-                    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
-                        _ffill(imgData, w, h, visited, mask, sx, sy, bgColor, maxDist);
-                    });
-                    const data = imgData.data;
-                    for (let i = 0; i < w*h; i++) {
-                        if (mask[i]) data[i*4+3] = 0;
-                    }
+                    _removeBgSimple(imgData, w, h, bgColor, maxDist);
                 } else {
-                    // 智慧模式：主動保護主體，只移除高度確定的背景
-                    _removeBgSmartConservative(imgData, w, h, bgColor, maxDist, feather);
+                    _removeBgSmart(imgData, w, h, bgColor, maxDist, feather);
                 }
 
                 ctx.putImageData(imgData, 0, 0);
@@ -1562,200 +1559,158 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
     });
 }
 
+// 使用者點擊選中的背景色（全域）
+let pickedBgColor = null;
+
 // ─────────────────────────────────────────────────
-// 保守智慧去背：只移除高度確定的背景區域
+// 自動偵測背景色：取邊界像素直方圖，抓最常見的顏色
 // ─────────────────────────────────────────────────
-function _removeBgSmartConservative(imgData, w, h, bgColor, maxDist, feather) {
+function _detectBgColor(imgData, w, h) {
     const data = imgData.data;
-    const mask = new Uint8Array(w * h);
-    const visited = new Uint8Array(w * h);
+    const bins = {};
 
-    // Step 1: 從四個角落各取一個參考色（只有 2x2 區域），取中位數
-    const cornerColors = [
-        [data[0], data[1], data[2]],                          // (0,0)
-        [data[(w-1)*4], data[(w-1)*4+1], data[(w-1)*4+2]],    // (w-1,0)
-        [data[(h-1)*w*4], data[(h-1)*w*4+1], data[(h-1)*w*4+2]], // (0,h-1)
-        [data[((h-1)*w+w-1)*4], data[((h-1)*w+w-1)*4+1], data[((h-1)*w+w-1)*4+2]] // (w-1,h-1)
-    ];
-    // 取每個 corner 的 2x2 block 平均
-    const cornerBgColors = [[0,0],[w-2,0],[0,h-2],[w-2,h-2]].map(([cx,cy]) => {
-        let r=0,g=0,b=0,n=0;
-        for (let dy=0; dy<2; dy++) {
-            for (let dx=0; dx<2; dx++) {
-                const x=cx+dx, y=cy+dy;
-                if (x<w && y<h) {
-                    const i=(y*w+x)*4;
-                    r+=data[i]; g+=data[i+1]; b+=data[i+2]; n++;
-                }
-            }
-        }
-        return n>0 ? [Math.round(r/n), Math.round(g/n), Math.round(b/n)] : [0,0,0];
-    });
-    const bgR = Math.round(cornerBgColors.map(c=>c[0]).sort((a,b)=>a-b)[1]);
-    const bgG = Math.round(cornerBgColors.map(c=>c[1]).sort((a,b)=>a-b)[1]);
-    const bgB = Math.round(cornerBgColors.map(c=>c[2]).sort((a,b)=>a-b)[1]);
-    const safeBgColor = [bgR, bgG, bgB];
-
-    // Step 2: 驗證背景色的代表性——計算四個角落偏離程度
-    let maxCornerDist = 0;
-    for (const c of cornerBgColors) {
-        const d = Math.sqrt((c[0]-safeBgColor[0])**2+(c[1]-safeBgColor[1])**2+(c[2]-safeBgColor[2])**2);
-        if (d > maxCornerDist) maxCornerDist = d;
-    }
-    console.log('[去背] 角落色偏離程度:', Math.round(maxCornerDist), '(>50表示角落有主體)');
-
-    // Step 3: 若角落顏色差異大，只用 flood-fill 從最安全的角出發
-    const safeCorners = maxCornerDist < 50
-        ? [[0,0],[w-1,0],[0,h-1],[w-1,h-1]]
-        : [[0,0]]; // 強制只用 (0,0) 最不可能有主體的角落
-
-    for (const [sx,sy] of safeCorners) {
-        _ffill(data, w, h, visited, mask, sx, sy, safeBgColor, maxDist);
-    }
-
-    // Step 4: Sobel 邊緣保護（3x3 neighborhood, thresh 0.25）
-    const edges = _sobelFast(imgData, w, h);
-    for (let y = 4; y < h-4; y++) {
-        for (let x = 4; x < w-4; x++) {
-            if (mask[y*w+x]) continue; // 已標記為背景，跳過
-            let nearEdge = false;
-            for (let dy = -3; dy <= 3 && !nearEdge; dy++) {
-                for (let dx = -3; dx <= 3 && !nearEdge; dx++) {
-                    const nx=x+dx, ny=y+dy;
-                    if (edges[ny*w+nx] > 0.25) nearEdge = true;
-                }
-            }
-            if (nearEdge) {
-                // 這個 pixel 靠近邊緣，檢查顏色是否足夠接近背景
-                const i4 = (y*w+x)*4;
-                const dist = Math.sqrt(
-                    (data[i4]-safeBgColor[0])**2 +
-                    (data[i4+1]-safeBgColor[1])**2 +
-                    (data[i4+2]-safeBgColor[2])**2
-                );
-                // 若靠近邊緣且顏色偏離背景不遠，則也設為透明（平滑邊緣）
-                // 若靠近邊緣但顏色偏離背景很遠，保留（這是主體）
-                // 這裡不主動擴充，只保護
-            }
-        }
-    }
-
-    // Step 5: 形態學清理（只腐蝕噪點，不膨脹避免吃掉主體）
-    _morphErode(mask, w, h);
-
-    // Step 6: 羽化
-    if (feather > 0) _featherEdge(imgData, w, h, mask, feather);
-
-    // Step 7: 套用
-    for (let i = 0; i < w*h; i++) {
-        if (mask[i]) data[i*4+3] = 0;
-    }
-}
-
-// ─────────────────────────────────────────────────
-// 極簡背景取樣：只用最外層 2px 像素
-// ─────────────────────────────────────────────────
-function _sampleBgCornerOnly(imgData, w, h) {
-    const data = imgData.data;
-    const samples = [];
-    // 最外層一圈像素
+    // 外層 3px 一圈採樣
     for (let x = 0; x < w; x++) {
-        samples.push([data[x*4], data[x*4+1], data[x*4+2]]); // top
-        samples.push([data[(h-1)*w*4+x*4], data[(h-1)*w*4+x*4+1], data[(h-1)*w*4+x*4+2]]); // bottom
+        for (let t = 0; t < 3; t++) {
+            _addBin(data, bins, x, t, w);
+            _addBin(data, bins, x, h-1-t, w);
+        }
     }
-    for (let y = 1; y < h-1; y++) {
-        samples.push([data[y*w*4], data[y*w*4+1], data[y*w*4+2]]); // left
-        samples.push([data[(y*w+w-1)*4], data[(y*w+w-1)*4+1], data[(y*w+w-1)*4+2]]); // right
+    for (let y = 3; y < h-3; y++) {
+        for (let t = 0; t < 3; t++) {
+            _addBin(data, bins, t, y, w);
+            _addBin(data, bins, w-1-t, y, w);
+        }
     }
-    // 取 RGB 最小值（最"背景"的值，去除主體影響）
-    const sortedR = samples.map(s=>s[0]).sort((a,b)=>a-b);
-    const sortedG = samples.map(s=>s[1]).sort((a,b)=>a-b);
-    const sortedB = samples.map(s=>s[2]).sort((a,b)=>a-b);
-    // 用第 25 百分位數（不怕主體汙染）
-    const q = Math.floor(samples.length * 0.25);
-    return [sortedR[q], sortedG[q], sortedB[q]];
+
+    // 找出現次數最多的 bin
+    let maxCount = 0, dominantKey = '128,128,128';
+    for (const key in bins) {
+        if (bins[key] > maxCount) { maxCount = bins[key]; dominantKey = key; }
+    }
+
+    // 該 bin 區域內取平均當背景色
+    const [br, bg, bb] = dominantKey.split(',').map(Number);
+    let r = 0, g = 0, b = 0, n = 0;
+    for (let x = 0; x < w; x++) {
+        for (let t = 0; t < 3; t++) {
+            const c1 = _getPixelColor(data, x, t, w);
+            if (_colorDist3(c1, [br, bg, bb]) <= 20) { r+=c1[0]; g+=c1[1]; b+=c1[2]; n++; }
+            const c2 = _getPixelColor(data, x, h-1-t, w);
+            if (_colorDist3(c2, [br, bg, bb]) <= 20) { r+=c2[0]; g+=c2[1]; b+=c2[2]; n++; }
+        }
+    }
+    for (let y = 3; y < h-3; y++) {
+        for (let t = 0; t < 3; t++) {
+            const c1 = _getPixelColor(data, t, y, w);
+            if (_colorDist3(c1, [br, bg, bb]) <= 20) { r+=c1[0]; g+=c1[1]; b+=c1[2]; n++; }
+            const c2 = _getPixelColor(data, w-1-t, y, w);
+            if (_colorDist3(c2, [br, bg, bb]) <= 20) { r+=c2[0]; g+=c2[1]; b+=c2[2]; n++; }
+        }
+    }
+
+    return n > 0 ? [Math.round(r/n), Math.round(g/n), Math.round(b/n)] : [br, bg, bb];
+}
+
+function _addBin(data, bins, x, y, w) {
+    const i = (y * w + x) * 4;
+    const key = ((data[i] >> 3) << 0) + ',' + ((data[i+1] >> 3) << 8) + ',' + ((data[i+2] >> 3) << 16);
+    bins[key] = (bins[key] || 0) + 1;
+}
+
+function _getPixelColor(data, x, y, w) {
+    const i = (y * w + x) * 4;
+    return [data[i], data[i+1], data[i+2]];
+}
+
+// RGB 三通道最大差值（比 Euclidean 更嚴格，更安全）
+function _colorDist3(c1, c2) {
+    return Math.max(Math.abs(c1[0]-c2[0]), Math.abs(c1[1]-c2[1]), Math.abs(c1[2]-c2[2]));
 }
 
 // ─────────────────────────────────────────────────
-// 形態學腐蝕（只去除孤點，不往外擴張）
+// 純色比對去背：從四邊往內掃描，確定是背景才移除
 // ─────────────────────────────────────────────────
-function _morphErode(mask, w, h) {
-    const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-    const out = new Uint8Array(w * h);
-    for (let y = 1; y < h-1; y++) {
-        for (let x = 1; x < w-1; x++) {
-            if (!mask[y*w+x]) continue;
-            let count = 0;
-            for (const [dx,dy] of dirs) {
-                if (mask[(y+dy)*w+(x+dx)]) count++;
-            }
-            // 只有鄰居全為 1 才保留（去除邊緣毛刺）
-            if (count === 4) out[y*w+x] = 1;
-        }
-    }
-    // 對於邊緣要求放寬：至少 3 個鄰居
-    for (let y = 1; y < h-1; y++) {
-        for (let x = 1; x < w-1; x++) {
-            if (out[y*w+x] || !mask[y*w+x]) continue;
-            let count = 0;
-            for (const [dx,dy] of dirs) {
-                if (mask[(y+dy)*w+(x+dx)]) count++;
-            }
-            if (count >= 3) out[y*w+x] = 1;
-        }
-    }
-    for (let i = 0; i < w*h; i++) mask[i] = out[i];
-}
-
-// ─────────────────────────────────────────────────
-// 背景取樣：12 點均勻分佈 + 角落加權
-// ─────────────────────────────────────────────────
-function _sampleBgColor(imgData, w, h) {
+function _removeBgSimple(imgData, w, h, bgColor, maxDist) {
     const data = imgData.data;
-    const pts = [
-        // 角落（加權 3x）
-        ...[[2,2],[w-3,2],[2,h-3],[w-3,h-3],
-            [4,4],[w-5,4],[4,h-5],[w-5,h-5]].flat(),
-        // 四邊中點
-        [Math.floor(w/2), 2], [Math.floor(w/2), h-3],
-        [2, Math.floor(h/2)], [w-3, Math.floor(h/2)],
-        // 額外中點
-        [Math.floor(w/4), Math.floor(h/4)],
-        [Math.floor(w*3/4), Math.floor(h*3/4)]
-    ].filter((v,i) => i%2===0).map((v,i,arr) => i%2===0 ? [v, arr[i+1]] : null).filter(Boolean);
-
-    const samples = pts.map(([cx,cy]) => {
-        let r=0,g=0,b=0,n=0;
-        for (let dy=-3; dy<=3; dy++) {
-            for (let dx=-3; dx<=3; dx++) {
-                const x=Math.max(0,Math.min(w-1,cx+dx));
-                const y=Math.max(0,Math.min(h-1,cy+dy));
-                const i=(y*w+x)*4;
-                r+=data[i]; g+=data[i+1]; b+=data[i+2]; n++;
-            }
+    // 上邊往下掃
+    outer:
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            const i = (y*w+x)*4;
+            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
+            data[i+3] = 0;
         }
-        return [Math.round(r/n), Math.round(g/n), Math.round(b/n)];
-    });
-
-    // 取 RGB 中位數
-    const sortedR = samples.map(s=>s[0]).sort((a,b)=>a-b);
-    const sortedG = samples.map(s=>s[1]).sort((a,b)=>a-b);
-    const sortedB = samples.map(s=>s[2]).sort((a,b)=>a-b);
-    const mid = Math.floor(samples.length/2);
-    return [sortedR[mid], sortedG[mid], sortedB[mid]];
+    }
+    // 下邊往上掃
+    outer2:
+    for (let y = h-1; y >= 0; y--) {
+        for (let x = 0; x < w; x++) {
+            const i = (y*w+x)*4;
+            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
+            data[i+3] = 0;
+        }
+    }
+    // 左邊往右掃
+    outer3:
+    for (let x = 0; x < w; x++) {
+        for (let y = 0; y < h; y++) {
+            const i = (y*w+x)*4;
+            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
+            data[i+3] = 0;
+        }
+    }
+    // 右邊往左掃
+    outer4:
+    for (let x = w-1; x >= 0; x--) {
+        for (let y = 0; y < h; y++) {
+            const i = (y*w+x)*4;
+            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
+            data[i+3] = 0;
+        }
+    }
 }
 
 // ─────────────────────────────────────────────────
-// 快速 Sobel（只用來保護邊緣，不做主體偵測）
+// 智慧去背：純色比對 + Sobel 邊緣保護
+// 只移除：顏色像背景 AND 位置不靠近邊緣
+// ─────────────────────────────────────────────────
+function _removeBgSmart(imgData, w, h, bgColor, maxDist, feather) {
+    const data = imgData.data;
+    const edges = _sobelFast(imgData, w, h);
+
+    for (let y = 3; y < h-3; y++) {
+        for (let x = 3; x < w-3; x++) {
+            const i = (y*w+x)*4;
+            const dist = _colorDist3([data[i],data[i+1],data[i+2]], bgColor);
+            if (dist > maxDist) continue;
+
+            // 檢查是否靠近 Sobel 邊緣
+            let nearEdge = false;
+            for (let dy = -2; dy <= 2 && !nearEdge; dy++) {
+                for (let dx = -2; dx <= 2 && !nearEdge; dx++) {
+                    if (edges[(y+dy)*w+(x+dx)] > 0.2) nearEdge = true;
+                }
+            }
+            if (nearEdge) continue; // 靠近邊緣，保留（可能是主體）
+
+            data[i+3] = 0;
+        }
+    }
+
+    if (feather > 0) _featherEdge(imgData, w, h, null, feather);
+}
+
+// ─────────────────────────────────────────────────
+// Sobel 邊緣偵測（正規化）
 // ─────────────────────────────────────────────────
 function _sobelFast(imgData, w, h) {
     const data = imgData.data;
     const out = new Float32Array(w*h);
     let max = 0;
-
-    for (let y=1; y<h-1; y++) {
-        for (let x=1; x<w-1; x++) {
-            const i=(y*w+x)*4;
+    for (let y = 1; y < h-1; y++) {
+        for (let x = 1; x < w-1; x++) {
+            const i = (y*w+x)*4;
             const gx = -data[i-4-w*4]+data[i+4-w*4]-2*data[i-4]+2*data[i+4]-data[i-4+w*4]+data[i+4+w*4];
             const gy = -data[i-w*4-4]-2*data[i-w*4]-data[i-w*4+4]+data[i+w*4-4]+2*data[i+w*4]+data[i+w*4+4];
             const mag = Math.sqrt(gx*gx+gy*gy);
@@ -1763,64 +1718,8 @@ function _sobelFast(imgData, w, h) {
             if (mag > max) max = mag;
         }
     }
-    if (max > 0) { for (let i=0; i<out.length; i++) out[i] /= max; }
+    if (max > 0) for (let i=0; i<out.length; i++) out[i] /= max;
     return out;
-}
-
-// ─────────────────────────────────────────────────
-// 標準 flood-fill（貪心 BFS）
-// ─────────────────────────────────────────────────
-function _ffill(data, w, h, visited, mask, sx, sy, bg, maxDist) {
-    const stack = [[sx,sy]];
-    while (stack.length) {
-        const [x,y] = stack.pop();
-        if (x<0||x>=w||y<0||y>=h) continue;
-        const i = y*w+x;
-        if (visited[i]) continue;
-        visited[i] = 1;
-        const i4 = i*4;
-        const dr = data[i4]-bg[0], dg = data[i4+1]-bg[1], db = data[i4+2]-bg[2];
-        const dist = Math.sqrt(dr*dr+dg*dg+db*db);
-        if (dist <= maxDist) {
-            mask[i] = 1;
-            stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────
-// 形態學開運算：腐蝕 → 膨脹
-// ─────────────────────────────────────────────────
-function _morphOpen(mask, w, h) {
-    const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-
-    // 腐蝕
-    const er = new Uint8Array(w*h);
-    for (let y=1; y<h-1; y++) {
-        for (let x=1; x<w-1; x++) {
-            if (!mask[y*w+x]) continue;
-            let c=0;
-            for (const [dx,dy] of dirs) {
-                if (mask[(y+dy)*w+(x+dx)]) c++;
-            }
-            if (c >= 1) er[y*w+x] = 1;
-        }
-    }
-
-    // 膨脹
-    const di = new Uint8Array(w*h);
-    for (let y=1; y<h-1; y++) {
-        for (let x=1; x<w-1; x++) {
-            if (er[y*w+x]) { di[y*w+x] = 1; continue; }
-            let c=0;
-            for (const [dx,dy] of dirs) {
-                if (er[(y+dy)*w+(x+dx)]) c++;
-            }
-            if (c >= 1) di[y*w+x] = 1;
-        }
-    }
-
-    for (let i=0; i<w*h; i++) mask[i] = di[i] || er[i];
 }
 
 // ─────────────────────────────────────────────────
@@ -1830,26 +1729,30 @@ function _featherEdge(imgData, w, h, mask, feather) {
     const data = imgData.data;
     const dirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
 
-    for (let y=feather; y<h-feather; y++) {
-        for (let x=feather; x<w-feather; x++) {
-            if (mask[y*w+x]) continue;
+    for (let y = feather; y < h-feather; y++) {
+        for (let x = feather; x < w-feather; x++) {
+            const i = (y*w+x)*4;
+            if (data[i+3] === 0) continue;
+
             let dist = Infinity;
             for (const [dx,dy] of dirs) {
-                let d=0;
-                for (let r=1; r<=feather; r++) {
-                    const nx=x+dx*r, ny=y+dy*r;
-                    if (nx<0||nx>=w||ny<0||ny>=h) { d=feather+1; break; }
-                    if (mask[ny*w+nx]) { d=r; break; }
+                let d = 0;
+                for (let r = 1; r <= feather; r++) {
+                    const nx = x+dx*r, ny = y+dy*r;
+                    if (nx<0||nx>=w||ny<0||ny>=h) { d = feather+1; break; }
+                    const ni = (ny*w+nx)*4;
+                    if (data[ni+3] === 0) { d = r; break; }
                 }
                 if (d < dist) dist = d;
             }
             if (dist <= feather) {
-                const i4 = (y*w+x)*4;
-                data[i4+3] = Math.min(data[i4+3], Math.round(255 * dist / feather));
+                data[i+3] = Math.min(data[i+3], Math.round(255 * dist / feather));
             }
         }
     }
 }
+
+// 去背 UI
 // 去背 UI
 // ============================================================
 async function doRemoveBg() {
