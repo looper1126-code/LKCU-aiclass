@@ -1727,39 +1727,36 @@ function _applyFeather(data, w, h, mask, feather) {
 function _morphologicalCleanup(mask, w, h) {
     const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
 
-    // 腐蝕：去除孤立的單點噪點
+    // 腐蝕：4連通鄰居至少2個是mask才保留（去除孤點）
     const eroded = new Uint8Array(w * h);
     for (let y = 1; y < h-1; y++) {
         for (let x = 1; x < w-1; x++) {
-            const idx = y*w+x;
-            if (!mask[idx]) continue;
-            // 周圍至少要有 2 個也是 mask=1 的像素
+            if (!mask[y*w+x]) continue;
             let count = 0;
             for (const [dx,dy] of dirs) {
                 if (mask[(y+dy)*w+(x+dx)]) count++;
             }
-            if (count >= 1) eroded[idx] = 1;
+            if (count >= 2) eroded[y*w+x] = 1;
         }
     }
 
-    // 膨脹：把邊緣補回來（填補腐蝕造成的缺口）
+    // 膨脹：鄰居有任1個是eroded就標記（填補腐蝕缺口）
     const dilated = new Uint8Array(w * h);
     for (let y = 1; y < h-1; y++) {
         for (let x = 1; x < w-1; x++) {
-            if (eroded[idx(y,x)]) { dilated[idx(y,x)] = 1; continue; }
-            // 周圍有腐蝕結果的話也標記
+            if (eroded[y*w+x]) { dilated[y*w+x] = 1; continue; }
             let count = 0;
             for (const [dx,dy] of dirs) {
-                if (eroded[idx(y+dy,x+dx)]) count++;
+                if (eroded[(y+dy)*w+(x+dx)]) count++;
             }
-            if (count >= 2) dilated[idx(y,x)] = 1;
+            if (count >= 1) dilated[y*w+x] = 1;
         }
     }
 
-    // 複製回去
-    for (let i = 0; i < w*h; i++) mask[i] = dilated[i] || eroded[i];
-
-    function idx(y, x) { return y*w+x; }
+    // 合併：保持輪廓完整
+    for (let i = 0; i < w*h; i++) {
+        mask[i] = dilated[i] || eroded[i];
+    }
 }
 
 // ============================================================
