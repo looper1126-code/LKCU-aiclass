@@ -603,6 +603,17 @@
                                     ↩️ 恢復原圖
                                 </button>
                             </div>
+                            <div style="margin-top:10px;">
+                                <label style="font-size:0.8rem; color:#aaa;">
+                                    敏感度：<span id="toleranceValue">32</span>
+                                </label>
+                                <input type="range" id="toleranceSlider" min="5" max="80" value="32"
+                                    style="width:100%; accent-color:#00D26A;"
+                                    oninput="bgTolerance=parseInt(this.value);document.getElementById('toleranceValue').textContent=this.value;">
+                                <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#666;margin-top:2px;">
+                                    <span>精準</span><span>範圍大</span>
+                                </div>
+                            </div>
                             <p id="bgStatusText" style="font-size:0.8rem; color:#00D26A; margin-top:6px; display:none;">
                                 ✓ 已去背（透明背景）
                             </p>
@@ -715,15 +726,7 @@
     <div class="toast" id="toast"></div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.0/dist/browser.js"></script>
     <script>
-        // 檢查 AI 去背 CDN 是否載入成功
-        window.bgRemovalLoaded = typeof backgroundRemoval === 'function';
-        if (!window.bgRemovalLoaded) {
-            console.warn('imgly background-removal CDN 載入失敗，AI 去背功能可能無法使用');
-        }
-        // 全域變數
-        let images = [];
         let currentIndex = -1;
         let currentSize = 240;
         let textStyle = {
@@ -846,14 +849,121 @@
             document.getElementById('bgProcessingText').style.display = 'none';
         }
 
-        // AI 去背
+        // ==========================================
+        // 純客戶端去背（Canvas 演算法，無需 ML 模型）
+        // ==========================================
+
+        // 讀取圖片並套用去背（回傳 dataURL）
+        async function removeBackgroundCanvas(imgDataUrl, tolerance) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imgData.data;
+
+                        // 抓四個角落的顏色（取多數當背景色）
+                        const cornerColors = [
+                            getPixel(data, canvas.width, 0, 0),           // 左上
+                            getPixel(data, canvas.width, canvas.width-1, 0),  // 右上
+                            getPixel(data, canvas.width, 0, canvas.height-1),   // 左下
+                            getPixel(data, canvas.width, canvas.width-1, canvas.height-1), // 右下
+                        ];
+
+                        // 取中位數背景色
+                        const bgColor = medianColor(cornerColors);
+
+                        // Flood-fill 標記
+                        const width = canvas.width;
+                        const height = canvas.height;
+                        const visited = new Uint8Array(width * height);
+                        const toRemove = new Uint8Array(width * height);
+
+                        // 從四個角落 flood-fill
+                        const corners = [
+                            [0, 0], [width-1, 0],
+                            [0, height-1], [width-1, height-1]
+                        ];
+                        corners.forEach(([sx, sy]) => {
+                            if (!visited[sy * width + sx]) {
+                                floodFill(data, width, height, visited, toRemove, sx, sy, bgColor, tolerance);
+                            }
+                        });
+
+                        // 套用透明
+                        for (let i = 0; i < data.length; i += 4) {
+                            const idx = i / 4;
+                            if (toRemove[idx]) {
+                                data[i + 3] = 0; // Alpha = 0
+                            }
+                        }
+
+                        ctx.putImageData(imgData, 0, 0);
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                img.onerror = reject;
+                img.src = imgDataUrl;
+            });
+        }
+
+        function getPixel(data, stride, x, y) {
+            const i = (y * stride + x) * 4;
+            return [data[i], data[i+1], data[i+2], data[i+3]];
+        }
+
+        function colorDistance(c1, c2) {
+            return Math.sqrt(
+                (c1[0] - c2[0]) ** 2 +
+                (c1[1] - c2[1]) ** 2 +
+                (c1[2] - c2[2]) ** 2
+            );
+        }
+
+        function medianColor(colors) {
+            const r = colors.map(c => c[0]).sort((a,b) => a-b);
+            const g = colors.map(c => c[1]).sort((a,b) => a-b);
+            const b = colors.map(c => c[2]).sort((a,b) => a-b);
+            const mid = Math.floor(colors.length / 2);
+            return [r[mid], g[mid], b[mid], 255];
+        }
+
+        function floodFill(data, width, height, visited, toRemove, sx, sy, bgColor, tolerance) {
+            const stack = [[sx, sy]];
+            const maxDist = tolerance * 4.43; // sqrt(255^2*3) ≈ 441, scale tolerance
+
+            while (stack.length > 0) {
+                const [x, y] = stack.pop();
+                const idx = y * width + x;
+
+                if (x < 0 || x >= width || y < 0 || y >= height) continue;
+                if (visited[idx]) continue;
+
+                visited[idx] = 1;
+                const pixel = getPixel(data, width, x, y);
+                const dist = colorDistance(pixel, bgColor);
+
+                if (dist <= maxDist) {
+                    toRemove[idx] = 1;
+                    stack.push([x+1, y], [x-1, y], [x, y+1], [x, y-1]);
+                }
+            }
+        }
+
+        // 容忍度 (0-100)
+        let bgTolerance = 32;
+
+        // 去背
         async function doRemoveBg() {
             if (currentIndex < 0 || !images[currentIndex]) return;
-
-            if (!window.bgRemovalLoaded) {
-                showToast('AI 去背功能載入失敗，請刷新頁面或檢查網路', 'error');
-                return;
-            }
 
             const btn = document.getElementById('removeBgBtn');
             const processingText = document.getElementById('bgProcessingText');
@@ -862,39 +972,18 @@
             processingText.style.display = 'block';
 
             try {
-                // 先把原圖 dataURL 存起來（如果還沒存過）
                 if (!originalDataMap[currentIndex]) {
                     originalDataMap[currentIndex] = images[currentIndex].data;
                 }
 
-                // 將 dataURL 轉成 Blob
-                const imgDataUrl = images[currentIndex].data;
-                const response = await fetch(imgDataUrl);
-                const blob = await response.blob();
+                const resultDataUrl = await removeBackgroundCanvas(
+                    images[currentIndex].data,
+                    bgTolerance
+                );
 
-                // 呼叫 imgly 去背（全域函式 backgroundRemoval）
-                const result = await backgroundRemoval(blob, {
-                    progress: (key, current, total) => {
-                        // 進度回调
-                    },
-                    output: {
-                        format: 'image/png',
-                        quality: 1
-                    }
-                });
-
-                // 將結果轉成 dataURL
-                const reader = new FileReader();
-                const resultDataUrl = await new Promise((resolve) => {
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.readAsDataURL(result);
-                });
-
-                // 更新圖片
                 images[currentIndex].data = resultDataUrl;
                 bgRemovedMap[currentIndex] = true;
 
-                // 更新 UI
                 document.getElementById('currentEditThumb').src = resultDataUrl;
                 updateBgRemovalUI(currentIndex);
                 updatePreview();
