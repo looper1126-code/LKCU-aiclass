@@ -1535,25 +1535,22 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
                 ctx.drawImage(img, 0, 0);
 
                 const imgData = ctx.getImageData(0, 0, w, h);
+                const data = imgData.data;
 
-                // 決定背景色
-                let bgColor;
-                if (pickedBgColor) {
-                    bgColor = pickedBgColor;
+                // tolerance 0-100 → maxDist 5-60（非常保守）
+                const maxDist = 5 + (tolerance / 100) * 55;
+
+                if (pickedBgColor !== null && pickedBgX >= 0) {
+                    // 【定點移除模式】從點擊處 flood-fill，只移除與點擊處相連的同色區域
+                    console.log('[去背] 定點模式：(', pickedBgX, ',', pickedBgY, ') 顏色', pickedBgColor);
+                    _floodFillRemoveBg(data, w, h, pickedBgX, pickedBgY, pickedBgColor, maxDist);
                     pickedBgColor = null;
-                    console.log('[去背] 使用者選色:', bgColor);
+                    pickedBgX = -1;
+                    pickedBgY = -1;
                 } else {
-                    bgColor = _detectBgColor(imgData, w, h);
-                    console.log('[去背] 自動偵測背景色:', bgColor);
-                }
-
-                // tolerance 0-100 對應 maxDist 5-120（保守設計）
-                const maxDist = 5 + (tolerance / 100) * 115;
-
-                if (mode === 'corner') {
-                    _removeBgSimple(imgData, w, h, bgColor, maxDist);
-                } else {
-                    _removeBgSmart(imgData, w, h, bgColor, maxDist, feather);
+                    // 【自動模式】scanline 保守移除（不改變主體）
+                    console.log('[去背] 自動模式');
+                    _removeBgScanlineSafe(data, w, h, tolerance, maxDist);
                 }
 
                 ctx.putImageData(imgData, 0, 0);
@@ -1574,197 +1571,161 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
     });
 }
 
-// 使用者點擊選中的背景色（全域）
-let pickedBgColor = null;
+// ─────────────────────────────────────────────────
+// 定點 flood-fill 移除：只移除與點擊處相連的同色區域
+// 演算法：從點擊處廣度優先擴散，只走「顏色夠像點擊處」的像素
+// 這樣主體顏色即使接近背景，也不會被擴散到（因為不相連）
+// ─────────────────────────────────────────────────
+function _floodFillRemoveBg(data, w, h, startX, startY, targetColor, maxDist) {
+    const visited = new Uint8Array(w * h);
+    const mask = new Uint8Array(w * h);
+    const queue = [];
+    const startI = (startY * w + startX) * 4;
+
+    // 記錄點擊處的顏色
+    const startR = data[startI], startG = data[startI+1], startB = data[startI+2];
+
+    // 驗證：點擊處周圍 3x3 是否有足夠多相似像素（避免點在主體邊緣）
+    let similarCount = 0;
+    for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+            const nx = startX+dx, ny = startY+dy;
+            if (nx<0||nx>=w||ny<0||ny>=h) continue;
+            const ni = (ny*w+nx)*4;
+            if (_colorDistMax([data[ni],data[ni+1],data[ni+2]], targetColor) <= maxDist) similarCount++;
+        }
+    }
+    console.log('[flood-fill] 起點相似像素:', similarCount, '/ 9');
+    if (similarCount < 3) {
+        console.log('[flood-fill] 警告：點擊處可能不在背景區域，取消移除');
+        return; // 點擊處周圍沒有足夠多相似像素，可能點在主體上
+    }
+
+    // BFS flood-fill
+    queue.push([startX, startY]);
+    visited[startY*w+startX] = 1;
+
+    const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+
+    while (queue.length > 0) {
+        const [x, y] = queue.shift();
+        const i = (y * w + x) * 4;
+        const dist = _colorDistMax([data[i], data[i+1], data[i+2]], targetColor);
+
+        if (dist <= maxDist) {
+            mask[y*w+x] = 1; // 標記為背景（將設透明）
+
+            for (const [dx, dy] of dirs) {
+                const nx = x+dx, ny = y+dy;
+                if (nx<0||nx>=w||ny<0||ny>=h) continue;
+                const idx = ny*w+nx;
+                if (!visited[idx]) {
+                    visited[idx] = 1;
+                    const ni = (ny*w+nx)*4;
+                    const ndist = _colorDistMax([data[ni],data[ni+1],data[ni+2]], targetColor);
+                    if (ndist <= maxDist) {
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+        }
+    }
+
+    // 套用透明
+    let removed = 0;
+    for (let i = 0; i < w*h; i++) {
+        if (mask[i]) { data[i*4+3] = 0; removed++; }
+    }
+    console.log('[flood-fill] 移除像素:', removed, '/', w*h);
+}
 
 // ─────────────────────────────────────────────────
-// 自動偵測背景色：取邊界像素直方圖，抓最常見的顏色
+// 保守 scanline 自動去背：只移除「一定是背景」的像素
+// 策略：從四邊往內，只在「該列/欄幾乎全是背景色」的情況下才移除
 // ─────────────────────────────────────────────────
-function _detectBgColor(imgData, w, h) {
-    const data = imgData.data;
-    const bins = {};
+function _removeBgScanlineSafe(data, w, h, tolerance, maxDist) {
+    // 自動偵測背景色（外層直方圖）
+    const bgColor = _autoBgColor(data, w, h);
+    console.log('[scanline] 偵測背景色:', bgColor);
 
-    // 外層 3px 一圈採樣
+    // 每列/欄計算「背景色比例」，只有 >= 85% 才移除該像素
+    const rowBgRatio = new Float32Array(h);
+    const colBgRatio = new Float32Array(w);
+
+    for (let y = 0; y < h; y++) {
+        let count = 0;
+        for (let x = 0; x < w; x++) {
+            const i = (y*w+x)*4;
+            if (_colorDistMax([data[i],data[i+1],data[i+2]], bgColor) <= maxDist) count++;
+        }
+        rowBgRatio[y] = count / w;
+    }
     for (let x = 0; x < w; x++) {
-        for (let t = 0; t < 3; t++) {
-            _addBin(data, bins, x, t, w);
-            _addBin(data, bins, x, h-1-t, w);
+        let count = 0;
+        for (let y = 0; y < h; y++) {
+            const i = (y*w+x)*4;
+            if (_colorDistMax([data[i],data[i+1],data[i+2]], bgColor) <= maxDist) count++;
         }
-    }
-    for (let y = 3; y < h-3; y++) {
-        for (let t = 0; t < 3; t++) {
-            _addBin(data, bins, t, y, w);
-            _addBin(data, bins, w-1-t, y, w);
-        }
+        colBgRatio[x] = count / h;
     }
 
-    // 找出現次數最多的 bin
-    let maxCount = 0, dominantKey = '128,128,128';
+    // 只移除「行列都是背景色」的角隅區域
+    const threshold = 0.82; // 該列/欄至少 82% 是背景色才移除
+    let removed = 0;
+    for (let y = 0; y < h; y++) {
+        if (rowBgRatio[y] < threshold) continue;
+        for (let x = 0; x < w; x++) {
+            if (colBgRatio[x] < threshold) continue;
+            const i = (y*w+x)*4;
+            if (data[i+3] === 0) continue; // 已是透明
+            const dist = _colorDistMax([data[i],data[i+1],data[i+2]], bgColor);
+            if (dist <= maxDist) {
+                data[i+3] = 0;
+                removed++;
+            }
+        }
+    }
+    console.log('[scanline] 移除像素:', removed, '/', w*h);
+}
+
+// ─────────────────────────────────────────────────
+// 自動偵測背景色（外層 2px 直方圖，取最常見的 bin）
+// ─────────────────────────────────────────────────
+function _autoBgColor(data, w, h) {
+    const bins = {};
+    // 上、下、左、右外層 2px
+    for (let x = 0; x < w; x++) {
+        for (let t = 0; t < 2; t++) {
+            _addBin2(data, bins, x, t, w);
+            _addBin2(data, bins, x, h-1-t, w);
+        }
+    }
+    for (let y = 2; y < h-2; y++) {
+        for (let t = 0; t < 2; t++) {
+            _addBin2(data, bins, t, y, w);
+            _addBin2(data, bins, w-1-t, y, w);
+        }
+    }
+    let maxCount = 0, dominantKey = '0,0,0';
     for (const key in bins) {
         if (bins[key] > maxCount) { maxCount = bins[key]; dominantKey = key; }
     }
-
-    // 該 bin 區域內取平均當背景色
-    const [br, bg, bb] = dominantKey.split(',').map(Number);
-    let r = 0, g = 0, b = 0, n = 0;
-    for (let x = 0; x < w; x++) {
-        for (let t = 0; t < 3; t++) {
-            const c1 = _getPixelColor(data, x, t, w);
-            if (_colorDist3(c1, [br, bg, bb]) <= 20) { r+=c1[0]; g+=c1[1]; b+=c1[2]; n++; }
-            const c2 = _getPixelColor(data, x, h-1-t, w);
-            if (_colorDist3(c2, [br, bg, bb]) <= 20) { r+=c2[0]; g+=c2[1]; b+=c2[2]; n++; }
-        }
-    }
-    for (let y = 3; y < h-3; y++) {
-        for (let t = 0; t < 3; t++) {
-            const c1 = _getPixelColor(data, t, y, w);
-            if (_colorDist3(c1, [br, bg, bb]) <= 20) { r+=c1[0]; g+=c1[1]; b+=c1[2]; n++; }
-            const c2 = _getPixelColor(data, w-1-t, y, w);
-            if (_colorDist3(c2, [br, bg, bb]) <= 20) { r+=c2[0]; g+=c2[1]; b+=c2[2]; n++; }
-        }
-    }
-
-    return n > 0 ? [Math.round(r/n), Math.round(g/n), Math.round(b/n)] : [br, bg, bb];
+    return dominantKey.split(',').map(Number);
 }
 
-function _addBin(data, bins, x, y, w) {
+function _addBin2(data, bins, x, y, w) {
     const i = (y * w + x) * 4;
+    // 5-bit 量化，減少 bin 數量
     const key = ((data[i] >> 3) << 0) + ',' + ((data[i+1] >> 3) << 8) + ',' + ((data[i+2] >> 3) << 16);
     bins[key] = (bins[key] || 0) + 1;
 }
 
-function _getPixelColor(data, x, y, w) {
-    const i = (y * w + x) * 4;
-    return [data[i], data[i+1], data[i+2]];
-}
-
-// RGB 三通道最大差值（比 Euclidean 更嚴格，更安全）
-function _colorDist3(c1, c2) {
-    return Math.max(Math.abs(c1[0]-c2[0]), Math.abs(c1[1]-c2[1]), Math.abs(c1[2]-c2[2]));
-}
-
-// ─────────────────────────────────────────────────
-// 純色比對去背：從四邊往內掃描，確定是背景才移除
-// ─────────────────────────────────────────────────
-function _removeBgSimple(imgData, w, h, bgColor, maxDist) {
-    const data = imgData.data;
-    // 上邊往下掃
-    outer:
-    for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-            const i = (y*w+x)*4;
-            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
-            data[i+3] = 0;
-        }
-    }
-    // 下邊往上掃
-    outer2:
-    for (let y = h-1; y >= 0; y--) {
-        for (let x = 0; x < w; x++) {
-            const i = (y*w+x)*4;
-            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
-            data[i+3] = 0;
-        }
-    }
-    // 左邊往右掃
-    outer3:
-    for (let x = 0; x < w; x++) {
-        for (let y = 0; y < h; y++) {
-            const i = (y*w+x)*4;
-            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
-            data[i+3] = 0;
-        }
-    }
-    // 右邊往左掃
-    outer4:
-    for (let x = w-1; x >= 0; x--) {
-        for (let y = 0; y < h; y++) {
-            const i = (y*w+x)*4;
-            if (_colorDist3([data[i],data[i+1],data[i+2]], bgColor) > maxDist) break;
-            data[i+3] = 0;
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────
-// 智慧去背：純色比對 + Sobel 邊緣保護
-// 只移除：顏色像背景 AND 位置不靠近邊緣
-// ─────────────────────────────────────────────────
-function _removeBgSmart(imgData, w, h, bgColor, maxDist, feather) {
-    const data = imgData.data;
-    const edges = _sobelFast(imgData, w, h);
-
-    for (let y = 3; y < h-3; y++) {
-        for (let x = 3; x < w-3; x++) {
-            const i = (y*w+x)*4;
-            const dist = _colorDist3([data[i],data[i+1],data[i+2]], bgColor);
-            if (dist > maxDist) continue;
-
-            // 檢查是否靠近 Sobel 邊緣
-            let nearEdge = false;
-            for (let dy = -2; dy <= 2 && !nearEdge; dy++) {
-                for (let dx = -2; dx <= 2 && !nearEdge; dx++) {
-                    if (edges[(y+dy)*w+(x+dx)] > 0.2) nearEdge = true;
-                }
-            }
-            if (nearEdge) continue; // 靠近邊緣，保留（可能是主體）
-
-            data[i+3] = 0;
-        }
-    }
-
-    if (feather > 0) _featherEdge(imgData, w, h, null, feather);
-}
-
-// ─────────────────────────────────────────────────
-// Sobel 邊緣偵測（正規化）
-// ─────────────────────────────────────────────────
-function _sobelFast(imgData, w, h) {
-    const data = imgData.data;
-    const out = new Float32Array(w*h);
-    let max = 0;
-    for (let y = 1; y < h-1; y++) {
-        for (let x = 1; x < w-1; x++) {
-            const i = (y*w+x)*4;
-            const gx = -data[i-4-w*4]+data[i+4-w*4]-2*data[i-4]+2*data[i+4]-data[i-4+w*4]+data[i+4+w*4];
-            const gy = -data[i-w*4-4]-2*data[i-w*4]-data[i-w*4+4]+data[i+w*4-4]+2*data[i+w*4]+data[i+w*4+4];
-            const mag = Math.sqrt(gx*gx+gy*gy);
-            out[y*w+x] = mag;
-            if (mag > max) max = mag;
-        }
-    }
-    if (max > 0) for (let i=0; i<out.length; i++) out[i] /= max;
-    return out;
-}
-
-// ─────────────────────────────────────────────────
-// 羽化邊緣
-// ─────────────────────────────────────────────────
-function _featherEdge(imgData, w, h, mask, feather) {
-    const data = imgData.data;
-    const dirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
-
-    for (let y = feather; y < h-feather; y++) {
-        for (let x = feather; x < w-feather; x++) {
-            const i = (y*w+x)*4;
-            if (data[i+3] === 0) continue;
-
-            let dist = Infinity;
-            for (const [dx,dy] of dirs) {
-                let d = 0;
-                for (let r = 1; r <= feather; r++) {
-                    const nx = x+dx*r, ny = y+dy*r;
-                    if (nx<0||nx>=w||ny<0||ny>=h) { d = feather+1; break; }
-                    const ni = (ny*w+nx)*4;
-                    if (data[ni+3] === 0) { d = r; break; }
-                }
-                if (d < dist) dist = d;
-            }
-            if (dist <= feather) {
-                data[i+3] = Math.min(data[i+3], Math.round(255 * dist / feather));
-            }
-        }
-    }
+// RGB 三通道最大差值
+function _colorDistMax(c1, c2) {
+    const dr = Math.abs(c1[0]-c2[0]);
+    const dg = Math.abs(c1[1]-c2[1]);
+    const db = Math.abs(c1[2]-c2[2]);
+    return dr > dg ? (dr > db ? dr : db) : (dg > db ? dg : db);
 }
 
 // 去背 UI
@@ -1772,51 +1733,54 @@ function _featherEdge(imgData, w, h, mask, feather) {
 // ============================================================
 
 let pickBgMode = false;
+let pickedBgColor = null;
+let pickedBgX = -1;   // 點擊位置（像素座標，0-base）
+let pickedBgY = -1;
 
 // 啟用背景取色模式
 function enablePickBgMode() {
     if (currentIndex < 0) { showToast('請先上傳圖片', 'error'); return; }
     pickBgMode = true;
+    pickedBgColor = null;
+    pickedBgX = -1;
+    pickedBgY = -1;
     const btn = document.getElementById('pickBgBtn');
     btn.classList.add('active');
     document.getElementById('pickModeHint').style.display = 'inline';
-    showToast('點擊主圖像選取背景顏色');
+    showToast('點擊圖片中要移除的背景區域');
 
-    // 對 mainCanvas 綁定一次性的點擊事件
     const canvas = document.getElementById('mainCanvas');
+
     const handler = (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        // 從 preview canvas 取色（顯示用）
-        const preview = document.getElementById('mainCanvas');
-        const rect = preview.getBoundingClientRect();
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clickX = Math.round((e.clientX - rect.left) * scaleX);
+        const clickY = Math.round((e.clientY - rect.top) * scaleY);
 
-        // 取得實際顯示的圖片範圍
-        const scaleX = preview.width / rect.width;
-        const scaleY = preview.height / rect.height;
-        const x = Math.round((e.clientX - rect.left) * scaleX);
-        const y = Math.round((e.clientY - rect.top) * scaleY);
+        // 從原圖 pixel 取色
+        const img = new Image();
+        img.onload = () => {
+            const w = img.naturalWidth, h = img.naturalHeight;
+            const c = document.createElement('canvas');
+            c.width = w; c.height = h;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const d = ctx.getImageData(0, 0, w, h).data;
+            const px = Math.min(w-1, Math.max(0, Math.round(clickX * w / canvas.width)));
+            const py = Math.min(h-1, Math.max(0, Math.round(clickY * h / canvas.height)));
+            const i = (py * w + px) * 4;
+            pickedBgColor = [d[i], d[i+1], d[i+2]];
+            pickedBgX = px;
+            pickedBgY = py;
+            console.log('[選色] 位置:', px, py, '顏色:', pickedBgColor);
+            showToast('已選色！按下「套用去背」移除該區域', '');
+        };
+        img.src = images[currentIndex].data;
 
-        // 從原圖 data 取色
-        if (currentIndex >= 0 && images[currentIndex]) {
-            const img = new Image();
-            img.onload = () => {
-                const w = img.naturalWidth, h = img.naturalHeight;
-                const c = document.createElement('canvas');
-                c.width = w; c.height = h;
-                const ctx = c.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const d = ctx.getImageData(0, 0, w, h).data;
-                const i = (Math.min(h-1, Math.max(0, y)) * w + Math.min(w-1, Math.max(0, x))) * 4;
-                pickedBgColor = [d[i], d[i+1], d[i+2]];
-                console.log('[選色] 已選擇背景色:', pickedBgColor);
-                showToast('已選色: RGB(' + pickedBgColor.join(',') + ')，可點「套用去背」', '');
-            };
-            img.src = images[currentIndex].data;
-        }
-
-        // 關閉選色模式
         pickBgMode = false;
         btn.classList.remove('active');
         document.getElementById('pickModeHint').style.display = 'none';
