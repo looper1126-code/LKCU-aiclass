@@ -364,6 +364,17 @@
 
         .btn-restore:hover { border-color: #888; color: #fff; }
 
+        .btn-pick {
+            background: #e8f4fd;
+            color: #007bff;
+            border: 1.5px solid #007bff;
+        }
+        .btn-pick:hover { background: #d0ecff; }
+        .btn-pick.active {
+            background: #007bff;
+            color: #fff;
+        }
+
         .bg-status {
             margin-top: 8px;
             font-size: 0.8rem;
@@ -939,12 +950,16 @@
                             </div>
 
                             <div class="bg-actions">
+                                <button class="btn-sm btn-pick" id="pickBgBtn" onclick="enablePickBgMode()">
+                                    🔍 選色
+                                </button>
                                 <button class="btn-sm btn-remove" id="removeBgBtn" onclick="doRemoveBg()">
                                     ✂️ 套用去背
                                 </button>
                                 <button class="btn-sm btn-restore" id="restoreBgBtn" onclick="restoreBackground()" style="display:none;">
                                     ↩️ 恢復原圖
                                 </button>
+                                <span id="pickModeHint" style="display:none;color:#007bff;font-size:0.8rem;margin-left:6px;">→ 點擊圖片選色</span>
                             </div>
 
                             <div id="bgStatusDone" class="bg-status done" style="display:none;">
@@ -1755,6 +1770,64 @@ function _featherEdge(imgData, w, h, mask, feather) {
 // 去背 UI
 // 去背 UI
 // ============================================================
+
+let pickBgMode = false;
+
+// 啟用背景取色模式
+function enablePickBgMode() {
+    if (currentIndex < 0) { showToast('請先上傳圖片', 'error'); return; }
+    pickBgMode = true;
+    const btn = document.getElementById('pickBgBtn');
+    btn.classList.add('active');
+    document.getElementById('pickModeHint').style.display = 'inline';
+    showToast('點擊主圖像選取背景顏色');
+
+    // 對 mainCanvas 綁定一次性的點擊事件
+    const canvas = document.getElementById('mainCanvas');
+    const handler = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // 從 preview canvas 取色（顯示用）
+        const preview = document.getElementById('mainCanvas');
+        const rect = preview.getBoundingClientRect();
+
+        // 取得實際顯示的圖片範圍
+        const scaleX = preview.width / rect.width;
+        const scaleY = preview.height / rect.height;
+        const x = Math.round((e.clientX - rect.left) * scaleX);
+        const y = Math.round((e.clientY - rect.top) * scaleY);
+
+        // 從原圖 data 取色
+        if (currentIndex >= 0 && images[currentIndex]) {
+            const img = new Image();
+            img.onload = () => {
+                const w = img.naturalWidth, h = img.naturalHeight;
+                const c = document.createElement('canvas');
+                c.width = w; c.height = h;
+                const ctx = c.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const d = ctx.getImageData(0, 0, w, h).data;
+                const i = (Math.min(h-1, Math.max(0, y)) * w + Math.min(w-1, Math.max(0, x))) * 4;
+                pickedBgColor = [d[i], d[i+1], d[i+2]];
+                console.log('[選色] 已選擇背景色:', pickedBgColor);
+                showToast('已選色: RGB(' + pickedBgColor.join(',') + ')，可點「套用去背」', '');
+            };
+            img.src = images[currentIndex].data;
+        }
+
+        // 關閉選色模式
+        pickBgMode = false;
+        btn.classList.remove('active');
+        document.getElementById('pickModeHint').style.display = 'none';
+        canvas.removeEventListener('click', handler);
+        canvas.removeEventListener('touchend', handler);
+    };
+
+    canvas.addEventListener('click', handler, { once: true });
+    canvas.addEventListener('touchend', handler, { once: true });
+}
+
 async function doRemoveBg() {
     if (currentIndex < 0) return;
 
