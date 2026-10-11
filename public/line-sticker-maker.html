@@ -1496,305 +1496,236 @@ function setBgMode(mode, btn) {
 }
 
 // ============================================================
-// 強化去背核心演算法
+// 去背核心演算法（重寫版 v3）
 // ============================================================
+
 async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
+    console.log('[去背] 開始處理', { mode, tolerance, feather });
+    const t0 = performance.now();
+
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
             try {
+                const w = img.naturalWidth;
+                const h = img.naturalHeight;
+                console.log('[去背] 圖片尺寸:', w, 'x', h);
+
+                if (w < 4 || h < 4) {
+                    reject(new Error('圖片太小'));
+                    return;
+                }
+
                 const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
                 const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
                 ctx.drawImage(img, 0, 0);
 
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const w = canvas.width;
-                const h = canvas.height;
+                const imgData = ctx.getImageData(0, 0, w, h);
 
-                if (mode === 'corner') {
-                    _removeBgCorner(imgData, w, h, tolerance, feather);
-                } else {
-                    _removeBgSmart(imgData, w, h, tolerance, feather);
+                // 背景取樣（12點，更魯棒）
+                const bgColor = _sampleBgColor(imgData, w, h);
+                console.log('[去背] 背景色偵測:', bgColor);
+
+                // 建立 mask：0=主體，1=背景
+                const mask = new Uint8Array(w * h);
+                const visited = new Uint8Array(w * h);
+
+                // maxDist 對應 tolerance：5→10, 45→150, 90→300
+                const maxDist = 10 + (tolerance / 90) * 290;
+
+                // 從角落 flood-fill
+                const corners = [[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
+                for (const [sx,sy] of corners) {
+                    _ffill(imgData, w, h, visited, mask, sx, sy, bgColor, maxDist);
+                }
+
+                // 二次 flood-fill（更大範圍）
+                const mask2 = new Uint8Array(w * h);
+                const visited2 = new Uint8Array(w * h);
+                for (const [sx,sy] of corners) {
+                    _ffill(imgData, w, h, visited2, mask2, sx, sy, bgColor, maxDist * 2.2);
+                }
+                // mask2 補充到 mask，但跳過強邊緣附近
+                const edges = _sobelFast(imgData, w, h);
+                const edgeThresh = 0.4 - (tolerance / 90) * 0.2;
+                for (let i = 0; i < w*h; i++) {
+                    if (!mask[i] && mask2[i]) {
+                        const y = Math.floor(i / w);
+                        const x = i % w;
+                        let near = false;
+                        for (let dy = -2; dy <= 2 && !near; dy++) {
+                            for (let dx = -2; dx <= 2 && !near; dx++) {
+                                const nx = x+dx, ny = y+dy;
+                                if (nx<0||nx>=w||ny<0||ny>=h) continue;
+                                if (edges[ny*w+nx] > edgeThresh) near = true;
+                            }
+                        }
+                        if (!near) mask[i] = 1;
+                    }
+                }
+
+                // 形態學：腐蝕 + 膨脹（平滑邊緣）
+                _morphOpen(mask, w, h);
+
+                // 羽化邊緣
+                if (feather > 0) {
+                    _featherEdge(imgData, w, h, mask, feather);
+                }
+
+                // 套用透明
+                const data = imgData.data;
+                for (let i = 0; i < w*h; i++) {
+                    if (mask[i]) data[i*4+3] = 0;
                 }
 
                 ctx.putImageData(imgData, 0, 0);
+                const elapsed = Math.round(performance.now() - t0);
+                const maskCount = mask.reduce((a,b) => a+b, 0);
+                console.log('[去背] 完成，耗时', elapsed+'ms', '，透明像素:', maskCount, '/', w*h);
+
                 resolve(canvas.toDataURL('image/png'));
-            } catch(e) { reject(e); }
+            } catch(e) {
+                console.error('[去背] 錯誤:', e);
+                reject(e);
+            }
         };
-        img.onerror = reject;
+        img.onerror = () => reject(new Error('圖片載入失敗'));
         img.src = imgDataUrl;
     });
 }
 
-// ============================================================
-// 純色去背：四角取樣 + flood-fill
-// ============================================================
-function _removeBgCorner(imgData, w, h, tolerance, feather) {
+// ─────────────────────────────────────────────────
+// 背景取樣：12 點均勻分佈 + 角落加權
+// ─────────────────────────────────────────────────
+function _sampleBgColor(imgData, w, h) {
     const data = imgData.data;
-    const bgColor = _sampleBackgroundColor(data, w, h);
-    const mask = new Uint8Array(w * h);
-    const visited = new Uint8Array(w * h);
-    // 敏感度 5-90 → maxDist 10-300
-    const maxDist = (tolerance / 90) * 280 + 10;
+    const pts = [
+        // 角落（加權 3x）
+        ...[[2,2],[w-3,2],[2,h-3],[w-3,h-3],
+            [4,4],[w-5,4],[4,h-5],[w-5,h-5]].flat(),
+        // 四邊中點
+        [Math.floor(w/2), 2], [Math.floor(w/2), h-3],
+        [2, Math.floor(h/2)], [w-3, Math.floor(h/2)],
+        // 額外中點
+        [Math.floor(w/4), Math.floor(h/4)],
+        [Math.floor(w*3/4), Math.floor(h*3/4)]
+    ].filter((v,i) => i%2===0).map((v,i,arr) => i%2===0 ? [v, arr[i+1]] : null).filter(Boolean);
 
-    // 從四個角落同時 flood-fill
-    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
-        _floodFill(data, w, h, visited, mask, sx, sy, bgColor, maxDist);
-    });
-
-    // 羽化邊緣
-    if (feather > 0) _applyFeather(data, w, h, mask, feather);
-
-    // 套用透明
-    _applyMask(data, w, h, mask);
-}
-
-// ============================================================
-// 智慧去背：多點取樣 + 邊緣保護 flood-fill
-// ============================================================
-function _removeBgSmart(imgData, w, h, tolerance, feather) {
-    const data = imgData.data;
-
-    // Step 1: 多點取樣背景色（8個位置，更魯棒）
-    const bgColor = _sampleBackgroundColor(data, w, h);
-
-    // Step 2: Sobel 邊緣偵測（只用來保護主體邊界，不做主體偵測）
-    const edges = _sobelEdges(data, w, h);
-
-    // Step 3: flood-fill 背景（從四個角落）
-    const mask = new Uint8Array(w * h);
-    const visited = new Uint8Array(w * h);
-    const maxDist = (tolerance / 90) * 280 + 10;
-
-    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
-        _floodFillEdgeAware(data, w, h, visited, mask, sx, sy, bgColor, edges, maxDist, tolerance);
-    });
-
-    // Step 3b: 二次 flood-fill（邊緣放寬 2x，捕漏網之魚）
-    const mask2 = new Uint8Array(w * h);
-    const visited2 = new Uint8Array(w * h);
-    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
-        _floodFill(data, w, h, visited2, mask2, sx, sy, bgColor, maxDist * 1.8);
-    });
-    // 合併：mask2 覆蓋但保護邊緣
-    const edgeThresh2 = 1 - (tolerance / 90) * 0.5;
-    for (let i = 0; i < w*h; i++) {
-        if (!mask[i] && mask2[i]) {
-            // 檢查這個pixel是否在強邊緣附近
-            let near = false;
-            const y = Math.floor(i / w), x = i % w;
-            for (let dy = -3; dy <= 3 && !near; dy++) {
-                for (let dx = -3; dx <= 3 && !near; dx++) {
-                    const nx = x+dx, ny = y+dy;
-                    if (nx<0||nx>=w||ny<0||ny>=h) continue;
-                    if (edges[ny*w+nx] > edgeThresh2) near = true;
-                }
-            }
-            if (!near) mask[i] = 1;
-        }
-    }
-
-    // Step 4: 形態學清理 + 羽化
-    if (feather > 0) _applyFeather(data, w, h, mask, feather);
-    _morphologicalCleanup(mask, w, h);
-
-    // Step 5: 色塊殘留清理（去除半透明色島）
-    _removeColorHalos(data, w, h, mask, bgColor);
-
-    // Step 6: 套用透明
-    _applyMask(data, w, h, mask);
-}
-
-// ============================================================
-// 色塊殘留清理：去除透明區域中的小型雜色塊
-// ============================================================
-function _removeColorHalos(data, w, h, mask, bgColor) {
-    // 標記每個候選pixel：非mask但顏色接近背景色
-    const candidates = new Uint8Array(w * h);
-    for (let y = 2; y < h-2; y++) {
-        for (let x = 2; x < w-2; x++) {
-            if (mask[y*w+x]) continue; // 已是透明
-            const px = _getPixel(data, w, x, y);
-            if (_colorDist(px, bgColor) < 60) { // 顏色接近背景
-                candidates[y*w+x] = 1;
-            }
-        }
-    }
-
-    // 對候選區域做 flood-fill 找連通塊，小於 threshold 就移除
-    const visited = new Uint8Array(w * h);
-    const minBlobSize = Math.max(50, Math.floor(w * h * 0.002)); // 最小 blob 門檻
-    const dirs4 = [[1,0],[-1,0],[0,1],[0,-1]];
-
-    for (let y = 2; y < h-2; y++) {
-        for (let x = 2; x < w-2; x++) {
-            if (!candidates[y*w+x] || visited[y*w+x]) continue;
-
-            // BFS 找連通塊
-            const stack = [[x, y]];
-            let count = 0;
-            const pixels = [];
-
-            while (stack.length) {
-                const [cx, cy] = stack.pop();
-                if (cx<2||cx>=w-2||cy<2||cy>=h-2) continue;
-                const idx = cy*w+cx;
-                if (visited[idx] || !candidates[idx]) continue;
-                visited[idx] = 1;
-                count++;
-                pixels.push(idx);
-                for (const [dx,dy] of dirs4) {
-                    stack.push([cx+dx, cy+dy]);
-                }
-            }
-
-            // 小於門檻的 blob → 移除（設為透明）
-            if (count < minBlobSize) {
-                for (const idx of pixels) {
-                    data[idx*4+3] = 0;
-                }
-            }
-        }
-    }
-}
-
-// ============================================================
-// 背景取樣：8個位置加權平均，角落優先
-// ============================================================
-function _sampleBackgroundColor(data, w, h) {
-    // 採樣點：4角落 + 4邊中點，各取 5x5 kernel 平均
-    const samplePoints = [
-        [2, 2], [w-3, 2], [2, h-3], [w-3, h-3],   // 角落
-        [Math.floor(w/2), 2], [Math.floor(w/2), h-3], // 上下中
-        [2, Math.floor(h/2)], [w-3, Math.floor(h/2)]  // 左右中
-    ];
-
-    const colors = samplePoints.map(([cx, cy]) => {
-        let r=0, g=0, b=0, n=0;
-        for (let dy = -2; dy <= 2; dy++) {
-            for (let dx = -2; dx <= 2; dx++) {
-                const x = Math.max(0, Math.min(w-1, cx+dx));
-                const y = Math.max(0, Math.min(h-1, cy+dy));
-                const i = (y*w+x)*4;
-                r += data[i]; g += data[i+1]; b += data[i+2]; n++;
+    const samples = pts.map(([cx,cy]) => {
+        let r=0,g=0,b=0,n=0;
+        for (let dy=-3; dy<=3; dy++) {
+            for (let dx=-3; dx<=3; dx++) {
+                const x=Math.max(0,Math.min(w-1,cx+dx));
+                const y=Math.max(0,Math.min(h-1,cy+dy));
+                const i=(y*w+x)*4;
+                r+=data[i]; g+=data[i+1]; b+=data[i+2]; n++;
             }
         }
         return [Math.round(r/n), Math.round(g/n), Math.round(b/n)];
     });
 
-    // 取 RGB 中位數（對抗極端值）
-    return [
-        Math.round(colors.map(c=>c[0]).sort((a,b)=>a-b)[Math.floor(colors.length/2)]),
-        Math.round(colors.map(c=>c[1]).sort((a,b)=>a-b)[Math.floor(colors.length/2)]),
-        Math.round(colors.map(c=>c[2]).sort((a,b)=>a-b)[Math.floor(colors.length/2)])
-    ];
+    // 取 RGB 中位數
+    const sortedR = samples.map(s=>s[0]).sort((a,b)=>a-b);
+    const sortedG = samples.map(s=>s[1]).sort((a,b)=>a-b);
+    const sortedB = samples.map(s=>s[2]).sort((a,b)=>a-b);
+    const mid = Math.floor(samples.length/2);
+    return [sortedR[mid], sortedG[mid], sortedB[mid]];
 }
 
-// ============================================================
-// Sobel 邊緣偵測，回傳歸一化邊緣強度圖
-// ============================================================
-function _sobelEdges(data, w, h) {
-    const edges = new Float32Array(w * h);
-    let maxMag = 0;
+// ─────────────────────────────────────────────────
+// 快速 Sobel（只用來保護邊緣，不做主體偵測）
+// ─────────────────────────────────────────────────
+function _sobelFast(imgData, w, h) {
+    const data = imgData.data;
+    const out = new Float32Array(w*h);
+    let max = 0;
 
-    for (let y = 1; y < h-1; y++) {
-        for (let x = 1; x < w-1; x++) {
-            const i = (y*w+x)*4;
-            // Sobel kernels
-            const gx = (
-                -data[i-4-w*4] + data[i+4-w*4] +
-                -2*data[i-4]   + 2*data[i+4]   +
-                -data[i-4+w*4]  + data[i+4+w*4]
-            );
-            const gy = (
-                -data[i-w*4-4] - 2*data[i-w*4] - data[i-w*4+4] +
-                 data[i+w*4-4] + 2*data[i+w*4] + data[i+w*4+4]
-            );
-            const mag = Math.sqrt(gx*gx + gy*gy);
-            edges[y*w+x] = mag;
-            if (mag > maxMag) maxMag = mag;
+    for (let y=1; y<h-1; y++) {
+        for (let x=1; x<w-1; x++) {
+            const i=(y*w+x)*4;
+            const gx = -data[i-4-w*4]+data[i+4-w*4]-2*data[i-4]+2*data[i+4]-data[i-4+w*4]+data[i+4+w*4];
+            const gy = -data[i-w*4-4]-2*data[i-w*4]-data[i-w*4+4]+data[i+w*4-4]+2*data[i+w*4]+data[i+w*4+4];
+            const mag = Math.sqrt(gx*gx+gy*gy);
+            out[y*w+x] = mag;
+            if (mag > max) max = mag;
         }
     }
-
-    // 歸一化到 0-1
-    if (maxMag > 0) {
-        for (let i = 0; i < edges.length; i++) edges[i] /= maxMag;
-    }
-    return edges;
+    if (max > 0) { for (let i=0; i<out.length; i++) out[i] /= max; }
+    return out;
 }
 
-// ============================================================
-// 標準 flood-fill（貪心版，無排序）
-// ============================================================
-function _floodFill(data, w, h, visited, mask, sx, sy, bgColor, maxDist) {
-    const stack = [[sx, sy]];
+// ─────────────────────────────────────────────────
+// 標準 flood-fill（貪心 BFS）
+// ─────────────────────────────────────────────────
+function _ffill(data, w, h, visited, mask, sx, sy, bg, maxDist) {
+    const stack = [[sx,sy]];
     while (stack.length) {
-        const [x, y] = stack.pop();
-        if (x < 0 || x >= w || y < 0 || y >= h) continue;
-        const idx = y*w+x;
-        if (visited[idx]) continue;
-        visited[idx] = 1;
-        const px = _getPixel(data, w, x, y);
-        if (_colorDist(px, bgColor) <= maxDist) {
-            mask[idx] = 1;
+        const [x,y] = stack.pop();
+        if (x<0||x>=w||y<0||y>=h) continue;
+        const i = y*w+x;
+        if (visited[i]) continue;
+        visited[i] = 1;
+        const i4 = i*4;
+        const dr = data[i4]-bg[0], dg = data[i4+1]-bg[1], db = data[i4+2]-bg[2];
+        const dist = Math.sqrt(dr*dr+dg*dg+db*db);
+        if (dist <= maxDist) {
+            mask[i] = 1;
             stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
         }
     }
 }
 
-// ============================================================
-// 邊緣感知 flood-fill：遇到強邊緣時停止滲透
-// ============================================================
-function _floodFillEdgeAware(data, w, h, visited, mask, sx, sy, bgColor, edges, maxDist, tolerance) {
-    // edgeThresh: 歸一化邊緣強度超過這個值就視為主體邊界
-    // 敏感度愈高 → threshold 愈低（連弱邊緣都擋住）
-    const edgeThresh = 1 - (tolerance / 90) * 0.7 - 0.1; // 0.23 (tol=90) ~ 0.9 (tol=5)
-    const stack = [[sx, sy]];
+// ─────────────────────────────────────────────────
+// 形態學開運算：腐蝕 → 膨脹
+// ─────────────────────────────────────────────────
+function _morphOpen(mask, w, h) {
+    const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
 
-    while (stack.length) {
-        const [x, y] = stack.pop();
-        if (x < 0 || x >= w || y < 0 || y >= h) continue;
-        const idx = y*w+x;
-        if (visited[idx]) continue;
-        visited[idx] = 1;
-
-        // 強邊緣像素：周圍 3x3 區域有強邊緣 → 不進入
-        let nearEdge = false;
-        const searchR = 2;
-        for (let dy = -searchR; dy <= searchR && !nearEdge; dy++) {
-            for (let dx = -searchR; dx <= searchR && !nearEdge; dx++) {
-                const nx = x+dx, ny = y+dy;
-                if (nx<0||nx>=w||ny<0||ny>=h) continue;
-                if (edges[ny*w+nx] > edgeThresh) nearEdge = true;
+    // 腐蝕
+    const er = new Uint8Array(w*h);
+    for (let y=1; y<h-1; y++) {
+        for (let x=1; x<w-1; x++) {
+            if (!mask[y*w+x]) continue;
+            let c=0;
+            for (const [dx,dy] of dirs) {
+                if (mask[(y+dy)*w+(x+dx)]) c++;
             }
-        }
-        if (nearEdge) continue;
-
-        const px = _getPixel(data, w, x, y);
-        if (_colorDist(px, bgColor) <= maxDist) {
-            mask[idx] = 1;
-            stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+            if (c >= 1) er[y*w+x] = 1;
         }
     }
+
+    // 膨脹
+    const di = new Uint8Array(w*h);
+    for (let y=1; y<h-1; y++) {
+        for (let x=1; x<w-1; x++) {
+            if (er[y*w+x]) { di[y*w+x] = 1; continue; }
+            let c=0;
+            for (const [dx,dy] of dirs) {
+                if (er[(y+dy)*w+(x+dx)]) c++;
+            }
+            if (c >= 1) di[y*w+x] = 1;
+        }
+    }
+
+    for (let i=0; i<w*h; i++) mask[i] = di[i] || er[i];
 }
 
-// ============================================================
-// 羽化：邊緣漸變透明
-// ============================================================
-function _applyFeather(data, w, h, mask, feather) {
+// ─────────────────────────────────────────────────
+// 羽化邊緣
+// ─────────────────────────────────────────────────
+function _featherEdge(imgData, w, h, mask, feather) {
+    const data = imgData.data;
     const dirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
-    const edgePixels = [];
 
-    // 找邊緣像素（mask=0 但周圍有 mask=1）
-    for (let y = feather; y < h-feather; y++) {
-        for (let x = feather; x < w-feather; x++) {
+    for (let y=feather; y<h-feather; y++) {
+        for (let x=feather; x<w-feather; x++) {
             if (mask[y*w+x]) continue;
             let dist = Infinity;
             for (const [dx,dy] of dirs) {
-                let d = 0;
-                for (let r = 1; r <= feather; r++) {
+                let d=0;
+                for (let r=1; r<=feather; r++) {
                     const nx=x+dx*r, ny=y+dy*r;
                     if (nx<0||nx>=w||ny<0||ny>=h) { d=feather+1; break; }
                     if (mask[ny*w+nx]) { d=r; break; }
@@ -1802,81 +1733,12 @@ function _applyFeather(data, w, h, mask, feather) {
                 if (d < dist) dist = d;
             }
             if (dist <= feather) {
-                edgePixels.push([x, y, dist]);
+                const i4 = (y*w+x)*4;
+                data[i4+3] = Math.min(data[i4+3], Math.round(255 * dist / feather));
             }
         }
     }
-
-    // 應用漸變 alpha
-    for (const [x, y, dist] of edgePixels) {
-        const i = (y*w+x)*4;
-        const alpha = Math.round(255 * dist / feather);
-        data[i+3] = Math.min(data[i+3], alpha);
-    }
 }
-
-// ============================================================
-// 形態學清理：腐蝕 + 膨脹（去除雜點，平滑邊緣）
-// ============================================================
-function _morphologicalCleanup(mask, w, h) {
-    const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-
-    // 腐蝕：4連通鄰居至少2個是mask才保留（去除孤點）
-    const eroded = new Uint8Array(w * h);
-    for (let y = 1; y < h-1; y++) {
-        for (let x = 1; x < w-1; x++) {
-            if (!mask[y*w+x]) continue;
-            let count = 0;
-            for (const [dx,dy] of dirs) {
-                if (mask[(y+dy)*w+(x+dx)]) count++;
-            }
-            if (count >= 2) eroded[y*w+x] = 1;
-        }
-    }
-
-    // 膨脹：鄰居有任1個是eroded就標記（填補腐蝕缺口）
-    const dilated = new Uint8Array(w * h);
-    for (let y = 1; y < h-1; y++) {
-        for (let x = 1; x < w-1; x++) {
-            if (eroded[y*w+x]) { dilated[y*w+x] = 1; continue; }
-            let count = 0;
-            for (const [dx,dy] of dirs) {
-                if (eroded[(y+dy)*w+(x+dx)]) count++;
-            }
-            if (count >= 1) dilated[y*w+x] = 1;
-        }
-    }
-
-    // 合併：保持輪廓完整
-    for (let i = 0; i < w*h; i++) {
-        mask[i] = dilated[i] || eroded[i];
-    }
-}
-
-// ============================================================
-// 工具函式
-// ============================================================
-function _getPixel(data, stride, x, y) {
-    const i = (y*stride+x)*4;
-    return [data[i], data[i+1], data[i+2], data[i+3]];
-}
-
-function _colorDist(c1, c2) {
-    return Math.sqrt(
-        (c1[0]-c2[0])**2 +
-        (c1[1]-c2[1])**2 +
-        (c1[2]-c2[2])**2
-    );
-}
-
-function _applyMask(data, w, h, mask) {
-    for (let i = 0; i < w*h; i++) {
-        if (mask[i]) data[i*4+3] = 0;
-    }
-}
-
-// ============================================================
-// ============================================================
 // 去背 UI
 // ============================================================
 async function doRemoveBg() {
