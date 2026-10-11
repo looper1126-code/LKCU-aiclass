@@ -1558,12 +1558,92 @@ function _removeBgSmart(imgData, w, h, tolerance, feather) {
         _floodFillEdgeAware(data, w, h, visited, mask, sx, sy, bgColor, edges, maxDist, tolerance);
     });
 
-    // Step 4: 羽化 + 形態學清理
+    // Step 3b: 二次 flood-fill（邊緣放寬 2x，捕漏網之魚）
+    const mask2 = new Uint8Array(w * h);
+    const visited2 = new Uint8Array(w * h);
+    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
+        _floodFill(data, w, h, visited2, mask2, sx, sy, bgColor, maxDist * 1.8);
+    });
+    // 合併：mask2 覆蓋但保護邊緣
+    const edgeThresh2 = 1 - (tolerance / 90) * 0.5;
+    for (let i = 0; i < w*h; i++) {
+        if (!mask[i] && mask2[i]) {
+            // 檢查這個pixel是否在強邊緣附近
+            let near = false;
+            const y = Math.floor(i / w), x = i % w;
+            for (let dy = -3; dy <= 3 && !near; dy++) {
+                for (let dx = -3; dx <= 3 && !near; dx++) {
+                    const nx = x+dx, ny = y+dy;
+                    if (nx<0||nx>=w||ny<0||ny>=h) continue;
+                    if (edges[ny*w+nx] > edgeThresh2) near = true;
+                }
+            }
+            if (!near) mask[i] = 1;
+        }
+    }
+
+    // Step 4: 形態學清理 + 羽化
     if (feather > 0) _applyFeather(data, w, h, mask, feather);
     _morphologicalCleanup(mask, w, h);
 
-    // Step 5: 套用透明
+    // Step 5: 色塊殘留清理（去除半透明色島）
+    _removeColorHalos(data, w, h, mask, bgColor);
+
+    // Step 6: 套用透明
     _applyMask(data, w, h, mask);
+}
+
+// ============================================================
+// 色塊殘留清理：去除透明區域中的小型雜色塊
+// ============================================================
+function _removeColorHalos(data, w, h, mask, bgColor) {
+    // 標記每個候選pixel：非mask但顏色接近背景色
+    const candidates = new Uint8Array(w * h);
+    for (let y = 2; y < h-2; y++) {
+        for (let x = 2; x < w-2; x++) {
+            if (mask[y*w+x]) continue; // 已是透明
+            const px = _getPixel(data, w, x, y);
+            if (_colorDist(px, bgColor) < 60) { // 顏色接近背景
+                candidates[y*w+x] = 1;
+            }
+        }
+    }
+
+    // 對候選區域做 flood-fill 找連通塊，小於 threshold 就移除
+    const visited = new Uint8Array(w * h);
+    const minBlobSize = Math.max(50, Math.floor(w * h * 0.002)); // 最小 blob 門檻
+    const dirs4 = [[1,0],[-1,0],[0,1],[0,-1]];
+
+    for (let y = 2; y < h-2; y++) {
+        for (let x = 2; x < w-2; x++) {
+            if (!candidates[y*w+x] || visited[y*w+x]) continue;
+
+            // BFS 找連通塊
+            const stack = [[x, y]];
+            let count = 0;
+            const pixels = [];
+
+            while (stack.length) {
+                const [cx, cy] = stack.pop();
+                if (cx<2||cx>=w-2||cy<2||cy>=h-2) continue;
+                const idx = cy*w+cx;
+                if (visited[idx] || !candidates[idx]) continue;
+                visited[idx] = 1;
+                count++;
+                pixels.push(idx);
+                for (const [dx,dy] of dirs4) {
+                    stack.push([cx+dx, cy+dy]);
+                }
+            }
+
+            // 小於門檻的 blob → 移除（設為透明）
+            if (count < minBlobSize) {
+                for (const idx of pixels) {
+                    data[idx*4+3] = 0;
+                }
+            }
+        }
+    }
 }
 
 // ============================================================
