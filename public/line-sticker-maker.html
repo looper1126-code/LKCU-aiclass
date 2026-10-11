@@ -715,9 +715,9 @@
     <div class="toast" id="toast"></div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/background-removal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.0.0/dist/browser.js"></script>
     <script>
-        // 檢查背景去除 CDN 是否載入成功
+        // 檢查 AI 去背 CDN 是否載入成功
         window.bgRemovalLoaded = typeof backgroundRemoval === 'function';
         if (!window.bgRemovalLoaded) {
             console.warn('imgly background-removal CDN 載入失敗，AI 去背功能可能無法使用');
