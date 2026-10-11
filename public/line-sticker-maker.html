@@ -220,7 +220,35 @@
             min-height: 350px;
             position: relative;
         }
-        
+
+        .canvas-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            z-index: 10;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 4px solid rgba(0,210,106,0.3);
+            border-top-color: #00D26A;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         #mainCanvas {
             max-width: 100%;
             max-height: 320px;
@@ -639,10 +667,23 @@
                     <div class="panel-title">預覽效果</div>
                     <div class="canvas-container">
                         <canvas id="mainCanvas" width="320" height="320"></canvas>
+                        <div id="generatingOverlay" class="canvas-overlay" style="display:none;">
+                            <div class="spinner"></div>
+                            <p>生成中...</p>
+                        </div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-primary" onclick="generateAll()">✨ 生成所有貼圖</button>
-                        <button class="btn btn-download" onclick="downloadAll()">📦 下載 ZIP</button>
+                        <button class="btn btn-primary" id="generateBtn" onclick="generateAll()">✨ 生成所有貼圖</button>
+                        <button class="btn btn-download" id="downloadBtn" onclick="downloadAll()">📦 下載 ZIP</button>
+                    </div>
+                </div>
+                
+                <!-- 生成結果 -->
+                <div class="panel" id="resultsPanel" style="margin-top: 20px; display:none;">
+                    <div class="panel-title">✨ 生成結果 <span id="resultCount" style="font-size:0.85rem;opacity:0.7;"></span></div>
+                    <div id="resultGrid" class="preview-grid"></div>
+                    <div style="margin-top:15px;text-align:center;">
+                        <p style="color:#00D26A;font-size:0.9rem;">✅ 貼圖已就緒，點擊「下載 ZIP」取得完整套裝！</p>
                     </div>
                 </div>
                 
@@ -1083,145 +1124,200 @@
                 showToast('請先上傳圖片！', 'error');
                 return;
             }
-            
-            showToast('正在生成所有貼圖...');
-            
-            const canvases = [];
-            
-            for (let i = 0; i < images.length; i++) {
-                const canvas = document.createElement('canvas');
-                canvas.width = currentSize;
-                canvas.height = currentSize;
-                const ctx = canvas.getContext('2d');
-                
-                const img = new Image();
-                img.src = images[i].data;
-                await new Promise(resolve => img.onload = resolve);
-                
-                const scale = Math.min(currentSize / img.width, currentSize / img.height);
-                const x = (currentSize - img.width * scale) / 2;
-                const y = (currentSize - img.height * scale) / 2;
-                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-                
-                const text = appliedTexts[i] || '';
-                if (text) {
-                    const fontSize = currentSize * 0.12;
-                    ctx.font = `${textStyle.bold ? 'bold ' : ''}${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    
-                    let textY;
-                    if (textStyle.position === 'top') textY = currentSize * 0.2;
-                    else if (textStyle.position === 'center') textY = currentSize * 0.5;
-                    else textY = currentSize * 0.85;
-                    
-                    if (textStyle.shadow) {
-                        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                        ctx.shadowBlur = currentSize * 0.025;
-                        ctx.shadowOffsetX = 2;
-                        ctx.shadowOffsetY = 2;
+
+            // 顯示 loading 狀態
+            const overlay = document.getElementById('generatingOverlay');
+            const generateBtn = document.getElementById('generateBtn');
+            overlay.style.display = 'flex';
+            generateBtn.disabled = true;
+            generateBtn.style.opacity = '0.6';
+
+            try {
+                const canvases = [];
+
+                for (let i = 0; i < images.length; i++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = currentSize;
+                    canvas.height = currentSize;
+                    const ctx = canvas.getContext('2d');
+
+                    const img = new Image();
+                    img.src = images[i].data;
+                    await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+
+                    const scale = Math.min(currentSize / img.width, currentSize / img.height);
+                    const x = (currentSize - img.width * scale) / 2;
+                    const y = (currentSize - img.height * scale) / 2;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+                    const text = appliedTexts[i] || '';
+                    if (text) {
+                        const fontSize = currentSize * 0.12;
+                        ctx.font = `${textStyle.bold ? 'bold ' : ''}${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        let textY;
+                        if (textStyle.position === 'top') textY = currentSize * 0.2;
+                        else if (textStyle.position === 'center') textY = currentSize * 0.5;
+                        else textY = currentSize * 0.85;
+
+                        if (textStyle.shadow) {
+                            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                            ctx.shadowBlur = currentSize * 0.025;
+                            ctx.shadowOffsetX = 2;
+                            ctx.shadowOffsetY = 2;
+                        }
+
+                        if (textStyle.outline) {
+                            ctx.strokeStyle = '#000000';
+                            ctx.lineWidth = fontSize * 0.15;
+                            ctx.strokeText(text, currentSize / 2, textY);
+                        }
+
+                        ctx.fillStyle = textStyle.color;
+                        ctx.fillText(text, currentSize / 2, textY);
                     }
-                    
-                    if (textStyle.outline) {
-                        ctx.strokeStyle = '#000000';
-                        ctx.lineWidth = fontSize * 0.15;
-                        ctx.strokeText(text, currentSize / 2, textY);
-                    }
-                    
-                    ctx.fillStyle = textStyle.color;
-                    ctx.fillText(text, currentSize / 2, textY);
+
+                    canvases.push({
+                        canvas: canvas,
+                        name: `sticker_${String(i + 1).padStart(3, '0')}.png`
+                    });
                 }
-                
-                canvases.push({
-                    canvas: canvas,
-                    name: `sticker_${String(i + 1).padStart(3, '0')}.png`
-                });
+
+                // 生成資訊圖（第一張圖放大）
+                if (images.length > 0) {
+                    const infoCanvas = document.createElement('canvas');
+                    infoCanvas.width = 370;
+                    infoCanvas.height = 320;
+                    const ctx = infoCanvas.getContext('2d');
+
+                    const img = new Image();
+                    img.src = images[0].data;
+                    await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+
+                    const scale = Math.min(370 / img.width, 320 / img.height);
+                    const x = (370 - img.width * scale) / 2;
+                    const y = (320 - img.height * scale) / 2;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+                    canvases.push({ canvas: infoCanvas, name: 'info.png' });
+                }
+
+                // 生成聊天圖示（第一張圖縮小）
+                if (images.length > 0) {
+                    const iconCanvas = document.createElement('canvas');
+                    iconCanvas.width = 110;
+                    iconCanvas.height = 110;
+                    const ctx = iconCanvas.getContext('2d');
+
+                    const img = new Image();
+                    img.src = images[0].data;
+                    await new Promise(resolve => { img.onload = resolve; img.onerror = resolve; });
+
+                    const scale = Math.min(110 / img.width, 110 / img.height);
+                    const x = (110 - img.width * scale) / 2;
+                    const y = (110 - img.height * scale) / 2;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+                    canvases.push({ canvas: iconCanvas, name: 'icon.png' });
+                }
+
+                // 存入全域變數供下載使用
+                window.generatedStickers = canvases;
+
+                // 顯示結果網格
+                showResultsGrid(canvases);
+
+                overlay.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.style.opacity = '1';
+                showToast(`已生成 ${canvases.length} 張貼圖！`);
+
+            } catch (err) {
+                console.error('generateAll error:', err);
+                overlay.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.style.opacity = '1';
+                showToast('生成失敗，請重試', 'error');
             }
-            
-            // 生成資訊圖（第一張圖放大）
-            if (images.length > 0) {
-                const infoCanvas = document.createElement('canvas');
-                infoCanvas.width = 370;
-                infoCanvas.height = 320;
-                const ctx = infoCanvas.getContext('2d');
-                
-                const img = new Image();
-                img.src = images[0].data;
-                await new Promise(resolve => img.onload = resolve);
-                
-                const scale = Math.min(370 / img.width, 320 / img.height);
-                const x = (370 - img.width * scale) / 2;
-                const y = (320 - img.height * scale) / 2;
-                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-                
-                canvases.push({
-                    canvas: infoCanvas,
-                    name: 'info.png'
-                });
-            }
-            
-            // 生成聊天圖示（第一張圖縮小）
-            if (images.length > 0) {
-                const iconCanvas = document.createElement('canvas');
-                iconCanvas.width = 110;
-                iconCanvas.height = 110;
-                const ctx = iconCanvas.getContext('2d');
-                
-                const img = new Image();
-                img.src = images[0].data;
-                await new Promise(resolve => img.onload = resolve);
-                
-                const scale = Math.min(110 / img.width, 110 / img.height);
-                const x = (110 - img.width * scale) / 2;
-                const y = (110 - img.height * scale) / 2;
-                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-                
-                canvases.push({
-                    canvas: iconCanvas,
-                    name: 'icon.png'
-                });
-            }
-            
-            // 存入全域變數供下載使用
-            window.generatedStickers = canvases;
-            
-            showToast(`已生成 ${canvases.length} 張貼圖！`);
-            
-            // 更新預覽為第一張
-            if (images.length > 0) {
-                selectImage(0);
-            }
+        }
+
+        // 顯示生成結果網格
+        function showResultsGrid(canvases) {
+            const panel = document.getElementById('resultsPanel');
+            const grid = document.getElementById('resultGrid');
+            const count = document.getElementById('resultCount');
+            const stickerCount = canvases.length - 2; // 扣掉 info.png 和 icon.png
+
+            panel.style.display = 'block';
+            count.textContent = `（含 ${stickerCount} 張貼圖 + info.png + icon.png）`;
+
+            grid.innerHTML = '';
+            canvases.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;';
+                const thumb = document.createElement('img');
+                thumb.src = item.canvas.toDataURL('image/png');
+                thumb.style.cssText = 'width:60px;height:60px;object-fit:contain;border-radius:6px;background:#222;';
+                const label = document.createElement('span');
+                label.textContent = item.name;
+                label.style.cssText = 'font-size:0.65rem;color:#aaa;';
+                div.appendChild(thumb);
+                div.appendChild(label);
+                grid.appendChild(div);
+            });
+
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
         // 下載所有貼圖
         async function downloadAll() {
-            if (!window.generatedStickers || window.generatedStickers.length === 0) {
-                // 如果還沒生成，先生成
-                await generateAll();
+            const downloadBtn = document.getElementById('downloadBtn');
+            const overlay = document.getElementById('generatingOverlay');
+
+            downloadBtn.disabled = true;
+            downloadBtn.style.opacity = '0.6';
+
+            try {
+                if (!window.generatedStickers || window.generatedStickers.length === 0) {
+                    overlay.style.display = 'flex';
+                    await generateAll();
+                    overlay.style.display = 'none';
+                }
+
+                if (window.generatedStickers.length === 0) {
+                    showToast('沒有可下載的貼圖！', 'error');
+                    return;
+                }
+
+                showToast('正在打包 ZIP...');
+
+                const zip = new JSZip();
+
+                window.generatedStickers.forEach(item => {
+                    const dataUrl = item.canvas.toDataURL('image/png');
+                    const base64 = dataUrl.split(',')[1];
+                    zip.file(item.name, base64, { base64: true });
+                });
+
+                const content = await zip.generateAsync({ type: 'blob' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = 'line_stickers_' + new Date().toISOString().slice(0, 10) + '.zip';
+                link.click();
+
+                showToast('下載完成！');
+
+                downloadBtn.disabled = false;
+                downloadBtn.style.opacity = '1';
+            } catch (err) {
+                console.error('downloadAll error:', err);
+                showToast('下載失敗，請重試', 'error');
+                downloadBtn.disabled = false;
+                downloadBtn.style.opacity = '1';
+                overlay.style.display = 'none';
             }
-            
-            if (window.generatedStickers.length === 0) {
-                showToast('沒有可下載的貼圖！', 'error');
-                return;
-            }
-            
-            showToast('正在打包 ZIP...');
-            
-            const zip = new JSZip();
-            
-            window.generatedStickers.forEach(item => {
-                const dataUrl = item.canvas.toDataURL('image/png');
-                const base64 = dataUrl.split(',')[1];
-                zip.file(item.name, base64, { base64: true });
-            });
-            
-            const content = await zip.generateAsync({ type: 'blob' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(content);
-            link.download = 'line_stickers_' + new Date().toISOString().slice(0, 10) + '.zip';
-            link.click();
-            
-            showToast('下載完成！');
         }
         
         // 初始繪製
