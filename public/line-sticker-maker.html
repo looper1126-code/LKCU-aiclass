@@ -1511,10 +1511,7 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
                 const h = img.naturalHeight;
                 console.log('[去背] 圖片尺寸:', w, 'x', h);
 
-                if (w < 4 || h < 4) {
-                    reject(new Error('圖片太小'));
-                    return;
-                }
+                if (w < 4 || h < 4) { reject(new Error('圖片太小')); return; }
 
                 const canvas = document.createElement('canvas');
                 canvas.width = w;
@@ -1524,39 +1521,51 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
 
                 const imgData = ctx.getImageData(0, 0, w, h);
 
-                // 背景取樣（12點，更魯棒）
+                // 背景取樣（12點均勻分佈）
                 const bgColor = _sampleBgColor(imgData, w, h);
                 console.log('[去背] 背景色偵測:', bgColor);
 
-                // 建立 mask：0=主體，1=背景
-                const mask = new Uint8Array(w * h);
-                const visited = new Uint8Array(w * h);
+                // maxDist：敏感度 5→20, 25→80, 50→175, 90→300
+                // 舊值 10+(tolerance/90)*290 導致敏感度14時 maxDist只有55，太窄
+                const maxDist = 20 + (tolerance / 90) * 280;
 
-                // maxDist 對應 tolerance：5→10, 45→150, 90→300
-                const maxDist = 10 + (tolerance / 90) * 290;
+                if (mode === 'corner') {
+                    // 角落模式：純 flood-fill，直接快速
+                    const mask = new Uint8Array(w * h);
+                    const visited = new Uint8Array(w * h);
+                    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
+                        _ffill(imgData, w, h, visited, mask, sx, sy, bgColor, maxDist);
+                    });
+                    const data = imgData.data;
+                    for (let i = 0; i < w*h; i++) {
+                        if (mask[i]) data[i*4+3] = 0;
+                    }
+                } else {
+                    // 智慧模式：邊緣保護 flood-fill + 形態學
+                    const mask = new Uint8Array(w * h);
+                    const visited = new Uint8Array(w * h);
 
-                // 從角落 flood-fill
-                const corners = [[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
-                for (const [sx,sy] of corners) {
-                    _ffill(imgData, w, h, visited, mask, sx, sy, bgColor, maxDist);
-                }
+                    // 第一遍 flood-fill（保守）
+                    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
+                        _ffill(imgData, w, h, visited, mask, sx, sy, bgColor, maxDist);
+                    });
 
-                // 二次 flood-fill（更大範圍）
-                const mask2 = new Uint8Array(w * h);
-                const visited2 = new Uint8Array(w * h);
-                for (const [sx,sy] of corners) {
-                    _ffill(imgData, w, h, visited2, mask2, sx, sy, bgColor, maxDist * 2.2);
-                }
-                // mask2 補充到 mask，但跳過強邊緣附近
-                const edges = _sobelFast(imgData, w, h);
-                const edgeThresh = 0.4 - (tolerance / 90) * 0.2;
-                for (let i = 0; i < w*h; i++) {
-                    if (!mask[i] && mask2[i]) {
-                        const y = Math.floor(i / w);
-                        const x = i % w;
+                    // 第二遍 flood-fill（放寬 2x）補漏
+                    const mask2 = new Uint8Array(w * h);
+                    const visited2 = new Uint8Array(w * h);
+                    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
+                        _ffill(imgData, w, h, visited2, mask2, sx, sy, bgColor, maxDist * 2.0);
+                    });
+
+                    // Sobel 邊緣保護
+                    const edges = _sobelFast(imgData, w, h);
+                    const edgeThresh = 0.35;
+                    for (let i = 0; i < w*h; i++) {
+                        if (mask[i] || !mask2[i]) continue;
+                        const y = Math.floor(i / w), x = i % w;
                         let near = false;
-                        for (let dy = -2; dy <= 2 && !near; dy++) {
-                            for (let dx = -2; dx <= 2 && !near; dx++) {
+                        for (let dy = -3; dy <= 3 && !near; dy++) {
+                            for (let dx = -3; dx <= 3 && !near; dx++) {
                                 const nx = x+dx, ny = y+dy;
                                 if (nx<0||nx>=w||ny<0||ny>=h) continue;
                                 if (edges[ny*w+nx] > edgeThresh) near = true;
@@ -1564,26 +1573,23 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
                         }
                         if (!near) mask[i] = 1;
                     }
-                }
 
-                // 形態學：腐蝕 + 膨脹（平滑邊緣）
-                _morphOpen(mask, w, h);
+                    // 形態學平滑
+                    _morphOpen(mask, w, h);
 
-                // 羽化邊緣
-                if (feather > 0) {
-                    _featherEdge(imgData, w, h, mask, feather);
-                }
+                    // 羽化
+                    if (feather > 0) _featherEdge(imgData, w, h, mask, feather);
 
-                // 套用透明
-                const data = imgData.data;
-                for (let i = 0; i < w*h; i++) {
-                    if (mask[i]) data[i*4+3] = 0;
+                    // 套用
+                    const data = imgData.data;
+                    for (let i = 0; i < w*h; i++) {
+                        if (mask[i]) data[i*4+3] = 0;
+                    }
                 }
 
                 ctx.putImageData(imgData, 0, 0);
                 const elapsed = Math.round(performance.now() - t0);
-                const maskCount = mask.reduce((a,b) => a+b, 0);
-                console.log('[去背] 完成，耗时', elapsed+'ms', '，透明像素:', maskCount, '/', w*h);
+                console.log('[去背] 完成，耗时', elapsed+'ms');
 
                 resolve(canvas.toDataURL('image/png'));
             } catch(e) {
@@ -1591,7 +1597,10 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
                 reject(e);
             }
         };
-        img.onerror = () => reject(new Error('圖片載入失敗'));
+        img.onerror = () => {
+            console.error('[去背] 圖片載入失敗');
+            reject(new Error('圖片載入失敗'));
+        };
         img.src = imgDataUrl;
     });
 }
