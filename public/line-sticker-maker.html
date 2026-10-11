@@ -533,11 +533,11 @@
             <div class="left-panel">
                 <div class="panel">
                     <div class="panel-title">上傳圖片</div>
-                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <label class="upload-area" for="fileInput" id="uploadLabel">
                         <div class="upload-icon">📁</div>
                         <p class="upload-text">點擊上傳或拖曳圖片到此處<br><span>支援 PNG、JPG、WebP</span></p>
-                    </div>
-                    <input type="file" id="fileInput" multiple accept="image/png,image/jpeg,image/webp">
+                    </label>
+                    <input type="file" id="fileInput" multiple accept="image/png,image/jpeg,image/webp" style="display:none">
                     
                     <div style="margin-top: 20px;">
                         <div class="panel-title">已上傳的貼圖 <span id="imageCount">(0/40)</span></div>
@@ -708,27 +708,39 @@
         // 檔案上傳處理
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
             files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        if (images.length < 40) {
-                            images.push({
-                                data: event.target.result,
-                                name: file.name,
-                                text: ''
-                            });
-                            updatePreview();
-                            if (currentIndex === -1) {
-                                selectImage(0);
-                            }
-                            showToast(`已添加圖片 (${images.length}/40)`);
-                        } else {
-                            showToast('最多只能上傳 40 張貼圖！', 'error');
-                        }
-                    };
-                    reader.readAsDataURL(file);
+                if (!file.type.startsWith('image/')) {
+                    showToast(`「${file.name}」不是圖片格式，已略過`, 'error');
+                    return;
                 }
+                if (file.size > 20 * 1024 * 1024) {
+                    showToast(`「${file.name}」超過 20MB 上限`, 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    if (images.length >= 40) {
+                        showToast('最多只能上傳 40 張貼圖！', 'error');
+                        return;
+                    }
+                    images.push({
+                        data: event.target.result,
+                        name: file.name,
+                        text: ''
+                    });
+                    const addedIndex = images.length - 1;
+                    updatePreview();
+                    if (currentIndex === -1) {
+                        selectImage(addedIndex);
+                    }
+                    showToast(`已添加：${file.name} (${images.length}/40)`);
+                };
+                reader.onerror = function() {
+                    showToast(`讀取「${file.name}」失敗，請重試`, 'error');
+                };
+                reader.readAsDataURL(file);
             });
             e.target.value = '';
         });
@@ -755,24 +767,31 @@
         
         // 選擇圖片
         function selectImage(index) {
+            if (index < 0 || index >= images.length) return;
+
             currentIndex = index;
             document.getElementById('noImageSelected').style.display = 'none';
             document.getElementById('editTools').style.display = 'block';
-            
+
             const img = images[index];
+            if (!img || !img.data) {
+                showToast('圖片資料無效，請重新上傳', 'error');
+                return;
+            }
+
             document.getElementById('currentEditThumb').src = img.data;
             document.getElementById('currentEditName').textContent = '貼圖 ' + (index + 1);
             document.getElementById('currentEditSize').textContent = '尺寸: ' + currentSize + ' × ' + currentSize;
-            
+
             if (img.text) {
                 document.getElementById('stickerText').value = img.text;
             } else {
                 document.getElementById('stickerText').value = '';
             }
-            
+
             // 更新去背狀態 UI
             updateBgRemovalUI(index);
-            
+
             updatePreview();
             drawCanvas();
         }
@@ -890,31 +909,35 @@
         // 繪製畫布
         function drawCanvas() {
             if (currentIndex < 0 || !images[currentIndex]) return;
-            
+
             const canvas = document.getElementById('mainCanvas');
             const ctx = canvas.getContext('2d');
             const size = 320;
             canvas.width = size;
             canvas.height = size;
-            
+
             // 繪製透明背景方格
             ctx.clearRect(0, 0, size, size);
-            
+
             // 繪製圖片
             const img = new Image();
             img.onload = function() {
                 const scale = Math.min(size / img.width, size / img.height);
                 const x = (size - img.width * scale) / 2;
                 const y = (size - img.height * scale) / 2;
-                
+
                 // 保持比例繪製
                 ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-                
+
                 // 繪製文字
                 const text = appliedTexts[currentIndex] || document.getElementById('stickerText').value;
                 if (text) {
                     drawText(ctx, text, size, size);
                 }
+            };
+            img.onerror = function() {
+                console.error('drawCanvas: 圖片載入失敗', images[currentIndex]?.name);
+                showToast('圖片載入失敗，請重新上傳', 'error');
             };
             img.src = images[currentIndex].data;
         }
