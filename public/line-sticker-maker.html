@@ -371,6 +371,12 @@
         }
         
         /* 尺寸說明 */
+        .left-panel, .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
         .specs {
             background: rgba(0,0,0,0.3);
             border-radius: 15px;
@@ -670,6 +676,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/background-removal.min.js"></script>
     <script>
+        // 檢查背景去除 CDN 是否載入成功
+        window.bgRemovalLoaded = typeof backgroundRemoval === 'function';
+        if (!window.bgRemovalLoaded) {
+            console.warn('imgly background-removal CDN 載入失敗，AI 去背功能可能無法使用');
+        }
         // 全域變數
         let images = [];
         let currentIndex = -1;
@@ -778,6 +789,11 @@
         // AI 去背
         async function doRemoveBg() {
             if (currentIndex < 0 || !images[currentIndex]) return;
+
+            if (!window.bgRemovalLoaded) {
+                showToast('AI 去背功能載入失敗，請刷新頁面或檢查網路', 'error');
+                return;
+            }
 
             const btn = document.getElementById('removeBgBtn');
             const processingText = document.getElementById('bgProcessingText');
