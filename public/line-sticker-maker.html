@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE 貼圖製作工具</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Noto Sans CJK TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00D26A, #00B900);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title::before {
+            content: "";
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, #00D26A, #00B900);
+            border-radius: 2px;
+        }
+        
+        /* 上傳區 */
+        .upload-area {
+            border: 2px dashed rgba(0,210,106,0.5);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0,210,106,0.05);
+        }
+        
+        .upload-area:hover {
+            border-color: #00D26A;
+            background: rgba(0,210,106,0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 1.1rem;
+            color: #a0a0a0;
+        }
+        
+        .upload-text span {
+            color: #00D26A;
+            font-weight: 700;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        /* 預覽區 */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preview-item {
+            aspect-ratio: 1;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .preview-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,210,106,0.3);
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-item .number {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 5px;
+        }
+        
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,0,0,0.8);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-item:hover .remove-btn {
+            display: flex;
+        }
+        
+        /* 編輯區 */
+        .edit-section {
+            margin-bottom: 25px;
+        }
+        
+        .edit-label {
+            font-size: 0.95rem;
+            color: #a0a0a0;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .size-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .size-btn {
+            padding: 12px 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .size-btn:hover, .size-btn.active {
+            border-color: #00D26A;
+            background: rgba(0,210,106,0.2);
+            color: #00D26A;
+        }
+        
+        .canvas-container {
+            background: repeating-conic-gradient(#333 0% 25%, #444 0% 50%) 50% / 20px 20px;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 350px;
+            position: relative;
+        }
+        
+        #mainCanvas {
+            max-width: 100%;
+            max-height: 320px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        /* 文字輸入 */
+        .text-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: #00D26A;
+            background: rgba(0,210,106,0.1);
+        }
+        
+        .text-input::placeholder {
+            color: #666;
+        }
+        
+        .text-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .control-btn {
+            padding: 10px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .control-btn.active {
+            background: #00D26A;
+            color: #000;
+        }
+        
+        /* 顏色選擇 */
+        .color-picker-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .color-picker {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: none;
+        }
+        
+        .color-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .color-preset {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .color-preset:hover, .color-preset.active {
+            border-color: #fff;
+            transform: scale(1.1);
+        }
+        
+        /* 按鈕 */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00D26A, #00B900);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,210,106,0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .btn-download {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            color: #fff;
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255,71,87,0.4);
+        }
+        
+        /* 尺寸說明 */
+        .specs {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .specs h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #00D26A;
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .spec-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        
+        .spec-item .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .spec-item .size {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .spec-item .desc {
+            font-size: 0.85rem;
+            color: #a0a0a0;
+        }
+        
+        /* 目前編輯的圖片預覽 */
+        .current-edit {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0,210,106,0.1);
+            border-radius: 10px;
+        }
+        
+        .current-edit img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        .current-edit-info {
+            flex: 1;
+        }
+        
+        .current-edit-info h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .current-edit-info p {
+            font-size: 0.85rem;
+            color: #a0a0a0;
+        }
+        
+        /* 提示訊息 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            opacity: 0;
+            transition: all 0.5s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background: linear-gradient(135deg, #00D26A, #00B900);
+            color: #000;
+        }
+        
+        .toast.error {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+        }
+        
+        /* 響應式 */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .preview-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .text-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 動畫效果 */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .processing {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LINE 貼圖製作工具</h1>
+            <p class="subtitle">上傳圖片 → 添加文字 → 一鍵下載 LINE 貼圖包</p>
+        </header>
+        
+        <div class="main-content">
+            <!-- 左側：上傳和預覽 -->
+            <div class="left-panel">
+                <div class="panel">
+                    <div class="panel-title">上傳圖片</div>
+                    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div class="upload-icon">📁</div>
+                        <p class="upload-text">點擊上傳或拖曳圖片到此處<br><span>支援 PNG、JPG、WebP</span></p>
+                    </div>
+                    <input type="file" id="fileInput" multiple accept="image/png,image/jpeg,image/webp">
+                    
+                    <div style="margin-top: 20px;">
+                        <div class="panel-title">已上傳的貼圖 <span id="imageCount">(0/40)</span></div>
+                        <div class="preview-grid" id="previewGrid"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右側：編輯工具 -->
+            <div class="right-panel">
+                <div class="panel">
+                    <div class="panel-title">編輯工具</div>
+                    
+                    <div id="noImageSelected" style="text-align: center; padding: 40px; color: #666;">
+                        <p style="font-size: 3rem; margin-bottom: 15px;">🖼️</p>
+                        <p>請先上傳圖片並點擊選擇要編輯的貼圖</p>
+                    </div>
+                    
+                    <div id="editTools" style="display: none;">
+                        <div class="current-edit">
+                            <img id="currentEditThumb" src="" alt="">
+                            <div class="current-edit-info">
+                                <h4 id="currentEditName">貼圖 1</h4>
+                                <p id="currentEditSize">尺寸: 240 × 240</p>
+                            </div>
+                        </div>
+
+                        <div class="edit-section">
+                            <label class="edit-label">AI 去背透明化</label>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button class="btn btn-secondary" id="removeBgBtn" onclick="doRemoveBg()" style="flex:1; min-width:120px;">
+                                    ✂️ AI 去背（移除背景）
+                                </button>
+                                <button class="btn btn-secondary" id="restoreBgBtn" onclick="restoreBackground()" style="flex:1; min-width:120px; display:none;">
+                                    ↩️ 恢復原圖
+                                </button>
+                            </div>
+                            <p id="bgStatusText" style="font-size:0.8rem; color:#00D26A; margin-top:6px; display:none;">
+                                ✓ 已去背（透明背景）
+                            </p>
+                            <p id="bgProcessingText" style="font-size:0.8rem; color:#FFB800; margin-top:6px; display:none;">
+                                🔄 AI 分析中，請稍候...
+                            </p>
+                        </div>
+                        
+                        
+                        <div class="edit-section">
+                            <label class="edit-label">選擇輸出尺寸</label>
+                            <div class="size-buttons">
+                                <button class="size-btn active" data-size="240">主圖 240×240</button>
+                                <button class="size-btn" data-size="310">表情 310×310</button>
+                                <button class="size-btn" data-size="370">資訊圖 370×320</button>
+                            </div>
+                        </div>
+                        
+                        <div class="edit-section">
+                            <label class="edit-label">添加文字（可選）</label>
+                            <div class="text-input-group">
+                                <input type="text" id="stickerText" class="text-input" placeholder="輸入貼圖文字..." maxlength="20">
+                            </div>
+                            <div class="text-controls">
+                                <button class="control-btn" id="boldBtn" onclick="toggleBold()">🔤 粗體</button>
+                                <button class="control-btn" id="shadowBtn" onclick="toggleShadow()">📝 陰影</button>
+                                <button class="control-btn" id="outlineBtn" onclick="toggleOutline()">⬜ 外框</button>
+                            </div>
+                            <div class="color-picker-wrap">
+                                <input type="color" id="textColor" class="color-picker" value="#FFFFFF">
+                                <div class="color-presets">
+                                    <div class="color-preset active" style="background: #FFFFFF" data-color="#FFFFFF"></div>
+                                    <div class="color-preset" style="background: #000000" data-color="#000000"></div>
+                                    <div class="color-preset" style="background: #FF4444" data-color="#FF4444"></div>
+                                    <div class="color-preset" style="background: #FFB800" data-color="#FFB800"></div>
+                                    <div class="color-preset" style="background: #00D26A" data-color="#00D26A"></div>
+                                    <div class="color-preset" style="background: #00B4D8" data-color="#00B4D8"></div>
+                                    <div class="color-preset" style="background: #9B5DE5" data-color="#9B5DE5"></div>
+                                    <div class="color-preset" style="background: #FF6B9D" data-color="#FF6B9D"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="edit-section">
+                            <label class="edit-label">文字位置</label>
+                            <div class="text-controls">
+                                <button class="control-btn active" data-pos="bottom" onclick="setTextPosition('bottom')">⬇️ 底部</button>
+                                <button class="control-btn" data-pos="center" onclick="setTextPosition('center')">⏺️ 中間</button>
+                                <button class="control-btn" data-pos="top" onclick="setTextPosition('top')">⬆️ 頂部</button>
+                            </div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="resetCanvas()">🔄 重置</button>
+                            <button class="btn btn-primary" onclick="applyText()">✅ 套用文字</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 預覽和下載 -->
+                <div class="panel" style="margin-top: 20px;">
+                    <div class="panel-title">預覽效果</div>
+                    <div class="canvas-container">
+                        <canvas id="mainCanvas" width="320" height="320"></canvas>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="generateAll()">✨ 生成所有貼圖</button>
+                        <button class="btn btn-download" onclick="downloadAll()">📦 下載 ZIP</button>
+                    </div>
+                </div>
+                
+                <!-- 規格說明 -->
+                <div class="specs">
+                    <h3>📋 LINE 貼圖規格</h3>
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <div class="icon">🖼️</div>
+                            <div class="size">240×240</div>
+                            <div class="desc">主圖片尺寸<br>最多 40 張</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="icon">📱</div>
+                            <div class="size">110×110</div>
+                            <div class="desc">聊天圖示<br>自動產生</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="icon">ℹ️</div>
+                            <div class="size">370×320</div>
+                            <div class="desc">資訊圖<br>（選填）</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/background-removal.min.js"></script>
+    <script>
+        // 全域變數
+        let images = [];
+        let currentIndex = -1;
+        let currentSize = 240;
+        let textStyle = {
+            bold: false,
+            shadow: false,
+            outline: false,
+            color: '#FFFFFF',
+            position: 'bottom'
+        };
+        let appliedTexts = {};
+        let bgRemovedMap = {}; // { index: true/false }
+        let originalDataMap = {}; // { index: original dataURL }
+        
+        // 顯示提示
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        // 檔案上傳處理
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        if (images.length < 40) {
+                            images.push({
+                                data: event.target.result,
+                                name: file.name,
+                                text: ''
+                            });
+                            updatePreview();
+                            if (currentIndex === -1) {
+                                selectImage(0);
+                            }
+                            showToast(`已添加圖片 (${images.length}/40)`);
+                        } else {
+                            showToast('最多只能上傳 40 張貼圖！', 'error');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            e.target.value = '';
+        });
+        
+        // 更新預覽區
+        function updatePreview() {
+            const grid = document.getElementById('previewGrid');
+            const count = document.getElementById('imageCount');
+            count.textContent = `(${images.length}/40)`;
+            
+            grid.innerHTML = '';
+            images.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item' + (index === currentIndex ? ' selected' : '');
+                item.innerHTML = \`
+                    <img src="\${img.data}" alt="貼圖\${index + 1}">
+                    <span class="number">\${index + 1}</span>
+                    <button class="remove-btn" onclick="event.stopPropagation(); removeImage(\${index})">×</button>
+                \`;
+                item.onclick = () => selectImage(index);
+                grid.appendChild(item);
+            });
+        }
+        
+        // 選擇圖片
+        function selectImage(index) {
+            currentIndex = index;
+            document.getElementById('noImageSelected').style.display = 'none';
+            document.getElementById('editTools').style.display = 'block';
+            
+            const img = images[index];
+            document.getElementById('currentEditThumb').src = img.data;
+            document.getElementById('currentEditName').textContent = '貼圖 ' + (index + 1);
+            document.getElementById('currentEditSize').textContent = '尺寸: ' + currentSize + ' × ' + currentSize;
+            
+            if (img.text) {
+                document.getElementById('stickerText').value = img.text;
+            } else {
+                document.getElementById('stickerText').value = '';
+            }
+            
+            // 更新去背狀態 UI
+            updateBgRemovalUI(index);
+            
+            updatePreview();
+            drawCanvas();
+        }
+
+        // 更新去背狀態 UI
+        function updateBgRemovalUI(index) {
+            const isRemoved = bgRemovedMap[index] === true;
+            document.getElementById('bgStatusText').style.display = isRemoved ? 'block' : 'none';
+            document.getElementById('removeBgBtn').style.display = isRemoved ? 'none' : 'inline-block';
+            document.getElementById('restoreBgBtn').style.display = isRemoved ? 'inline-block' : 'none';
+            document.getElementById('bgProcessingText').style.display = 'none';
+        }
+
+        // AI 去背
+        async function doRemoveBg() {
+            if (currentIndex < 0 || !images[currentIndex]) return;
+
+            const btn = document.getElementById('removeBgBtn');
+            const processingText = document.getElementById('bgProcessingText');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            processingText.style.display = 'block';
+
+            try {
+                // 先把原圖 dataURL 存起來（如果還沒存過）
+                if (!originalDataMap[currentIndex]) {
+                    originalDataMap[currentIndex] = images[currentIndex].data;
+                }
+
+                // 將 dataURL 轉成 Blob
+                const imgDataUrl = images[currentIndex].data;
+                const response = await fetch(imgDataUrl);
+                const blob = await response.blob();
+
+                // 呼叫 imgly 去背（全域函式 backgroundRemoval）
+                const result = await backgroundRemoval(blob, {
+                    progress: (key, current, total) => {
+                        // 進度回调
+                    },
+                    output: {
+                        format: 'image/png',
+                        quality: 1
+                    }
+                });
+
+                // 將結果轉成 dataURL
+                const reader = new FileReader();
+                const resultDataUrl = await new Promise((resolve) => {
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(result);
+                });
+
+                // 更新圖片
+                images[currentIndex].data = resultDataUrl;
+                bgRemovedMap[currentIndex] = true;
+
+                // 更新 UI
+                document.getElementById('currentEditThumb').src = resultDataUrl;
+                updateBgRemovalUI(currentIndex);
+                updatePreview();
+                drawCanvas();
+
+                showToast('去背完成！背景已變成透明 ✨');
+            } catch (err) {
+                console.error('去背失敗:', err);
+                showToast('去背失敗，請稍後再試', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                processingText.style.display = 'none';
+            }
+        }
+
+        // 恢復原圖
+        function restoreBackground() {
+            if (currentIndex < 0) return;
+            if (!originalDataMap[currentIndex]) return;
+
+            images[currentIndex].data = originalDataMap[currentIndex];
+            bgRemovedMap[currentIndex] = false;
+
+            document.getElementById('currentEditThumb').src = originalDataMap[currentIndex];
+            updateBgRemovalUI(currentIndex);
+            updatePreview();
+            drawCanvas();
+            showToast('已恢復原圖');
+        }
+        
+        
+        // 移除圖片
+        function removeImage(index) {
+            images.splice(index, 1);
+            delete appliedTexts[index];
+            delete bgRemovedMap[index];
+            delete originalDataMap[index];
+            if (currentIndex >= images.length) {
+                currentIndex = images.length - 1;
+            }
+            if (currentIndex === -1) {
+                document.getElementById('noImageSelected').style.display = 'block';
+                document.getElementById('editTools').style.display = 'none';
+            }
+            updatePreview();
+            if (currentIndex >= 0) {
+                selectImage(currentIndex);
+            }
+            showToast('已移除圖片');
+        }
+        
+        // 繪製畫布
+        function drawCanvas() {
+            if (currentIndex < 0 || !images[currentIndex]) return;
+            
+            const canvas = document.getElementById('mainCanvas');
+            const ctx = canvas.getContext('2d');
+            const size = 320;
+            canvas.width = size;
+            canvas.height = size;
+            
+            // 繪製透明背景方格
+            ctx.clearRect(0, 0, size, size);
+            
+            // 繪製圖片
+            const img = new Image();
+            img.onload = function() {
+                const scale = Math.min(size / img.width, size / img.height);
+                const x = (size - img.width * scale) / 2;
+                const y = (size - img.height * scale) / 2;
+                
+                // 保持比例繪製
+                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                
+                // 繪製文字
+                const text = appliedTexts[currentIndex] || document.getElementById('stickerText').value;
+                if (text) {
+                    drawText(ctx, text, size, size);
+                }
+            };
+            img.src = images[currentIndex].data;
+        }
+        
+        // 繪製文字
+        function drawText(ctx, text, width, height) {
+            const pos = textStyle.position;
+            const fontSize = Math.min(width * 0.12, 36);
+            
+            ctx.font = \`\${textStyle.bold ? 'bold ' : ''}\${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif\`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            let y;
+            if (pos === 'top') y = height * 0.2;
+            else if (pos === 'center') y = height * 0.5;
+            else y = height * 0.85;
+            
+            // 陰影
+            if (textStyle.shadow) {
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+            } else {
+                ctx.shadowColor = 'transparent';
+            }
+            
+            // 外框
+            if (textStyle.outline) {
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = fontSize * 0.15;
+                ctx.strokeText(text, width / 2, y);
+            }
+            
+            // 填色
+            ctx.fillStyle = textStyle.color;
+            ctx.fillText(text, width / 2, y);
+            
+            // 重置陰影
+            ctx.shadowColor = 'transparent';
+        }
+        
+        // 套用文字
+        function applyText() {
+            const text = document.getElementById('stickerText').value;
+            if (currentIndex >= 0) {
+                appliedTexts[currentIndex] = text;
+                images[currentIndex].text = text;
+                showToast('文字已套用！');
+            }
+            drawCanvas();
+        }
+        
+        // 重置
+        function resetCanvas() {
+            if (currentIndex >= 0) {
+                appliedTexts[currentIndex] = '';
+                images[currentIndex].text = '';
+                document.getElementById('stickerText').value = '';
+                textStyle = { bold: false, shadow: false, outline: false, color: '#FFFFFF', position: 'bottom' };
+                
+                // 重置 UI
+                document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector('[data-pos="bottom"]').classList.add('active');
+                document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+                document.querySelector('.color-preset[data-color="#FFFFFF"]').classList.add('active');
+                document.getElementById('textColor').value = '#FFFFFF';
+                
+                drawCanvas();
+                showToast('已重置');
+            }
+        }
+        
+        // 切換粗體
+        function toggleBold() {
+            textStyle.bold = !textStyle.bold;
+            document.getElementById('boldBtn').classList.toggle('active', textStyle.bold);
+            drawCanvas();
+        }
+        
+        // 切換陰影
+        function toggleShadow() {
+            textStyle.shadow = !textStyle.shadow;
+            document.getElementById('shadowBtn').classList.toggle('active', textStyle.shadow);
+            drawCanvas();
+        }
+        
+        // 切換外框
+        function toggleOutline() {
+            textStyle.outline = !textStyle.outline;
+            document.getElementById('outlineBtn').classList.toggle('active', textStyle.outline);
+            drawCanvas();
+        }
+        
+        // 設定文字位置
+        function setTextPosition(pos) {
+            textStyle.position = pos;
+            document.querySelectorAll('[data-pos]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.pos === pos);
+            });
+            drawCanvas();
+        }
+        
+        // 尺寸按鈕
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentSize = parseInt(this.dataset.size);
+                if (currentIndex >= 0) {
+                    document.getElementById('currentEditSize').textContent = '尺寸: ' + currentSize + ' × ' + currentSize;
+                }
+            });
+        });
+        
+        // 顏色選擇
+        document.querySelectorAll('.color-preset').forEach(preset => {
+            preset.addEventListener('click', function() {
+                document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                textStyle.color = this.dataset.color;
+                document.getElementById('textColor').value = this.dataset.color;
+                drawCanvas();
+            });
+        });
+        
+        document.getElementById('textColor').addEventListener('input', function() {
+            textStyle.color = this.value;
+            document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+            drawCanvas();
+        });
+        
+        // 文字輸入即時預覽
+        document.getElementById('stickerText').addEventListener('input', function() {
+            appliedTexts[currentIndex] = this.value;
+            drawCanvas();
+        });
+        
+        // 生成所有貼圖
+        async function generateAll() {
+            if (images.length === 0) {
+                showToast('請先上傳圖片！', 'error');
+                return;
+            }
+            
+            showToast('正在生成所有貼圖...');
+            
+            const canvases = [];
+            
+            for (let i = 0; i < images.length; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.width = currentSize;
+                canvas.height = currentSize;
+                const ctx = canvas.getContext('2d');
+                
+                const img = new Image();
+                img.src = images[i].data;
+                await new Promise(resolve => img.onload = resolve);
+                
+                const scale = Math.min(currentSize / img.width, currentSize / img.height);
+                const x = (currentSize - img.width * scale) / 2;
+                const y = (currentSize - img.height * scale) / 2;
+                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                
+                const text = appliedTexts[i] || '';
+                if (text) {
+                    const fontSize = currentSize * 0.12;
+                    ctx.font = \`\${textStyle.bold ? 'bold ' : ''}\${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif\`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    let textY;
+                    if (textStyle.position === 'top') textY = currentSize * 0.2;
+                    else if (textStyle.position === 'center') textY = currentSize * 0.5;
+                    else textY = currentSize * 0.85;
+                    
+                    if (textStyle.shadow) {
+                        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                        ctx.shadowBlur = currentSize * 0.025;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                    }
+                    
+                    if (textStyle.outline) {
+                        ctx.strokeStyle = '#000000';
+                        ctx.lineWidth = fontSize * 0.15;
+                        ctx.strokeText(text, currentSize / 2, textY);
+                    }
+                    
+                    ctx.fillStyle = textStyle.color;
+                    ctx.fillText(text, currentSize / 2, textY);
+                }
+                
+                canvases.push({
+                    canvas: canvas,
+                    name: \`sticker_\${String(i + 1).padStart(3, '0')}.png\`
+                });
+            }
+            
+            // 生成資訊圖（第一張圖放大）
+            if (images.length > 0) {
+                const infoCanvas = document.createElement('canvas');
+                infoCanvas.width = 370;
+                infoCanvas.height = 320;
+                const ctx = infoCanvas.getContext('2d');
+                
+                const img = new Image();
+                img.src = images[0].data;
+                await new Promise(resolve => img.onload = resolve);
+                
+                const scale = Math.min(370 / img.width, 320 / img.height);
+                const x = (370 - img.width * scale) / 2;
+                const y = (320 - img.height * scale) / 2;
+                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                
+                canvases.push({
+                    canvas: infoCanvas,
+                    name: 'info.png'
+                });
+            }
+            
+            // 生成聊天圖示（第一張圖縮小）
+            if (images.length > 0) {
+                const iconCanvas = document.createElement('canvas');
+                iconCanvas.width = 110;
+                iconCanvas.height = 110;
+                const ctx = iconCanvas.getContext('2d');
+                
+                const img = new Image();
+                img.src = images[0].data;
+                await new Promise(resolve => img.onload = resolve);
+                
+                const scale = Math.min(110 / img.width, 110 / img.height);
+                const x = (110 - img.width * scale) / 2;
+                const y = (110 - img.height * scale) / 2;
+                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                
+                canvases.push({
+                    canvas: iconCanvas,
+                    name: 'icon.png'
+                });
+            }
+            
+            // 存入全域變數供下載使用
+            window.generatedStickers = canvases;
+            
+            showToast(\`已生成 \${canvases.length} 張貼圖！\`);
+            
+            // 更新預覽為第一張
+            if (images.length > 0) {
+                selectImage(0);
+            }
+        }
+        
+        // 下載所有貼圖
+        async function downloadAll() {
+            if (!window.generatedStickers || window.generatedStickers.length === 0) {
+                // 如果還沒生成，先生成
+                await generateAll();
+            }
+            
+            if (window.generatedStickers.length === 0) {
+                showToast('沒有可下載的貼圖！', 'error');
+                return;
+            }
+            
+            showToast('正在打包 ZIP...');
+            
+            const zip = new JSZip();
+            
+            window.generatedStickers.forEach(item => {
+                const dataUrl = item.canvas.toDataURL('image/png');
+                const base64 = dataUrl.split(',')[1];
+                zip.file(item.name, base64, { base64: true });
+            });
+            
+            const content = await zip.generateAsync({ type: 'blob' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = 'line_stickers_' + new Date().toISOString().slice(0, 10) + '.zip';
+            link.click();
+            
+            showToast('下載完成！');
+        }
+        
+        // 初始繪製
+        window.onload = function() {
+            // 繪製空白畫布
+            const canvas = document.getElementById('mainCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 320;
+            canvas.height = 320;
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, 320, 320);
+            ctx.fillStyle = '#666';
+            ctx.font = '16px "Noto Sans CJK TC"';
+            ctx.textAlign = 'center';
+            ctx.fillText('上傳圖片即可開始', 160, 160);
+        };
+    </script>
+</body>
+</html>
