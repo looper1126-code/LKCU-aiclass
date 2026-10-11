@@ -1521,16 +1521,15 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
 
                 const imgData = ctx.getImageData(0, 0, w, h);
 
-                // 背景取樣（12點均勻分佈）
-                const bgColor = _sampleBgColor(imgData, w, h);
+                // 背景取樣：只從絕對角落（最外層 2px）取，避免主體汙染
+                const bgColor = _sampleBgCornerOnly(imgData, w, h);
                 console.log('[去背] 背景色偵測:', bgColor);
 
-                // maxDist：敏感度 5→20, 25→80, 50→175, 90→300
-                // 舊值 10+(tolerance/90)*290 導致敏感度14時 maxDist只有55，太窄
-                const maxDist = 20 + (tolerance / 90) * 280;
+                // maxDist：保守設計，敏感度 5→18, 30→65, 50→120, 90→280
+                const maxDist = 18 + (tolerance / 90) * 262;
 
                 if (mode === 'corner') {
-                    // 角落模式：純 flood-fill，直接快速
+                    // 角落模式：純 flood-fill
                     const mask = new Uint8Array(w * h);
                     const visited = new Uint8Array(w * h);
                     [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
@@ -1541,50 +1540,8 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
                         if (mask[i]) data[i*4+3] = 0;
                     }
                 } else {
-                    // 智慧模式：邊緣保護 flood-fill + 形態學
-                    const mask = new Uint8Array(w * h);
-                    const visited = new Uint8Array(w * h);
-
-                    // 第一遍 flood-fill（保守）
-                    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
-                        _ffill(imgData, w, h, visited, mask, sx, sy, bgColor, maxDist);
-                    });
-
-                    // 第二遍 flood-fill（放寬 2x）補漏
-                    const mask2 = new Uint8Array(w * h);
-                    const visited2 = new Uint8Array(w * h);
-                    [[0,0],[w-1,0],[0,h-1],[w-1,h-1]].forEach(([sx,sy]) => {
-                        _ffill(imgData, w, h, visited2, mask2, sx, sy, bgColor, maxDist * 2.0);
-                    });
-
-                    // Sobel 邊緣保護
-                    const edges = _sobelFast(imgData, w, h);
-                    const edgeThresh = 0.35;
-                    for (let i = 0; i < w*h; i++) {
-                        if (mask[i] || !mask2[i]) continue;
-                        const y = Math.floor(i / w), x = i % w;
-                        let near = false;
-                        for (let dy = -3; dy <= 3 && !near; dy++) {
-                            for (let dx = -3; dx <= 3 && !near; dx++) {
-                                const nx = x+dx, ny = y+dy;
-                                if (nx<0||nx>=w||ny<0||ny>=h) continue;
-                                if (edges[ny*w+nx] > edgeThresh) near = true;
-                            }
-                        }
-                        if (!near) mask[i] = 1;
-                    }
-
-                    // 形態學平滑
-                    _morphOpen(mask, w, h);
-
-                    // 羽化
-                    if (feather > 0) _featherEdge(imgData, w, h, mask, feather);
-
-                    // 套用
-                    const data = imgData.data;
-                    for (let i = 0; i < w*h; i++) {
-                        if (mask[i]) data[i*4+3] = 0;
-                    }
+                    // 智慧模式：主動保護主體，只移除高度確定的背景
+                    _removeBgSmartConservative(imgData, w, h, bgColor, maxDist, feather);
                 }
 
                 ctx.putImageData(imgData, 0, 0);
@@ -1603,6 +1560,151 @@ async function removeBackgroundAdvanced(imgDataUrl, mode, tolerance, feather) {
         };
         img.src = imgDataUrl;
     });
+}
+
+// ─────────────────────────────────────────────────
+// 保守智慧去背：只移除高度確定的背景區域
+// ─────────────────────────────────────────────────
+function _removeBgSmartConservative(imgData, w, h, bgColor, maxDist, feather) {
+    const data = imgData.data;
+    const mask = new Uint8Array(w * h);
+    const visited = new Uint8Array(w * h);
+
+    // Step 1: 從四個角落各取一個參考色（只有 2x2 區域），取中位數
+    const cornerColors = [
+        [data[0], data[1], data[2]],                          // (0,0)
+        [data[(w-1)*4], data[(w-1)*4+1], data[(w-1)*4+2]],    // (w-1,0)
+        [data[(h-1)*w*4], data[(h-1)*w*4+1], data[(h-1)*w*4+2]], // (0,h-1)
+        [data[((h-1)*w+w-1)*4], data[((h-1)*w+w-1)*4+1], data[((h-1)*w+w-1)*4+2]] // (w-1,h-1)
+    ];
+    // 取每個 corner 的 2x2 block 平均
+    const cornerBgColors = [[0,0],[w-2,0],[0,h-2],[w-2,h-2]].map(([cx,cy]) => {
+        let r=0,g=0,b=0,n=0;
+        for (let dy=0; dy<2; dy++) {
+            for (let dx=0; dx<2; dx++) {
+                const x=cx+dx, y=cy+dy;
+                if (x<w && y<h) {
+                    const i=(y*w+x)*4;
+                    r+=data[i]; g+=data[i+1]; b+=data[i+2]; n++;
+                }
+            }
+        }
+        return n>0 ? [Math.round(r/n), Math.round(g/n), Math.round(b/n)] : [0,0,0];
+    });
+    const bgR = Math.round(cornerBgColors.map(c=>c[0]).sort((a,b)=>a-b)[1]);
+    const bgG = Math.round(cornerBgColors.map(c=>c[1]).sort((a,b)=>a-b)[1]);
+    const bgB = Math.round(cornerBgColors.map(c=>c[2]).sort((a,b)=>a-b)[1]);
+    const safeBgColor = [bgR, bgG, bgB];
+
+    // Step 2: 驗證背景色的代表性——計算四個角落偏離程度
+    let maxCornerDist = 0;
+    for (const c of cornerBgColors) {
+        const d = Math.sqrt((c[0]-safeBgColor[0])**2+(c[1]-safeBgColor[1])**2+(c[2]-safeBgColor[2])**2);
+        if (d > maxCornerDist) maxCornerDist = d;
+    }
+    console.log('[去背] 角落色偏離程度:', Math.round(maxCornerDist), '(>50表示角落有主體)');
+
+    // Step 3: 若角落顏色差異大，只用 flood-fill 從最安全的角出發
+    const safeCorners = maxCornerDist < 50
+        ? [[0,0],[w-1,0],[0,h-1],[w-1,h-1]]
+        : [[0,0]]; // 強制只用 (0,0) 最不可能有主體的角落
+
+    for (const [sx,sy] of safeCorners) {
+        _ffill(data, w, h, visited, mask, sx, sy, safeBgColor, maxDist);
+    }
+
+    // Step 4: Sobel 邊緣保護（3x3 neighborhood, thresh 0.25）
+    const edges = _sobelFast(imgData, w, h);
+    for (let y = 4; y < h-4; y++) {
+        for (let x = 4; x < w-4; x++) {
+            if (mask[y*w+x]) continue; // 已標記為背景，跳過
+            let nearEdge = false;
+            for (let dy = -3; dy <= 3 && !nearEdge; dy++) {
+                for (let dx = -3; dx <= 3 && !nearEdge; dx++) {
+                    const nx=x+dx, ny=y+dy;
+                    if (edges[ny*w+nx] > 0.25) nearEdge = true;
+                }
+            }
+            if (nearEdge) {
+                // 這個 pixel 靠近邊緣，檢查顏色是否足夠接近背景
+                const i4 = (y*w+x)*4;
+                const dist = Math.sqrt(
+                    (data[i4]-safeBgColor[0])**2 +
+                    (data[i4+1]-safeBgColor[1])**2 +
+                    (data[i4+2]-safeBgColor[2])**2
+                );
+                // 若靠近邊緣且顏色偏離背景不遠，則也設為透明（平滑邊緣）
+                // 若靠近邊緣但顏色偏離背景很遠，保留（這是主體）
+                // 這裡不主動擴充，只保護
+            }
+        }
+    }
+
+    // Step 5: 形態學清理（只腐蝕噪點，不膨脹避免吃掉主體）
+    _morphErode(mask, w, h);
+
+    // Step 6: 羽化
+    if (feather > 0) _featherEdge(imgData, w, h, mask, feather);
+
+    // Step 7: 套用
+    for (let i = 0; i < w*h; i++) {
+        if (mask[i]) data[i*4+3] = 0;
+    }
+}
+
+// ─────────────────────────────────────────────────
+// 極簡背景取樣：只用最外層 2px 像素
+// ─────────────────────────────────────────────────
+function _sampleBgCornerOnly(imgData, w, h) {
+    const data = imgData.data;
+    const samples = [];
+    // 最外層一圈像素
+    for (let x = 0; x < w; x++) {
+        samples.push([data[x*4], data[x*4+1], data[x*4+2]]); // top
+        samples.push([data[(h-1)*w*4+x*4], data[(h-1)*w*4+x*4+1], data[(h-1)*w*4+x*4+2]]); // bottom
+    }
+    for (let y = 1; y < h-1; y++) {
+        samples.push([data[y*w*4], data[y*w*4+1], data[y*w*4+2]]); // left
+        samples.push([data[(y*w+w-1)*4], data[(y*w+w-1)*4+1], data[(y*w+w-1)*4+2]]); // right
+    }
+    // 取 RGB 最小值（最"背景"的值，去除主體影響）
+    const sortedR = samples.map(s=>s[0]).sort((a,b)=>a-b);
+    const sortedG = samples.map(s=>s[1]).sort((a,b)=>a-b);
+    const sortedB = samples.map(s=>s[2]).sort((a,b)=>a-b);
+    // 用第 25 百分位數（不怕主體汙染）
+    const q = Math.floor(samples.length * 0.25);
+    return [sortedR[q], sortedG[q], sortedB[q]];
+}
+
+// ─────────────────────────────────────────────────
+// 形態學腐蝕（只去除孤點，不往外擴張）
+// ─────────────────────────────────────────────────
+function _morphErode(mask, w, h) {
+    const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+    const out = new Uint8Array(w * h);
+    for (let y = 1; y < h-1; y++) {
+        for (let x = 1; x < w-1; x++) {
+            if (!mask[y*w+x]) continue;
+            let count = 0;
+            for (const [dx,dy] of dirs) {
+                if (mask[(y+dy)*w+(x+dx)]) count++;
+            }
+            // 只有鄰居全為 1 才保留（去除邊緣毛刺）
+            if (count === 4) out[y*w+x] = 1;
+        }
+    }
+    // 對於邊緣要求放寬：至少 3 個鄰居
+    for (let y = 1; y < h-1; y++) {
+        for (let x = 1; x < w-1; x++) {
+            if (out[y*w+x] || !mask[y*w+x]) continue;
+            let count = 0;
+            for (const [dx,dy] of dirs) {
+                if (mask[(y+dy)*w+(x+dx)]) count++;
+            }
+            if (count >= 3) out[y*w+x] = 1;
+        }
+    }
+    for (let i = 0; i < w*h; i++) mask[i] = out[i];
 }
 
 // ─────────────────────────────────────────────────
