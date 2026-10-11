@@ -743,11 +743,11 @@
             images.forEach((img, index) => {
                 const item = document.createElement('div');
                 item.className = 'preview-item' + (index === currentIndex ? ' selected' : '');
-                item.innerHTML = \`
-                    <img src="\${img.data}" alt="貼圖\${index + 1}">
-                    <span class="number">\${index + 1}</span>
-                    <button class="remove-btn" onclick="event.stopPropagation(); removeImage(\${index})">×</button>
-                \`;
+                item.innerHTML = `
+                    <img src="${img.data}" alt="貼圖${index + 1}">
+                    <span class="number">${index + 1}</span>
+                    <button class="remove-btn" onclick="event.stopPropagation(); removeImage(${index})">×</button>
+                `;
                 item.onclick = () => selectImage(index);
                 grid.appendChild(item);
             });
@@ -924,7 +924,7 @@
             const pos = textStyle.position;
             const fontSize = Math.min(width * 0.12, 36);
             
-            ctx.font = \`\${textStyle.bold ? 'bold ' : ''}\${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif\`;
+            ctx.font = `${textStyle.bold ? 'bold ' : ''}${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
@@ -1083,7 +1083,7 @@
                 const text = appliedTexts[i] || '';
                 if (text) {
                     const fontSize = currentSize * 0.12;
-                    ctx.font = \`\${textStyle.bold ? 'bold ' : ''}\${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif\`;
+                    ctx.font = `${textStyle.bold ? 'bold ' : ''}${fontSize}px "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     
@@ -1111,7 +1111,7 @@
                 
                 canvases.push({
                     canvas: canvas,
-                    name: \`sticker_\${String(i + 1).padStart(3, '0')}.png\`
+                    name: `sticker_${String(i + 1).padStart(3, '0')}.png`
                 });
             }
             
@@ -1162,7 +1162,7 @@
             // 存入全域變數供下載使用
             window.generatedStickers = canvases;
             
-            showToast(\`已生成 \${canvases.length} 張貼圖！\`);
+            showToast(`已生成 ${canvases.length} 張貼圖！`);
             
             // 更新預覽為第一張
             if (images.length > 0) {
